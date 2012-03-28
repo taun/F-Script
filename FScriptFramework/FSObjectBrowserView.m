@@ -1202,7 +1202,7 @@ static NSMutableArray *customButtons = nil;
       }
     else*/  
 	
-#ifdef __LP64__
+#if OBJC_API_VERSION == 2
     unsigned methodCount; 
     Method *methods = class_copyMethodList(cls, &methodCount);
 	

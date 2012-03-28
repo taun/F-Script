@@ -1567,7 +1567,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     {
       for (i = 0; i < count; i++)
       {
-#ifdef __LP64__	
+#if OBJC_API_VERSION == 2
         if (class_getSuperclass(classes[i]) == object) [classNames addObject:NSStringFromClass(classes[i])];
 #else
         if (classes[i]->super_class == object) [classNames addObject:NSStringFromClass(classes[i])];
@@ -1582,7 +1582,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     
     [view addBlankRowToMatrix:m];
     
-#ifdef __LP64__	
+#if OBJC_API_VERSION == 2
     if (class_getSuperclass(object) == nil) [view addLabelAlone:@"This class is a root class" toMatrix:m];
     else [view addObject:class_getSuperclass((Class)object) withLabel:@"Superclass" toMatrix:m classLabel:@"" selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];
 #else

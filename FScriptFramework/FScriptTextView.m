@@ -60,7 +60,7 @@ static NSMutableCharacterSet *letterDigitUnderscoreCharacterSet;
       // Register class name 
       [completionStringSet addObject:NSStringFromClass(classes[j])];
     
-#ifdef __LP64__
+#if OBJC_API_VERSION == 2
     unsigned methodCount; 
     Method *methods;
 	  
