@@ -273,8 +273,14 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
           [openPanel setCanChooseDirectories:YES];
           [openPanel setTitle:@"Choose the directory that will become the F-Script repository"];
   
-          if([openPanel runModal] == NSOKButton) repositoryPath = [openPanel filename];
-          else                                   repositoryPath = nil; 
+          if([openPanel runModal] == NSOKButton)
+#ifdef MAC_OS_X_VERSION_10_6
+            repositoryPath = [[openPanel URL] path];
+#else
+            repositoryPath = [openPanel filename];
+#endif
+          else
+            repositoryPath = nil;
         }
         else repositoryPath = [NSHomeDirectory() stringByAppendingPathComponent:@"FScriptRepository"];
         

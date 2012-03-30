@@ -146,7 +146,7 @@
   
   if (![data writeToFile:operand atomically:YES]) 
     FSExecError([NSString stringWithFormat:@"failure while saving on file \"%@\"",[NSString stringWithString:operand]]);
-}  
+}
        
 - (void)save
 {
@@ -156,7 +156,11 @@
   //[panel setRequiredFileType:@"fsobject"];
   
   if ([panel runModal] == NSOKButton)
-    [self save:[panel filename]];
+#ifdef MAC_OS_X_VERSION_10_6
+      [self save:[[panel URL] path]]; 
+#else
+      [self save:[panel filename]];
+#endif
 }      
 
 - (void)throw

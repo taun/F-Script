@@ -248,7 +248,11 @@ static BOOL loadNonKeyedArchives;
   NSOpenPanel *openPanel = [NSOpenPanel openPanel];
   
   if([openPanel runModal] == NSOKButton) 
+#ifdef MAC_OS_X_VERSION_10_6
+      return [self load:[[openPanel URL] path]];
+#else
     return [self load:[openPanel filename]];
+#endif
   else  // cancel button
     return [FSVoid fsVoid];
 }  

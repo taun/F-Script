@@ -4251,7 +4251,11 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
           ADD_BOOL(          [o allowsMultipleSelection]          ,@"Allows multiple selection")
           ADD_BOOL(          [o canChooseDirectories]             ,@"Can choose directories")
           ADD_BOOL(          [o canChooseFiles]                   ,@"Can choose files")
+#ifdef MAC_OS_X_VERSION_10_6
+          ADD_OBJECTS(       [[o URLs] valueForKey:@"path"]       ,@"Filenames")
+#else
           ADD_OBJECTS(       [o filenames]                        ,@"Filenames")
+#endif
           ADD_BOOL(          [o resolvesAliases]                  ,@"Resolves aliases")
           ADD_OBJECTS(       [o URLs]                             ,@"URLs")
         }
@@ -4264,8 +4268,14 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
         ADD_BOOL(          [o canCreateDirectories]               ,@"Can create directories")
         ADD_BOOL(          [o canSelectHiddenExtension]           ,@"Can select hidden extension")
         ADD_OBJECT_NOT_NIL([o delegate]                           ,@"Delegate")
+#ifdef MAC_OS_X_VERSION_10_6
+        ADD_OBJECT(        [[o directoryURL] path]                ,@"Directory")
+        ADD_OBJECT(        [[o URL] path]                         ,@"Filename")
+#else
         ADD_OBJECT(        [o directory]                          ,@"Directory")
         ADD_OBJECT(        [o filename]                           ,@"Filename")
+#endif
+
         ADD_BOOL(          [o isExpanded]                         ,@"Is expanded")
         ADD_BOOL(          [o isExtensionHidden]                  ,@"Is extension hidden")
         ADD_OBJECT(        [o message]                            ,@"Message")

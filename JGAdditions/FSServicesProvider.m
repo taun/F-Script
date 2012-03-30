@@ -73,8 +73,12 @@ static id globalServicesProvider;
 }
 - (void)registerServerConnection:(NSString *)connectionName
 {
-  NSConnection *theConnection = [NSConnection defaultConnection]; // in current Thread
-  [theConnection setRootObject:self];
+#ifdef MAC_OS_X_VERSION_10_6
+    NSConnection *theConnection = [[NSConnection new] autorelease]; // in current Thread
+#else
+    NSConnection *theConnection = [NSConnection defaultConnection]; // in current Thread
+#endif
+    [theConnection setRootObject:self];
   if ([theConnection registerName:connectionName] == NO) {
     NSLog(@"Handle error.");
   }
