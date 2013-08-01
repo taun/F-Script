@@ -207,7 +207,8 @@
       NSString *selectorStr = [bl selectorStr];
       FSMsgContext *msgContext = [bl msgContext];
 
-      args[1] = (id)(selector ? selector : [FSCompiler selectorFromString:selectorStr]);
+      //args[1] = (id)(selector ? selector : [FSCompiler selectorFromString:selectorStr]);
+      args[1] = selectorStr;
 
       for (i = 1; i < count; i++)
       {

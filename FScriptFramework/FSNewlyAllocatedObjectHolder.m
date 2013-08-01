@@ -25,7 +25,7 @@
 
 - (NSString *)printString
 {
-  return [[@"Holder for a newly allocated " stringByAppendingString:NSStringFromClass(object->isa)] stringByAppendingString:@". Don't forget to initialize it (use an init... method) and to use the object returned by the init... method instead of this holder." ];
+  return [[@"Holder for a newly allocated " stringByAppendingString:NSStringFromClass([object class])] stringByAppendingString:@". Don't forget to initialize it (use an init... method) and to use the object returned by the init... method instead of this holder." ];
 }
 
 @end

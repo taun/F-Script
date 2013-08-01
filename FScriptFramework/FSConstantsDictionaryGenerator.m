@@ -34,15 +34,15 @@
 #import <IOBluetooth/objc/IOBluetoothHandsFreeGateway.h>
 #import <IOBluetooth/objc/IOBluetoothRFCOMMAudioController.h>
 #import <IOBluetoothUI/IOBluetoothUI.h>
-#import <JavaScriptCore/JavaScriptCore.h>
+//#import <JavaScriptCore/JavaScriptCore.h>
 //#import <JavaVM/JavaVM.h>
 #import <LatentSemanticMapping/LatentSemanticMapping.h>
 #import <Message/NSMailDelivery.h>
 //#import <OpenDirectory/OpenDirectory.h>
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/glu.h>
-#import <OpenGL/CGLProfilerFunctionEnum.h>
-#import <OpenGL/CGLProfiler.h>
+#import "CGLProfilerFunctionEnum.h"
+#import "CGLProfiler.h"
 #import <OpenGL/CGLRenderers.h>
 #import <OSAKit/OSAKit.h>
 #import <PreferencePanes/PreferencePanes.h>
@@ -59,8 +59,8 @@
 #import <SyncServices/SyncServices.h>
 #import <SystemConfiguration/SystemConfiguration.h>
 #import <WebKit/WebKit.h>
-#import <WebKit/WebJavaPlugIn.h>
-#import <XgridFoundation/XgridFoundation.h>
+//#import <WebKit/WebJavaPlugIn.h>
+//#import <XgridFoundation/XgridFoundation.h>
 
 #import "Number_fscript.h"
 #import "FSBoolean.h"

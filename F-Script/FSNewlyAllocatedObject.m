@@ -13,7 +13,7 @@
 
 - (NSString *)description
 {
-  return [[@"Proxy for a newly allocated " stringByAppendingString:NSStringFromClass(target->isa)] stringByAppendingString:@". Don't forget to initialize it and to use the object returned by the init... method instead of this proxy." ];
+  return [[@"Proxy for a newly allocated " stringByAppendingString:NSStringFromClass([target class])] stringByAppendingString:@". Don't forget to initialize it and to use the object returned by the init... method instead of this proxy." ];
 }
 
 - (void)forwardInvocation:(NSInvocation *)anInvocation

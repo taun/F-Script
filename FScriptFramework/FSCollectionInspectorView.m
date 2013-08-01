@@ -13,16 +13,31 @@
 #import "FSNumber.h"
 #import "FSNSString.h"
 #import "FSCollectionInspector.h"
+#import "FSCellBlock.h"
+
+// TODO: identifier change plan
+/*
+ TODO:
+ Plan: Subclass NSTableColumn to include an FSBlock property and use initWithFSBlock
+       Change FSBlock to include a string representation (asString) to use as column identifier.
+
+ AND
+  ** Subclass NSCell to store FSBlock then use custom cell for NSTableColumn header cell.
  
+ 
+ 
+ */
+
 static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
 
-static NSString *headerCellStringForBlock(FSBlock *block)
-{
-  NSString *key = FS_Block_keyOfSetValueForKeyMessage(block);
-  if (key) return key;
-  else     return [[block printString] substringFromIndex:[[block printString] hasPrefix:@"#"] ? 1 : 0];  
-}
- 
+// Moved to FSCellBlock class
+//static NSString *headerCellStringForBlock(FSBlock *block)
+//{
+//  NSString *key = FS_Block_keyOfSetValueForKeyMessage(block);
+//  if (key) return key;
+//  else     return [[block printString] substringFromIndex:[[block printString] hasPrefix:@"#"] ? 1 : 0];  
+//}
+
 @interface FSCollectionInspectorView(FSCollectionInspectorViewPrivateInternal)  // Methods declaration to let the compiler know
 - (void) filter;
 - (NSArray *)selectedColumnObjects;
@@ -106,13 +121,14 @@ static NSString *headerCellStringForBlock(FSBlock *block)
 - (IBAction)add:(id)sender 
 {
   FSBlock *defaultBlock = [[interpreter execute:@"#self"] result];
-    
+  FSCellBlock* headerCell = [FSCellBlock newCellBlockWithFSBlock: defaultBlock];
   // TODO: as of 10.7 the signature of NSTableColumn initWithIdentifier: has changed to
   // - (id)initWithIdentifier:(NSString *)identifier;
-  NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier:defaultBlock] autorelease];
+  NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier: [headerCell stringValue]] autorelease];
+  
   NSInteger newColumnIndex = [tableView numberOfColumns] > 0 && [[[tableView tableColumns] objectAtIndex:0] identifier] == externalColumnIdentifier ? 1 : 0;
   
-  [[column headerCell] setStringValue:headerCellStringForBlock(defaultBlock)];  
+  [column setHeaderCell: headerCell];
   [column setEditable:NO];
   [[column dataCell] setFont:[NSFont userFixedPitchFontOfSize:userFixedPitchFontSize()]];
   [[column dataCell] setDrawsBackground:NO];  
@@ -146,9 +162,15 @@ static NSString *headerCellStringForBlock(FSBlock *block)
 
 - (void)blockDidChange:(NSNotification *)notification 
 {
-  NSTableColumn *column = [tableView tableColumnWithIdentifier:[notification object]];
+  id notificationObject = [notification object];
   
-  [[column headerCell] setStringValue:headerCellStringForBlock([notification object])];
+  NSTableColumn *column = [tableView tableColumnWithIdentifier: notificationObject];
+  
+  NSAssert2([notificationObject isKindOfClass: [FSBlock class]], @"Notification object should be of class FSBlock instead %@ is class %@", notificationObject, NSStringFromClass([notificationObject class]));
+  
+  FSCellBlock* headerCell = [FSCellBlock newCellBlockWithFSBlock: notificationObject];
+  
+  [column setHeaderCell: headerCell];
 
   if (sortColumn == column) [self setSortColumn:nil];
   [self filter];
@@ -340,30 +362,42 @@ static NSString *headerCellStringForBlock(FSBlock *block)
 
 -(NSArray *) selectedColumnObjects  
 {
-  if ([tableView selectedColumn] == -1) return nil;
-  else
-  {
+  NSArray* resultArray = nil;
+  FSBlock* block = nil;
+  
+  if ([tableView selectedColumn] != -1)  {
     NSUInteger i;
     const NSUInteger count = [filteredSortedModelArray count];
     NSTableColumn *column = [[tableView tableColumns] objectAtIndex:[tableView selectedColumn]];
-    FSBlock *block = [column identifier];
+    
+    NSCell* headerCell = [column headerCell];
+    
+    
+    if ([headerCell isKindOfClass: [FSCellBlock class]]) {
+      block = [(FSCellBlock*)headerCell fsBlock];
+    }
+
     FSArray *objects = [FSArray arrayWithCapacity:count];
 
-    if ([column identifier] == externalColumnIdentifier) return [[filteredSortedExternals copy] autorelease];
-    
-    for (i = 0; i < count; i++)
-    {
-      FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:[filteredSortedModelArray objectAtIndex:i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
-      if (![interpreterResult isOK])
+    if ([column identifier] == externalColumnIdentifier){
+      resultArray = [[filteredSortedExternals copy] autorelease];
+    } else {
+      for (i = 0; i < count; i++)
       {
-        [interpreterResult inspectBlocksInCallStack];
-        NSBeginInformationalAlertSheet(@"An error occurred while computing the column's values", @"OK", nil, nil, [tableView window], nil, NULL, NULL, NULL, @"%@", [interpreterResult errorMessage]);
-        return nil;
+        FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:[filteredSortedModelArray objectAtIndex:i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
+        if (![interpreterResult isOK])
+        {
+          [interpreterResult inspectBlocksInCallStack];
+          NSBeginInformationalAlertSheet(@"An error occurred while computing the column's values", @"OK", nil, nil, [tableView window], nil, NULL, NULL, NULL, @"%@", [interpreterResult errorMessage]);
+          return nil;
+        }
+        [objects addObject:[interpreterResult result]];
       }
-      [objects addObject:[interpreterResult result]];
-    } 
-    return objects;
+      resultArray = objects;
+    }
+    
   }
+  return resultArray;
 }    
 
 - (void) setCollection:(id)theCollection interpreter:(FSInterpreter *)theInterpreter blocks:(NSArray *)blocks showExternals:(BOOL)showExternals
@@ -438,10 +472,12 @@ static NSString *headerCellStringForBlock(FSBlock *block)
     [column sizeToFit];
   }
   
-  for (NSUInteger i = 0, count = [blocks count]; i < count; i++)
-  { 
-    column = [[[NSTableColumn alloc] initWithIdentifier:[blocks objectAtIndex:i]] autorelease];
-    [[column headerCell] setStringValue:headerCellStringForBlock([blocks objectAtIndex:i])];  
+  for (NSUInteger i = 0, count = [blocks count]; i < count; i++) {
+    FSBlock* headerBlock = [blocks objectAtIndex:i];
+    FSCellBlock* headerCell = [FSCellBlock newCellBlockWithFSBlock: headerBlock];
+    // Check for class == FSCellBlock?
+    column = [[[NSTableColumn alloc] initWithIdentifier:[headerCell stringValue]] autorelease];
+    [column setHeaderCell: headerCell];
     [column setEditable:NO];
     [[column dataCell] setFont:[NSFont userFixedPitchFontOfSize:dataFontSize]];
     [[column dataCell] setDrawsBackground:NO];
@@ -528,8 +564,14 @@ static NSString *headerCellStringForBlock(FSBlock *block)
   {
     NSUInteger i;
     const NSUInteger count = [sortedModelArray count];
-    FSBlock *block = [column identifier];
-    FSArray *objects = [FSArray arrayWithCapacity:count];   
+    FSBlock *block = nil;
+    
+    NSCell* headerCell = [column headerCell];
+    if ([headerCell isKindOfClass:[FSCellBlock class]]) {
+      block = [(FSCellBlock*)headerCell fsBlock];
+    }
+
+    FSArray *objects = [FSArray arrayWithCapacity:count];
     
     for (i = 0; i < count; i++)
     {
@@ -593,8 +635,12 @@ static NSString *headerCellStringForBlock(FSBlock *block)
   
     if ([aTableColumn identifier] == externalColumnIdentifier) 
       object = [filteredSortedExternals objectAtIndex:rowIndex];
-    else   
-      object = [[aTableColumn identifier] value:[filteredSortedModelArray objectAtIndex:rowIndex]];
+    else {
+      NSCell* headerCell = [aTableColumn headerCell];
+      if ([headerCell isKindOfClass:[FSCellBlock class]] && [(FSCellBlock*)headerCell fsBlock]) {
+        object = [[(FSCellBlock*)headerCell fsBlock] value:[filteredSortedModelArray objectAtIndex:rowIndex]];
+      }
+    }
 
     if ([object isKindOfClass:[NSString class]]) result = object; // Because we don't want the quotes to appear.
     else result = printStringLimited(object, 500);
