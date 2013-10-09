@@ -73,7 +73,7 @@ static BOOL useMaxSize;
 
     for (i = 0, count = [identifiers count]; i < count; i++)
     {
-      NSString *completionCandidate = [identifiers objectAtIndex:i];
+      NSString *completionCandidate = identifiers[i];
       if ([completionCandidate hasPrefix:stringToComplete])
         [result addObject:completionCandidate];
     }
@@ -81,7 +81,7 @@ static BOOL useMaxSize;
   
   for (i = 0, count = [superResult count]; i < count; i++)
   {
-    [result addObject:[superResult objectAtIndex:i]];
+    [result addObject:superResult[i]];
   }
 
   if ([[self delegate] respondsToSelector:@selector(textView:completions:forPartialWordRange:indexOfSelectedItem:)])
@@ -367,7 +367,7 @@ static BOOL useMaxSize;
 {
   NSPasteboard *pb = [NSPasteboard pasteboardByFilteringTypesInPasteboard:[NSPasteboard  generalPasteboard]];
   
-  if ([pb availableTypeFromArray:[NSArray arrayWithObject:NSStringPboardType]] == NSStringPboardType)
+  if ([pb availableTypeFromArray:@[NSStringPboardType]] == NSStringPboardType)
   {
     NSMutableString *command = [[[pb stringForType:NSStringPboardType] mutableCopy] autorelease];
     

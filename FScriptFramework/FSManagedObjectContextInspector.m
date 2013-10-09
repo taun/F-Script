@@ -48,7 +48,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 {
   NSFetchRequest *request = [[[NSClassFromString(@"NSFetchRequest") alloc] init] autorelease];
   NSManagedObjectModel *objectModel = [[model persistentStoreCoordinator] managedObjectModel];
-  NSEntityDescription *entity = [[objectModel entitiesByName] objectForKey:[entityList titleOfSelectedItem]];
+  NSEntityDescription *entity = [objectModel entitiesByName][[entityList titleOfSelectedItem]];
   NSPredicate *predicate = nil;
   
   [request setEntity:entity];

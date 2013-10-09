@@ -267,7 +267,7 @@ static NSMutableArray *customButtons = nil;
     NSUserDefaults *defaults = [NSUserDefaults standardUserDefaults];
     NSMutableDictionary *registrationDict = [NSMutableDictionary dictionary];
         
-    [registrationDict setObject:[NSNumber numberWithDouble:[[NSFont userFixedPitchFontOfSize:-1] pointSize]] forKey:@"FScriptFontSize"];
+    registrationDict[@"FScriptFontSize"] = @([[NSFont userFixedPitchFontOfSize:-1] pointSize]);
     [defaults registerDefaults:registrationDict];
         
     NSManagedObjectClass = NSClassFromString(@"NSManagedObject");
@@ -338,8 +338,8 @@ static NSMutableArray *customButtons = nil;
   
   for (i = 0; i < 10; i++)
   { 
-    [defaults setObject:[[customButtons objectAtIndex:i] name] forKey:[NSString stringWithFormat:@"BigBrowserToolbarButtonCustom%dName",i+1]]; 
-    [defaults setObject:[NSKeyedArchiver archivedDataWithRootObject:[[customButtons objectAtIndex:i] block]] forKey:[NSString stringWithFormat:@"BigBrowserToolbarButtonCustom%dBlock",i+1]];
+    [defaults setObject:[customButtons[i] name] forKey:[NSString stringWithFormat:@"BigBrowserToolbarButtonCustom%dName",i+1]]; 
+    [defaults setObject:[NSKeyedArchiver archivedDataWithRootObject:[customButtons[i] block]] forKey:[NSString stringWithFormat:@"BigBrowserToolbarButtonCustom%dBlock",i+1]];
   } 
   [defaults synchronize];
 }
@@ -360,11 +360,11 @@ static NSMutableArray *customButtons = nil;
     NSString *valueLabel           = @"Value";
     NSString *optionsLabel         = @"Options";
     
-    id objectBound         = [infoForBinding objectForKey:NSObservedObjectKey];
-    NSString *keyPathBound = [infoForBinding objectForKey:NSObservedKeyPathKey];
+    id objectBound         = infoForBinding[NSObservedObjectKey];
+    NSString *keyPathBound = infoForBinding[NSObservedKeyPathKey];
     Class valueClass       = [object respondsToSelector:@selector(valueClassForBinding:)] ? [object valueClassForBinding:name] : nil;
     id value               = [objectBound valueForKeyPath:keyPathBound];  
-    NSDictionary *options  = [infoForBinding objectForKey:NSOptionsKey];
+    NSDictionary *options  = infoForBinding[NSOptionsKey];
   
     NSString *objectBoundString  = printString(objectBound);
     NSString *keyPathBoundString = keyPathBound;
@@ -425,7 +425,7 @@ static NSMutableArray *customButtons = nil;
           //cell = [matrix cellAtRow:[matrix numberOfRows]-1 column:0];  
           cell =  addRowToMatrix(matrix); 
           
-          value = [d objectForKey:key];
+          value = d[key];
           [cell setRepresentedObject:[FSAssociation associationWithKey:key value:value]];      
           objectString = [NSString stringWithFormat:@"    %@ -> %@",printStringLimited(key,50),printStringLimited(value,1000)];
           if ([objectString length] > 510) 
@@ -440,14 +440,14 @@ static NSMutableArray *customButtons = nil;
       }  
       else
       {
-        while ((key = [enumerator nextObject]) && !containsString(printString(key), filterString, NSCaseInsensitiveSearch) && !containsString(printString([d objectForKey:key]), filterString, NSCaseInsensitiveSearch) && !([d objectForKey:key] == selectedObject && [printString(key) isEqualToString:selectedLabel])); 
+        while ((key = [enumerator nextObject]) && !containsString(printString(key), filterString, NSCaseInsensitiveSearch) && !containsString(printString(d[key]), filterString, NSCaseInsensitiveSearch) && !(d[key] == selectedObject && [printString(key) isEqualToString:selectedLabel])); 
 
         if (key)
         {
           [self addLabel:label toMatrix:matrix];
           while (key) 
           {
-            value = [d objectForKey:key];
+            value = d[key];
             BOOL addingSelectedObject = (value == selectedObject && [printString(key) isEqualToString:selectedLabel]);
             if (containsString(printString(value), filterString, NSCaseInsensitiveSearch) || containsString(printString(key), filterString, NSCaseInsensitiveSearch) || addingSelectedObject)
             {
@@ -503,7 +503,7 @@ static NSMutableArray *customButtons = nil;
     
     if ([contextualizedBlock argumentCount] == 0)
     {
-      FSInterpreterResult *interpreterResult = [contextualizedBlock executeWithArguments:[NSArray array]];
+      FSInterpreterResult *interpreterResult = [contextualizedBlock executeWithArguments:@[]];
       
       if (![interpreterResult isOK])
       {
@@ -528,7 +528,7 @@ static NSMutableArray *customButtons = nil;
       [self selectMethodNamed:methodName];
       [browser setDelegate:self];
       
-      interpreterResult = [contextualizedBlock executeWithArguments:[NSArray arrayWithObject:selectedObject]];
+      interpreterResult = [contextualizedBlock executeWithArguments:@[selectedObject]];
     
       if ([interpreterResult isOK])
         [self fillMatrix:[browser matrixInColumn:[browser lastColumn]] withObject:[interpreterResult result]];
@@ -603,7 +603,7 @@ static NSMutableArray *customButtons = nil;
         [self addLabel:label toMatrix:matrix];
         for (i = 0; i < count; i++)
         { 
-          NSString *className = [classNames objectAtIndex:i];
+          NSString *className = classNames[i];
           [self addClassWithName:className toMatrix:matrix label:label classLabel:classLabel indentationLevel:1];
 
           if (selectedObject != nil && [selectedObject class] == selectedObject && [NSStringFromClass(selectedObject) isEqualToString:className] && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel])
@@ -613,17 +613,17 @@ static NSMutableArray *customButtons = nil;
       else
       {
         i = 0;
-        while (i < count && !containsString([classNames objectAtIndex:i], filterString, NSCaseInsensitiveSearch) && !(selectedObject != nil && [selectedObject class] == selectedObject && [NSStringFromClass(selectedObject) isEqualToString:[classNames objectAtIndex:i]] && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]))
+        while (i < count && !containsString(classNames[i], filterString, NSCaseInsensitiveSearch) && !(selectedObject != nil && [selectedObject class] == selectedObject && [NSStringFromClass(selectedObject) isEqualToString:classNames[i]] && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]))
           i++;
         if (i < count)
         {
           [self addLabel:label toMatrix:matrix];
           for (; i < count; i++)
           {
-            BOOL addingSelectedObject = (selectedObject != nil && [selectedObject class] == selectedObject && [NSStringFromClass(selectedObject) isEqualToString:[classNames objectAtIndex:i]] && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]);
-            if (containsString([classNames objectAtIndex:i], filterString, NSCaseInsensitiveSearch) || addingSelectedObject)
+            BOOL addingSelectedObject = (selectedObject != nil && [selectedObject class] == selectedObject && [NSStringFromClass(selectedObject) isEqualToString:classNames[i]] && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]);
+            if (containsString(classNames[i], filterString, NSCaseInsensitiveSearch) || addingSelectedObject)
             {
-              [self addClassWithName:[classNames objectAtIndex:i] toMatrix:matrix label:label classLabel:classLabel indentationLevel:1];
+              [self addClassWithName:classNames[i] toMatrix:matrix label:label classLabel:classLabel indentationLevel:1];
               if (addingSelectedObject)
                 [matrix selectCellAtRow:[matrix numberOfRows]-1 column:0];
             }
@@ -637,7 +637,7 @@ static NSMutableArray *customButtons = nil;
 - (void)addClassLabel:(NSString *)label toMatrix:(NSMatrix *)matrix color:(NSColor *)color
 {
   NSBrowserCell *cell;
-  NSDictionary *txtDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSForegroundColorAttributeName, color, NSBackgroundColorAttributeName, nil];
+  NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: color};
   NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict] autorelease];
 
   [self addBlankRowToMatrix:matrix];
@@ -712,7 +712,7 @@ static NSMutableArray *customButtons = nil;
   if ([object isKindOfClass:[FSNewlyAllocatedObjectHolder class]])
   {
     NSColor *txtColor = [NSColor purpleColor];
-    NSDictionary *txtDict = [NSDictionary dictionaryWithObjectsAndKeys:txtColor, NSForegroundColorAttributeName, nil];
+    NSDictionary *txtDict = @{NSForegroundColorAttributeName: txtColor};
     NSAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:cellString attributes:txtDict] autorelease];
     [cell setAttributedStringValue:attrStr];
   }
@@ -768,7 +768,7 @@ static NSMutableArray *customButtons = nil;
         [self addLabel:label toMatrix:matrix];
         for (i = 0; i < count; i++)
         { 
-          id object = [objects objectAtIndex:i];
+          id object = objects[i];
           [self addObject:object toMatrix:matrix label:label classLabel:classLabel];
           if (object == selectedObject && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel])
             [matrix selectCellAtRow:[matrix numberOfRows]-1 column:0];
@@ -777,17 +777,17 @@ static NSMutableArray *customButtons = nil;
       else
       {
         i = 0;
-        while (i < count && !containsString(printString([objects objectAtIndex:i]), filterString, NSCaseInsensitiveSearch) && !([objects objectAtIndex:i] == selectedObject && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]))
+        while (i < count && !containsString(printString(objects[i]), filterString, NSCaseInsensitiveSearch) && !(objects[i] == selectedObject && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]))
           i++;
         if (i < count)
         {
           [self addLabel:label toMatrix:matrix];
           for (; i < count; i++)
           {
-            BOOL addingSelectedObject = ([objects objectAtIndex:i] == selectedObject && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]);
-            if (containsString(printString([objects objectAtIndex:i]), filterString, NSCaseInsensitiveSearch) || addingSelectedObject)
+            BOOL addingSelectedObject = (objects[i] == selectedObject && [label isEqualToString:selectedLabel] && [classLabel isEqualToString:selectedClassLabel]);
+            if (containsString(printString(objects[i]), filterString, NSCaseInsensitiveSearch) || addingSelectedObject)
             {
-              [self addObject:[objects objectAtIndex:i] toMatrix:matrix label:label classLabel:classLabel];
+              [self addObject:objects[i] toMatrix:matrix label:label classLabel:classLabel];
               if (addingSelectedObject)
                 [matrix selectCellAtRow:[matrix numberOfRows]-1 column:0];
             }
@@ -801,7 +801,7 @@ static NSMutableArray *customButtons = nil;
 - (void)addPropertyLabel:(NSString *)label toMatrix:(NSMatrix *)matrix
 {
   NSBrowserCell *cell;
-  NSDictionary *txtDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSForegroundColorAttributeName, [NSColor redColor], NSBackgroundColorAttributeName, nil];
+  NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: [NSColor redColor]};
   NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict] autorelease];
 
   [self addBlankRowToMatrix:matrix];
@@ -875,7 +875,7 @@ static NSMutableArray *customButtons = nil;
     else if (nbarg == 0)
     {
       // NSBrowserCell *cell;
-      [self sendMessageTo:selectedObject selectorString:selectedString arguments:[NSArray array] putResultInMatrix:matrix];
+      [self sendMessageTo:selectedObject selectorString:selectedString arguments:@[] putResultInMatrix:matrix];
     
       /*if (cell = [matrix cellAtRow:0 column:0])
       {
@@ -922,7 +922,7 @@ static NSMutableArray *customButtons = nil;
       [cancelButton setKeyEquivalent:@"\e"];
       [[argumentsWindow contentView] addSubview:cancelButton];
       
-      if (nbarg == 1 && [[selectorComponents objectAtIndex:0] hasPrefix:@"operator_"]) 
+      if (nbarg == 1 && [selectorComponents[0] hasPrefix:@"operator_"]) 
       {
         const char *type = [signature getArgumentTypeAtIndex:2];
         NSString *typeDescription = humanReadableFScriptTypeDescriptionFromEncodedObjCType(type);
@@ -942,7 +942,7 @@ static NSMutableArray *customButtons = nil;
           
           if ([typeDescription length] > 0) typeDescription = [[@"(" stringByAppendingString:typeDescription] stringByAppendingString:@")"];
           
-          [f addEntry:[[[selectorComponents objectAtIndex:i] stringByAppendingString:@":"] stringByAppendingString:typeDescription]];
+          [f addEntry:[[selectorComponents[i] stringByAppendingString:@":"] stringByAppendingString:typeDescription]];
           [[f cellAtIndex:i] setStringValue:template];
         }
         
@@ -1031,7 +1031,7 @@ static NSMutableArray *customButtons = nil;
   
   for (NSInteger i = 0; i < count; i++)
   {
-    NSString *className = [classNames objectAtIndex:i];
+    NSString *className = classNames[i];
     if ([self hasEmptyFilterString] || containsString(className, filterString, NSCaseInsensitiveSearch) || (selectedObjectName != nil && [className isEqualToString:selectedObjectName]))
     {
       cell =  addRowToMatrix(matrix); 
@@ -1063,7 +1063,7 @@ static NSMutableArray *customButtons = nil;
 
   for (NSInteger i = 0; i < count; i++)
   {
-    NSString *identifier = [identifiers objectAtIndex:i];
+    NSString *identifier = identifiers[i];
     object = [interpreter objectForIdentifier:identifier found:NULL];
     NSString *objectPrintString = printStringForObjectBrowser(object);
     if ([self hasEmptyFilterString] || containsString(identifier, filterString, NSCaseInsensitiveSearch) || containsString(objectPrintString, filterString, NSCaseInsensitiveSearch) || (object == selectedObject && [identifier isEqualToString:selectedLabel]))
@@ -1179,7 +1179,7 @@ static NSMutableArray *customButtons = nil;
     NSInteger i,nb;
     FSObjectBrowserCell *cell;
     NSMutableArray *selectorStrings = [NSMutableArray arrayWithCapacity:400];
-    NSDictionary *txtDict = [NSDictionary dictionaryWithObjectsAndKeys:[NSColor whiteColor], NSForegroundColorAttributeName, [NSColor blueColor], NSBackgroundColorAttributeName, nil];
+    NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: [NSColor blueColor]};
     NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@ Methods  ", [cls printString]] attributes:txtDict] autorelease];
     [attrStr setAlignment:NSCenterTextAlignment range:NSMakeRange(0,[attrStr length])];
 
@@ -1240,7 +1240,7 @@ static NSMutableArray *customButtons = nil;
     
     [selectorStrings sortUsingFunction:FSCompareMethodsNamesForAlphabeticalOrder context:NULL];
     
-    for (i = 0, nb = [selectorStrings count]; i < nb; i++) [self fillMatrix:matrix withMethod:[selectorStrings objectAtIndex:i]];
+    for (i = 0, nb = [selectorStrings count]; i < nb; i++) [self fillMatrix:matrix withMethod:selectorStrings[i]];
     
     if (cls == [cls superclass])  // The NSProxy class return itself when asked for its superclass.
                                   // This would result in an infinite loop. This test work around this.
@@ -1475,7 +1475,7 @@ static NSMutableArray *customButtons = nil;
 
 - (void)menuWillSendAction:(NSNotification *)notification;
 {
-  NSMenuItem *item = [[notification userInfo] objectForKey: @"MenuItem"];
+  NSMenuItem *item = [notification userInfo][@"MenuItem"];
   selectedView = [item retain];
 }
 
@@ -1615,7 +1615,7 @@ static NSMutableArray *customButtons = nil;
     methodCells  = [[browser matrixInColumn:methodColumn] cells];
   }
   
-  while (i < count && !([[[methodCells objectAtIndex:i] stringValue] isEqualToString:methodName] && [[methodCells objectAtIndex:i] objectBrowserCellType] == FSOBMETHOD)) i++;
+  while (i < count && !([[methodCells[i] stringValue] isEqualToString:methodName] && [methodCells[i] objectBrowserCellType] == FSOBMETHOD)) i++;
   
   if (i < count) 
     [browser selectRow:i inColumn:methodColumn];
@@ -1846,7 +1846,7 @@ static NSMutableArray *customButtons = nil;
 {
   NSString *selectedString = [[browser selectedCell] stringValue];
   id selectedObject = [[browser loadedCellAtRow:0 column:[browser selectedColumn]] representedObject];
-  NSForm *f = [[[[sender window] contentView] subviews] objectAtIndex:0];
+  NSForm *f = [[[sender window] contentView] subviews][0];
   NSInteger nbarg = [f numberOfRows];
   FSArray *arguments = [FSArray arrayWithCapacity:nbarg]; // FSArray instead of NSMutableArray in order to support nil
   NSInteger i;
@@ -1916,7 +1916,7 @@ static NSMutableArray *customButtons = nil;
   if ([receiver isKindOfClass:[FSNewlyAllocatedObjectHolder class]]) receiver = [receiver object];      
   args[0] = receiver;
   args[1] = selectorStr;
-  for (i = 0; i < nbarg; i++) args[i+2] = [arguments objectAtIndex:i];
+  for (i = 0; i < nbarg; i++) args[i+2] = arguments[i];
     
   @try
   {

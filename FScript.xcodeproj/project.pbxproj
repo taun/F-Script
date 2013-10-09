@@ -3277,7 +3277,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "Info-FScriptFramework__Upgraded_.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.6.8;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lffi",
@@ -3288,6 +3288,7 @@
 				OTHER_REZFLAGS = "";
 				PRINCIPAL_CLASS = "";
 				PRODUCT_NAME = FScript;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -3313,7 +3314,7 @@
 				GCC_WARN_UNKNOWN_PRAGMAS = NO;
 				INFOPLIST_FILE = "Info-FScriptFramework__Upgraded_.plist";
 				INSTALL_PATH = "@executable_path/../Frameworks";
-				MACOSX_DEPLOYMENT_TARGET = 10.6;
+				MACOSX_DEPLOYMENT_TARGET = 10.6.8;
 				OTHER_CFLAGS = "";
 				OTHER_LDFLAGS = (
 					"-lffi",
@@ -3324,6 +3325,7 @@
 				OTHER_REZFLAGS = "";
 				PRINCIPAL_CLASS = "";
 				PRODUCT_NAME = FScript;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				SKIP_INSTALL = YES;
 				WARNING_CFLAGS = "-Wmost";
@@ -3348,6 +3350,7 @@
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = FSTest1;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -3371,6 +3374,7 @@
 				OTHER_LDFLAGS = "";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = FSTest1;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -3397,6 +3401,7 @@
 				OTHER_LDFLAGS = "-lffi";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = FSTest2;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -3421,6 +3426,7 @@
 				OTHER_LDFLAGS = "-lffi";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = FSTest2;
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;
@@ -3448,6 +3454,7 @@
 				OTHER_LDFLAGS = "-lffi";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = "F-Script";
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WRAPPER_EXTENSION = app;
 				ZERO_LINK = NO;
@@ -3484,6 +3491,7 @@
 				OTHER_LDFLAGS = "-lffi";
 				OTHER_REZFLAGS = "";
 				PRODUCT_NAME = "F-Script";
+				SDKROOT = macosx;
 				SECTORDER_FLAGS = "";
 				WARNING_CFLAGS = "-Wmost";
 				WRAPPER_EXTENSION = app;

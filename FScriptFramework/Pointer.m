@@ -108,8 +108,8 @@
   case 'L':  return [FSNumber numberWithDouble:((unsigned long *)cPointer)[index]];
   case 'f':  return [FSNumber numberWithDouble:((float *)cPointer)[index]];
   case 'd':  return [FSNumber numberWithDouble:((double *)cPointer)[index]];
-  case 'q':  return [NSNumber numberWithLongLong:((long long *)cPointer)[index]];
-  case 'Q':  return [NSNumber numberWithDouble:((unsigned long long *)cPointer)[index]];
+  case 'q':  return @(((long long *)cPointer)[index]);
+  case 'Q':  return @(((unsigned long long *)cPointer)[index]);
              //******************
              // The folowing would be better but NSNumber support for unsigned types is broken (at least in Mac OS X 10.3)
              // return [NSNumber numberWithUnsignedLongLong:((unsigned long long *)cPointer)[index]]; 

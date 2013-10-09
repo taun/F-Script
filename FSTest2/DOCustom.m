@@ -16,12 +16,12 @@
 
 - (byref NSArray*)getNSArrayByRef
 {
-  return [NSArray arrayWithObjects:[NSScanner scannerWithString:@"hello"], [NSProcessInfo processInfo], nil];
+  return @[[NSScanner scannerWithString:@"hello"], [NSProcessInfo processInfo]];
 }
 
 - (byref NSNumber*)getNSNumberByRef
 {
-  return [NSNumber numberWithDouble:30]; 
+  return @30.0; 
 }
 
 - (byref NSString*)getNSStringByRef

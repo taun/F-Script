@@ -154,7 +154,7 @@
 {
   if (!b)
   {
-    [results replaceObjectAtIndex:[results count]-1 withObject:[FSBoolean fsFalse]];
+    results[[results count]-1] = [FSBoolean fsFalse];
     [self addComment:[NSString stringWithFormat:@" assertCount = %ld (note: counting starts at zero)", (long)assertCount]];
   }
   assertCount++;
@@ -177,7 +177,7 @@
   
   if (!isException)
   {
-   [results replaceObjectAtIndex:[results count]-1 withObject:[FSBoolean fsFalse]];
+   results[[results count]-1] = [FSBoolean fsFalse];
    [self addComment:[NSString stringWithFormat:@" assertCount = %ld (note: counting starts at zero)", (long)assertCount]];
   }
   
@@ -223,13 +223,13 @@
   
   for (i = 0; i < [comments count]; i++)
   { 
-    if (![[comments objectAtIndex:i] isEqual:@""]) [(NSMutableString *)commentReport appendFormat:@"\n    %@ -> %@",[names objectAtIndex:i],[comments objectAtIndex:i]];
+    if (![comments[i] isEqual:@""]) [(NSMutableString *)commentReport appendFormat:@"\n    %@ -> %@",names[i],comments[i]];
   }
   if (![commentReport isEqual:@""]) commentReport = [@"Comments:" stringByAppendingString:commentReport];
   
   for (i = 0; i < [results count]; i++)
   { 
-    if ([[results objectAtIndex:i] isEqual:[FSBoolean fsFalse]]) [(NSMutableString *)errorReport appendFormat:@"%@ failed\n",[names objectAtIndex:i]];
+    if ([results[i] isEqual:[FSBoolean fsFalse]]) [(NSMutableString *)errorReport appendFormat:@"%@ failed\n",names[i]];
   }
   //if (![errorReport isEqual:@""]) errorReport = [@"Comments:" stringByAppendingString:commentReport];  
           
@@ -242,7 +242,7 @@
     double testTime = 0;
     for (i = 0; i < [times count]; i++)
     {
-      testTime += [[times objectAtIndex:i] doubleValue];
+      testTime += [times[i] doubleValue];
     }  
     return [NSString stringWithFormat:@"KTest OK !\nTestTime = %g\n%@", testTime, commentReport];
   }
@@ -604,13 +604,13 @@
   NSAffineTransform *nsatControl = [NSAffineTransform transform];
   [nsatControl setTransformStruct:(NSAffineTransformStruct){10, 55, 20, 56, 2, 3}];
   
-  NSArray *control = [NSArray arrayWithObjects:self, cl, [@"#between:and:" asBlock], [FSBoolean fsFalse], [FSBoolean fsTrue], [FSBoolean booleanWithBool:c1], 
-                     [NSNumber numberWithUnsignedChar:uc], [NSNumber numberWithShort:s1], [NSNumber numberWithUnsignedShort:us2], [NSNumber numberWithInt:i1],
-                     [NSNumber numberWithUnsignedInt:ui], [NSNumber numberWithLong:l2], [NSNumber numberWithUnsignedLong:ul], [NSNumber numberWithLongLong:ll1],
-                     [NSNumber numberWithUnsignedLongLong:ull], [NSNumber numberWithInteger:nsi1], [NSNumber numberWithUnsignedInteger:nsui],
-                     [NSNumber numberWithFloat:123], [NSNumber numberWithDouble:456], [NSNumber numberWithDouble:789], [NSValue valueWithRange:range],
+  NSArray *control = @[self, cl, [@"#between:and:" asBlock], [FSBoolean fsFalse], [FSBoolean fsTrue], [FSBoolean booleanWithBool:c1], 
+                     @(uc), @(s1), @(us2), @(i1),
+                     @(ui), @(l2), @(ul), @(ll1),
+                     @(ull), @(nsi1), @(nsui),
+                     @123.0f, @456.0, @789.0, [NSValue valueWithRange:range],
                      [NSValue valueWithPoint:point], [NSValue valueWithPoint:NSPointFromCGPoint(cgpoint)], [NSValue valueWithRect:rect], 
-                     [NSValue valueWithRect:NSRectFromCGRect(cgrect)], [NSValue valueWithSize:size], [NSValue valueWithSize:NSSizeFromCGSize(cgsize)], nsatControl, str, nil];
+                     [NSValue valueWithRect:NSRectFromCGRect(cgrect)], [NSValue valueWithSize:size], [NSValue valueWithSize:NSSizeFromCGSize(cgsize)], nsatControl, str];
   
   //NSLog(@"%@", [objects operator_equal:control]);
   

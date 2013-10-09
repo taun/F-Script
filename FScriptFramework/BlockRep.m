@@ -58,14 +58,14 @@
       [letterUnderscoreDollarCharacterSet addCharactersInString:@"_"];
       [letterUnderscoreDollarCharacterSet addCharactersInString:@"$"];
 
-      if ([letterUnderscoreDollarCharacterSet characterIsMember:[[selectorComponents objectAtIndex:0] characterAtIndex:0]])
+      if ([letterUnderscoreDollarCharacterSet characterIsMember:[selectorComponents[0] characterAtIndex:0]])
         for (i = 0, count = [selectorComponents count]; i < count; i++)
-          [selectorComponents replaceObjectAtIndex:i withObject:[[selectorComponents objectAtIndex:i] stringByAppendingString:@":"]];
+          selectorComponents[i] = [selectorComponents[i] stringByAppendingString:@":"];
       
-      return [[NSArray arrayWithObject:@"receiver"] arrayByAddingObjectsFromArray:selectorComponents];
+      return [@[@"receiver"] arrayByAddingObjectsFromArray:selectorComponents];
     }
-    else if (sel == (SEL)0) return [NSArray array];
-    else                    return [NSArray arrayWithObject:@"receiver"];                      
+    else if (sel == (SEL)0) return @[];
+    else                    return @[@"receiver"];                      
   }
   else
   {
@@ -152,7 +152,7 @@
       BlockStackElem      *blockStackElem = [BlockStackElem blockStackElemWithBlock:block errorStr:compilationResult->errorMessage firstCharIndex:compilationResult->errorFirstCharacterIndex lastCharIndex:compilationResult->errorLastCharacterIndex];
 
       [blockStack addObject:blockStackElem];
-      [userInfo setObject:blockStack forKey:@"FScriptBlockStack"]; 
+      userInfo[@"FScriptBlockStack"] = blockStack; 
       
 	  @throw [NSException exceptionWithName:FSExecutionErrorException reason:[NSString stringWithFormat:@"syntax error in a block: %@", compilationResult->errorMessage] userInfo:userInfo];      
 	}             
@@ -233,7 +233,7 @@
   @catch (NSException *exception)
   {
     NSDictionary   *userInfo   = [exception userInfo];
-    NSArray        *blockStack = [userInfo objectForKey:@"FScriptBlockStack"];
+    NSArray        *blockStack = userInfo[@"FScriptBlockStack"];
     
     if (blockStack)
     {
@@ -245,7 +245,7 @@
       }
       else
       {
-        BlockStackElem *blockStackElem = [blockStack objectAtIndex:0];
+        BlockStackElem *blockStackElem = blockStack[0];
         return [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange([blockStackElem firstCharIndex], 1+[blockStackElem lastCharIndex]-[blockStackElem firstCharIndex]) errorMessage:[blockStackElem errorStr] callStack:blockStack];
       }
     }
@@ -410,7 +410,7 @@
       && ((FSCNKeywordMessage *)ac)->receiver->nodeType == IDENTIFIER
       && ((FSCNKeywordMessage *)ac)->selector == @selector(valueForKey:) 
       && ((FSCNKeywordMessage *)ac)->pattern == nil
-      && [((FSCNIdentifier *)(((FSCNKeywordMessage *)ac)->receiver))->identifierString isEqualToString:[[self argumentsNames] objectAtIndex:0]]
+      && [((FSCNIdentifier *)(((FSCNKeywordMessage *)ac)->receiver))->identifierString isEqualToString:[self argumentsNames][0]]
       && ((FSCNKeywordMessage *)ac)->arguments[0]->nodeType == OBJECT
       && [((FSCNPrecomputedObject *)((FSCNKeywordMessage *)ac)->arguments[0])->object isKindOfClass:[NSString class]])
   {    
@@ -429,7 +429,7 @@
       if (   (ac->nodeType == UNARY_MESSAGE || ac->nodeType == BINARY_MESSAGE || ac->nodeType == KEYWORD_MESSAGE)
           && ((FSCNMessage *)ac)->receiver->nodeType == IDENTIFIER
           && ((FSCNMessage *)ac)->pattern == nil
-          && [((FSCNIdentifier *)(((FSCNMessage *)ac)->receiver))->identifierString isEqualToString:[[self argumentsNames] objectAtIndex:0]])
+          && [((FSCNIdentifier *)(((FSCNMessage *)ac)->receiver))->identifierString isEqualToString:[self argumentsNames][0]])
       {    
         return ((FSCNMessage *)ac)->selector;
       }   
@@ -548,10 +548,10 @@
     if (!(userInfo = [[exception userInfo] mutableCopy])) 
       userInfo = [NSMutableDictionary dictionaryWithCapacity:1];
     
-    if (!(blockStack = [userInfo objectForKey:@"FScriptBlockStack"]))
+    if (!(blockStack = userInfo[@"FScriptBlockStack"]))
     { // This blockStack will represent the callStack of blocks. We construct it in order to be able to have it when the exception is returned to the top level FSInterpreter (in order for example to provide it in the FSInterpreterResult) or to a block exception handler (see method -onException: of class Block to see how to use an exception handler at the F-Script language level)
       blockStack = [NSMutableArray array];
-      [userInfo setObject:blockStack forKey:@"FScriptBlockStack"]; 
+      userInfo[@"FScriptBlockStack"] = blockStack; 
     }  
     
     [blockStack addObject:[BlockStackElem blockStackElemWithBlock:block errorStr:FSErrorMessageFromException(exception) firstCharIndex:0 lastCharIndex:[selStr length]]];
@@ -628,8 +628,8 @@
   
     if (![arguments isKindOfClass:[FSArray class]] || [arguments isProxy])
     {
-      args[0] = [arguments objectAtIndex:0];
-      for (i = 1; i < nb; i++)  args[i+1] = [arguments objectAtIndex:i];
+      args[0] = arguments[0];
+      for (i = 1; i < nb; i++)  args[i+1] = arguments[i];
     }
     else 
     {

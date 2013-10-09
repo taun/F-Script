@@ -20,60 +20,60 @@ void FSConstantsInitialization(NSMutableDictionary *d)
     [d addEntriesFromDictionary:[NSKeyedUnarchiver unarchiveObjectWithFile:path]]; 
   } 
  
-  if (NSMultipleValuesMarker) [d setObject:NSMultipleValuesMarker forKey:@"NSMultipleValuesMarker"]; 
-  if (NSNoSelectionMarker)    [d setObject:NSNoSelectionMarker    forKey:@"NSNoSelectionMarker"]; 
-  if (NSNotApplicableMarker)  [d setObject:NSNotApplicableMarker  forKey:@"NSNotApplicableMarker"];
+  if (NSMultipleValuesMarker) d[@"NSMultipleValuesMarker"] = NSMultipleValuesMarker; 
+  if (NSNoSelectionMarker)    d[@"NSNoSelectionMarker"] = NSNoSelectionMarker; 
+  if (NSNotApplicableMarker)  d[@"NSNotApplicableMarker"] = NSNotApplicableMarker;
   
-  if (NSErrorMergePolicy)                      [d setObject:NSErrorMergePolicy                      forKey:@"NSErrorMergePolicy"]; 
-  if (NSMergeByPropertyStoreTrumpMergePolicy)  [d setObject:NSMergeByPropertyStoreTrumpMergePolicy  forKey:@"NSMergeByPropertyStoreTrumpMergePolicy"]; 
-  if (NSMergeByPropertyObjectTrumpMergePolicy) [d setObject:NSMergeByPropertyObjectTrumpMergePolicy forKey:@"NSMergeByPropertyObjectTrumpMergePolicy"]; 
-  if (NSOverwriteMergePolicy)                  [d setObject:NSOverwriteMergePolicy                  forKey:@"NSOverwriteMergePolicy"]; 
-  if (NSRollbackMergePolicy)                   [d setObject:NSRollbackMergePolicy                   forKey:@"NSRollbackMergePolicy"]; 
+  if (NSErrorMergePolicy)                      d[@"NSErrorMergePolicy"] = NSErrorMergePolicy; 
+  if (NSMergeByPropertyStoreTrumpMergePolicy)  d[@"NSMergeByPropertyStoreTrumpMergePolicy"] = NSMergeByPropertyStoreTrumpMergePolicy; 
+  if (NSMergeByPropertyObjectTrumpMergePolicy) d[@"NSMergeByPropertyObjectTrumpMergePolicy"] = NSMergeByPropertyObjectTrumpMergePolicy; 
+  if (NSOverwriteMergePolicy)                  d[@"NSOverwriteMergePolicy"] = NSOverwriteMergePolicy; 
+  if (NSRollbackMergePolicy)                   d[@"NSRollbackMergePolicy"] = NSRollbackMergePolicy; 
  
-  [d setObject:[NSNumber numberWithUnsignedLongLong:NSNotFound]   forKey:@"NSNotFound"];
-  [d setObject:[NSNumber numberWithLong:NSIntegerMax]             forKey:@"NSIntegerMax"];
-  [d setObject:[NSNumber numberWithLong:NSIntegerMin]             forKey:@"NSIntegerMin"];
-  [d setObject:[NSNumber numberWithUnsignedLong:NSUIntegerMax]    forKey:@"NSUIntegerMax"];
-  [d setObject:[NSNumber numberWithLong:NSUndefinedDateComponent] forKey:@"NSUndefinedDateComponent"];
+  d[@"NSNotFound"] = @(NSNotFound);
+  d[@"NSIntegerMax"] = @NSIntegerMax;
+  d[@"NSIntegerMin"] = @NSIntegerMin;
+  d[@"NSUIntegerMax"] = @NSUIntegerMax;
+  d[@"NSUndefinedDateComponent"] = @(NSDateComponentUndefined);
   
 #ifdef __LP64__
   // 64-bit code
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:(CGFloat *)NSFontIdentityMatrix freeWhenDone:NO type:"d"] autorelease] forKey:@"NSFontIdentityMatrix"];
+  d[@"NSFontIdentityMatrix"] = [[[FSGenericPointer alloc] initWithCPointer:(CGFloat *)NSFontIdentityMatrix freeWhenDone:NO type:"d"] autorelease];
 #else
   // 32-bit code
   [d setObject:[[[FSGenericPointer alloc] initWithCPointer:(CGFloat *)NSFontIdentityMatrix freeWhenDone:NO type:"f"] autorelease] forKey:@"NSFontIdentityMatrix"];
 #endif
 
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceIsPrivateKey       freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioAggregateDeviceIsPrivateKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceMasterSubDeviceKey freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioAggregateDeviceMasterSubDeviceKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceNameKey            freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioAggregateDeviceNameKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceSubDeviceListKey   freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioAggregateDeviceSubDeviceListKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceUIDKey             freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioAggregateDeviceUIDKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioHardwareRunLoopMode               freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioHardwareRunLoopMode"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceDriftCompensationKey     freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceDriftCompensationKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraInputLatencyKey     freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceExtraInputLatencyKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraOutputLatencyKey    freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceExtraOutputLatencyKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceInputChannelsKey         freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceInputChannelsKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceNameKey                  freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceNameKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceOutputChannelsKey        freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceOutputChannelsKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceUIDKey                   freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceUIDKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceDriftCompensationKey     freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceDriftCompensationKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraInputLatencyKey     freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceExtraInputLatencyKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraOutputLatencyKey    freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceExtraOutputLatencyKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceInputChannelsKey         freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceInputChannelsKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceNameKey                  freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceNameKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceOutputChannelsKey        freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceOutputChannelsKey"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceUIDKey                   freeWhenDone:NO type:"c"] autorelease] forKey:@"kAudioSubDeviceUIDKey"];
+  d[@"kAudioAggregateDeviceIsPrivateKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceIsPrivateKey       freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioAggregateDeviceMasterSubDeviceKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceMasterSubDeviceKey freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioAggregateDeviceNameKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceNameKey            freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioAggregateDeviceSubDeviceListKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceSubDeviceListKey   freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioAggregateDeviceUIDKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioAggregateDeviceUIDKey             freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioHardwareRunLoopMode"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioHardwareRunLoopMode               freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceDriftCompensationKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceDriftCompensationKey     freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceExtraInputLatencyKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraInputLatencyKey     freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceExtraOutputLatencyKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraOutputLatencyKey    freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceInputChannelsKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceInputChannelsKey         freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceNameKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceNameKey                  freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceOutputChannelsKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceOutputChannelsKey        freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceUIDKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceUIDKey                   freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceDriftCompensationKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceDriftCompensationKey     freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceExtraInputLatencyKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraInputLatencyKey     freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceExtraOutputLatencyKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceExtraOutputLatencyKey    freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceInputChannelsKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceInputChannelsKey         freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceNameKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceNameKey                  freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceOutputChannelsKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceOutputChannelsKey        freeWhenDone:NO type:"c"] autorelease];
+  d[@"kAudioSubDeviceUIDKey"] = [[[FSGenericPointer alloc] initWithCPointer:kAudioSubDeviceUIDKey                   freeWhenDone:NO type:"c"] autorelease];
 
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kCharsetStringISO88591         freeWhenDone:NO type:"c"] autorelease] forKey:@"kCharsetStringISO88591"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kCharsetStringUTF8             freeWhenDone:NO type:"c"] autorelease] forKey:@"kCharsetStringUTF8"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kEncodingString8Bit            freeWhenDone:NO type:"c"] autorelease] forKey:@"kEncodingString8Bit"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kEncodingStringBase64          freeWhenDone:NO type:"c"] autorelease] forKey:@"kEncodingStringBase64"];
-  [d setObject:[[[FSGenericPointer alloc] initWithCPointer:kEncodingStringQuotedPrintable freeWhenDone:NO type:"c"] autorelease] forKey:@"kEncodingStringQuotedPrintable"];
+  d[@"kCharsetStringISO88591"] = [[[FSGenericPointer alloc] initWithCPointer:kCharsetStringISO88591         freeWhenDone:NO type:"c"] autorelease];
+  d[@"kCharsetStringUTF8"] = [[[FSGenericPointer alloc] initWithCPointer:kCharsetStringUTF8             freeWhenDone:NO type:"c"] autorelease];
+  d[@"kEncodingString8Bit"] = [[[FSGenericPointer alloc] initWithCPointer:kEncodingString8Bit            freeWhenDone:NO type:"c"] autorelease];
+  d[@"kEncodingStringBase64"] = [[[FSGenericPointer alloc] initWithCPointer:kEncodingStringBase64          freeWhenDone:NO type:"c"] autorelease];
+  d[@"kEncodingStringQuotedPrintable"] = [[[FSGenericPointer alloc] initWithCPointer:kEncodingStringQuotedPrintable freeWhenDone:NO type:"c"] autorelease];
 
-  [d setObject:[NSValue valueWithPoint:NSZeroPoint] forKey:@"NSZeroPoint"];
-  [d setObject:[NSValue valueWithRect:NSZeroRect]   forKey:@"NSZeroRect"];
-  [d setObject:[NSValue valueWithSize:NSZeroSize]   forKey:@"NSZeroSize"];
+  d[@"NSZeroPoint"] = [NSValue valueWithPoint:NSZeroPoint];
+  d[@"NSZeroRect"] = [NSValue valueWithRect:NSZeroRect];
+  d[@"NSZeroSize"] = [NSValue valueWithSize:NSZeroSize];
 
   // NSLog(@"constantsDictionary count = %lu", (unsigned long)[d count]);
 }

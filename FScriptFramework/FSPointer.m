@@ -121,7 +121,7 @@ void FSPointer_validateDereferencingWithSelector_index(FSPointer *s, SEL selecto
   else return nil;
 }
 
-- (NSNumber *) address { return [NSNumber numberWithUnsignedInteger:(NSUInteger)cPointer]; }
+- (NSNumber *) address { return @((NSUInteger)cPointer); }
 
 - (void *)cPointer { return cPointer; }  
 

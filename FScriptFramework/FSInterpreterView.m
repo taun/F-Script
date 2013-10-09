@@ -35,7 +35,7 @@ static BOOL isEmpty(NSString *str)
   //NSLog(@"FSInterpreterView +initialize");
   NSMutableDictionary *registrationDict = [NSMutableDictionary dictionary];
 
-  [registrationDict setObject:[NSNumber numberWithDouble:[[NSFont userFixedPitchFontOfSize:-1] pointSize]] forKey:@"FScriptFontSize"];
+  registrationDict[@"FScriptFontSize"] = @([[NSFont userFixedPitchFontOfSize:-1] pointSize]);
   [[NSUserDefaults standardUserDefaults] registerDefaults:registrationDict];
 }
 
@@ -43,7 +43,7 @@ static BOOL isEmpty(NSString *str)
 
 - (BOOL)acceptsFirstResponder {return YES;}
 
-- (BOOL)becomeFirstResponder {[[self window] performSelector:@selector(makeFirstResponder:) withObject:[[[[self cliView] subviews] objectAtIndex:0] documentView] afterDelay:0]; return YES;}
+- (BOOL)becomeFirstResponder {[[self window] performSelector:@selector(makeFirstResponder:) withObject:[[[self cliView] subviews][0] documentView] afterDelay:0]; return YES;}
 
 /////////////////
 
@@ -270,7 +270,7 @@ static BOOL isEmpty(NSString *str)
 
 - (CLIView *)cliView
 {
-  return [[self subviews] objectAtIndex:0];
+  return [self subviews][0];
 }
 
 @end

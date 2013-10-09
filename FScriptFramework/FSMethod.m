@@ -401,7 +401,7 @@ void fscript_setDynamicIvarNames(Class class, NSSet *ivarNames)
         }
         
         if (j < [methodHolders count]) 
-          [[methodHolders objectAtIndex:j] setMethod:self];
+          [methodHolders[j] setMethod:self];
         else                           
         {
           FSMethodHolder *holder = [[[FSMethodHolder alloc] initWithMethod:self] autorelease];
@@ -546,7 +546,7 @@ void fscript_setDynamicIvarNames(Class class, NSSet *ivarNames)
   typesByArgument = NSAllocateCollectable(argumentCount * sizeof(char *), NSScannedOption);
   for (NSUInteger i = 0; i < argumentCount; i++)
   {
-    NSString *type = [theTypesByArgument objectAtIndex:i];
+    NSString *type = theTypesByArgument[i];
     NSUInteger typeLength = [type lengthOfBytesUsingEncoding:NSUTF8StringEncoding]+1;
     typesByArgument[i] = NSAllocateCollectable(typeLength, 0);
     [type getCString:typesByArgument[i] maxLength:typeLength encoding:NSUTF8StringEncoding];

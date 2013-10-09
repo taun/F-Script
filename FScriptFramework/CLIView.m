@@ -56,7 +56,7 @@ the commands entered by the user and the results of those commands etc.
   BOOL shouldRetainCommandHandler = [self shouldRetainCommandHandler] ;
   id _commandHandler = [self commandHandler];
  
-  sub = [[[self subviews] objectAtIndex:0] retain];   // I can't encode the shellView since its superclass
+  sub = [[self subviews][0] retain];   // I can't encode the shellView since its superclass
                                                       // (NSTextView) doesn't 
                                                       // comforms to NSCoding (note: this is true under 
                                                       // OpenStep, it seems to have changed with OSX) 
@@ -165,7 +165,7 @@ the commands entered by the user and the results of those commands etc.
 
 - (ShellView *)shellView
 {
-  return [[[self subviews] objectAtIndex:0] documentView];
+  return [[self subviews][0] documentView];
 }
 
 @end

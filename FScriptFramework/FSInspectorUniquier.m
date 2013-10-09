@@ -29,7 +29,7 @@ static NSMutableArray *inspectors;
 {
   NSUInteger index = [inspectedObjects indexOfObject:inspectedObject];
   if (index == NSNotFound) return nil;
-  else return [inspectors objectAtIndex:index];
+  else return inspectors[index];
 }
 
 + (void)removeEntryForInspector:(id)inspector

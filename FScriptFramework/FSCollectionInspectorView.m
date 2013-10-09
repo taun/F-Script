@@ -62,7 +62,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   
   for (i = 0, count = [propertyKeys count]; i < count; i++)
   {
-     NSMutableString *encodedPropertyKey = [[[propertyKeys objectAtIndex:i] mutableCopy] autorelease];
+     NSMutableString *encodedPropertyKey = [[propertyKeys[i] mutableCopy] autorelease];
      [encodedPropertyKey replaceOccurrencesOfString:@"'" withString:@"''" options:0 range:NSMakeRange(0, [encodedPropertyKey length])];
      
      NSString *blockString = [NSString stringWithFormat:@"[:object| object valueForKey:'%@']", encodedPropertyKey];
@@ -113,7 +113,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     [tableView setRowHeight:dataFontSize + 4];
     if ([tableView respondsToSelector:@selector(setGridStyleMask:)]) [tableView setGridStyleMask:NSTableViewSolidVerticalGridLineMask];
 
-    [self setCollection:[NSArray array] interpreter:[FSInterpreter interpreter] blocks:[NSArray array] showExternals:YES];   
+    [self setCollection:@[] interpreter:[FSInterpreter interpreter] blocks:@[] showExternals:YES];   
   }
   return self;
 }
@@ -126,7 +126,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   // - (id)initWithIdentifier:(NSString *)identifier;
   NSTableColumn *column = [[[NSTableColumn alloc] initWithIdentifier: [headerCell stringValue]] autorelease];
   
-  NSInteger newColumnIndex = [tableView numberOfColumns] > 0 && [[[tableView tableColumns] objectAtIndex:0] identifier] == externalColumnIdentifier ? 1 : 0;
+  NSInteger newColumnIndex = [tableView numberOfColumns] > 0 && [[tableView tableColumns][0] identifier] == externalColumnIdentifier ? 1 : 0;
   
   [column setHeaderCell: headerCell];
   [column setEditable:NO];
@@ -156,7 +156,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   NSInteger row = [tableView selectedRow];
   NSArray *objects;
 
-  if (row != -1) [interpreter browse:[filteredSortedModelArray objectAtIndex:row]];
+  if (row != -1) [interpreter browse:filteredSortedModelArray[row]];
   else if ((objects = [self selectedColumnObjects])) [interpreter browse:objects];  
 }
 
@@ -181,7 +181,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
 {
   if ([model isKindOfClass:[NSArray class]])
   {
-    [self setSortedExternals:[[NSNumber numberWithUnsignedInteger:[(NSArray *)model count]] iota]];
+    [self setSortedExternals:[@([(NSArray *)model count]) iota]];
     [self setSortedModelArray:model];
   }
   else if ([model isKindOfClass:[NSDictionary class]])
@@ -190,7 +190,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     NSMutableArray *newSortedModelArray = [NSMutableArray arrayWithCapacity:[model count]];
     [self setSortedExternals:[model allKeys]];
     for (i = 0, count = [sortedExternals count]; i < count; i++)
-      [newSortedModelArray addObject:[model objectForKey:[sortedExternals objectAtIndex:i]]];
+      [newSortedModelArray addObject:model[sortedExternals[i]]];
     
     [self setSortedModelArray:newSortedModelArray];    
   }
@@ -200,7 +200,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     NSMutableArray *newSortedExternals = [NSMutableArray arrayWithCapacity:[model count]];
     [self setSortedModelArray:[model allObjects]];
     for (i = 0, count = [sortedModelArray count]; i < count; i++)
-      [newSortedExternals addObject:[FSNumber numberWithDouble:[model countForObject:[sortedModelArray objectAtIndex:i]]]];
+      [newSortedExternals addObject:[FSNumber numberWithDouble:[model countForObject:sortedModelArray[i]]]];
     
     [self setSortedExternals:newSortedExternals];
   }
@@ -245,15 +245,15 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     {
       for (columnIndex = 0; columnIndex < numberOfColumns; columnIndex++)
       {
-        id currentString = [self tableView:tableView objectValueForTableColumn:[columns objectAtIndex:columnIndex] row:rowIndex];
+        id currentString = [self tableView:tableView objectValueForTableColumn:columns[columnIndex] row:rowIndex];
         if ([currentString isKindOfClass:NSAttributedStringClass]) currentString = [currentString string];
         if (containsString(currentString, filterString, NSCaseInsensitiveSearch))
           break;
       }
       if (columnIndex < numberOfColumns)
       {
-        [newFilteredSortedExternals  addObject:[sortedExternals objectAtIndex:rowIndex]];
-        [newFilteredSortedModelArray addObject:[sortedModelArray objectAtIndex:rowIndex]];
+        [newFilteredSortedExternals  addObject:sortedExternals[rowIndex]];
+        [newFilteredSortedModelArray addObject:sortedModelArray[rowIndex]];
       } 
     }
     [self setFilteredSortedExternals:newFilteredSortedExternals];
@@ -275,7 +275,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
 {
   if ([tableView numberOfSelectedRows] == 1)
   {
-    inspect([filteredSortedModelArray objectAtIndex:[tableView selectedRow]], interpreter, nil);
+    inspect(filteredSortedModelArray[[tableView selectedRow]], interpreter, nil);
   }
   else if ([tableView numberOfSelectedColumns] == 1)
   {  
@@ -287,9 +287,9 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
 {
   NSInteger i = [tableView selectedColumn]; 
   
-  if (i != -1 && [[[tableView tableColumns] objectAtIndex:i] identifier] != externalColumnIdentifier)
+  if (i != -1 && [[tableView tableColumns][i] identifier] != externalColumnIdentifier)
   {
-    [(id)[[[tableView tableColumns] objectAtIndex:i] identifier] inspect];
+    [(id)[[tableView tableColumns][i] identifier] inspect];
   }
 }
 
@@ -342,7 +342,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   
   if (i != -1 && [tableView numberOfColumns] > 1)
   {
-    NSTableColumn *column = [[tableView tableColumns] objectAtIndex:i];
+    NSTableColumn *column = [tableView tableColumns][i];
     [[NSNotificationCenter defaultCenter] removeObserver:self name:@"BlockDidChangeNotification" object:[column identifier]];
     [tableView removeTableColumn:column];
     [tableView sizeLastColumnToFit];
@@ -368,7 +368,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   if ([tableView selectedColumn] != -1)  {
     NSUInteger i;
     const NSUInteger count = [filteredSortedModelArray count];
-    NSTableColumn *column = [[tableView tableColumns] objectAtIndex:[tableView selectedColumn]];
+    NSTableColumn *column = [tableView tableColumns][[tableView selectedColumn]];
     
     NSCell* headerCell = [column headerCell];
     
@@ -384,7 +384,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     } else {
       for (i = 0; i < count; i++)
       {
-        FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:[filteredSortedModelArray objectAtIndex:i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
+        FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:filteredSortedModelArray[i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
         if (![interpreterResult isOK])
         {
           [interpreterResult inspectBlocksInCallStack];
@@ -410,7 +410,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   [theInterpreter retain]; [interpreter release]; interpreter = theInterpreter;
   
   while ([[tableView tableColumns] count] > 0)
-    [tableView removeTableColumn:[[tableView tableColumns] objectAtIndex:0]];
+    [tableView removeTableColumn:[tableView tableColumns][0]];
  
   if (blocks == nil)
   {
@@ -429,22 +429,22 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
       count = [objects count];
       i = 0;
       
-      if (count > 0 && [[objects objectAtIndex:0] isKindOfClass:NSManagedObjectClass]) 
+      if (count > 0 && [objects[0] isKindOfClass:NSManagedObjectClass]) 
       {
-        entityName = [[[objects objectAtIndex:0] entity] name];
+        entityName = [[objects[0] entity] name];
 
         // We don't use an NSEnumerator because our collection may be an FSArray containing nil.
         for (i = 1; i  < count; i++)
         {
-          element  = [objects objectAtIndex:i];
+          element  = objects[i];
           if (![element isKindOfClass:NSManagedObjectClass] || ![[[element entity] name] isEqualToString:entityName]) 
             break;
         }
       }  
       
-      if (count > 0 && i == count) blocks = [[self class] blocksForEntity:[[objects objectAtIndex:0] entity] interpreter:interpreter];
+      if (count > 0 && i == count) blocks = [[self class] blocksForEntity:[objects[0] entity] interpreter:interpreter];
     }
-    if (blocks == nil) blocks = [NSArray arrayWithObject:[[interpreter execute:@"#self"] result]];
+    if (blocks == nil) blocks = @[[[interpreter execute:@"#self"] result]];
   }
   
   if (showExternals && ([model isKindOfClass:[NSArray class]] || [model isKindOfClass:[NSDictionary class]] || [model isKindOfClass:[NSCountedSet class]]))
@@ -473,7 +473,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   }
   
   for (NSUInteger i = 0, count = [blocks count]; i < count; i++) {
-    FSBlock* headerBlock = [blocks objectAtIndex:i];
+    FSBlock* headerBlock = blocks[i];
     FSCellBlock* headerCell = [FSCellBlock newCellBlockWithFSBlock: headerBlock];
     // Check for class == FSCellBlock?
     column = [[[NSTableColumn alloc] initWithIdentifier:[headerCell stringValue]] autorelease];
@@ -485,7 +485,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     //[[column dataCell] setFormatter:formatter];
     [tableView addTableColumn:column];
     
-    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(blockDidChange:) name:@"BlockDidChangeNotification" object:[blocks objectAtIndex:i]];
+    [[NSNotificationCenter defaultCenter] addObserver:self selector:@selector(blockDidChange:) name:@"BlockDidChangeNotification" object:blocks[i]];
   }
   //[tableView sizeToFit];
   //[tableView setNeedsDisplay:YES];
@@ -575,7 +575,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     
     for (i = 0; i < count; i++)
     {
-      FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:[sortedModelArray objectAtIndex:i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
+      FSInterpreterResult *interpreterResult = [block executeWithArguments:[FSArray arrayWithObject:sortedModelArray[i]]]; // We use an FSArray instead of NSArray because the argumement might be nil
 
       if ([interpreterResult isOK]) [objects addObject:[interpreterResult result]];
       else
@@ -611,7 +611,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
 - (IBAction)sort:(id)sender 
 {
   NSInteger i = [tableView selectedColumn];
-  if (i != -1) [self sortOnColumn:[[tableView tableColumns] objectAtIndex:i]];
+  if (i != -1) [self sortOnColumn:[tableView tableColumns][i]];
 } 
 
 //////////////////// NSTableView callbacks (NSTableDataSource informal protocol)
@@ -634,11 +634,11 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   {
   
     if ([aTableColumn identifier] == externalColumnIdentifier) 
-      object = [filteredSortedExternals objectAtIndex:rowIndex];
+      object = filteredSortedExternals[rowIndex];
     else {
       NSCell* headerCell = [aTableColumn headerCell];
       if ([headerCell isKindOfClass:[FSCellBlock class]] && [(FSCellBlock*)headerCell fsBlock]) {
-        object = [[(FSCellBlock*)headerCell fsBlock] value:[filteredSortedModelArray objectAtIndex:rowIndex]];
+        object = [[(FSCellBlock*)headerCell fsBlock] value:filteredSortedModelArray[rowIndex]];
       }
     }
 
@@ -647,11 +647,11 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   }
   @catch (NSException *exception)
   {
-    result = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"***%@", [exception reason]] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor redColor],NSForegroundColorAttributeName, nil]];
+    result = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"***%@", [exception reason]] attributes:@{NSForegroundColorAttributeName: [NSColor redColor]}];
   }
   @catch (id exception)
   {
-    result = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"***%@", FSErrorMessageFromException(exception)] attributes:[NSDictionary dictionaryWithObjectsAndKeys:[NSColor redColor],NSForegroundColorAttributeName, nil]];
+    result = [[NSAttributedString alloc] initWithString:[NSString stringWithFormat:@"***%@", FSErrorMessageFromException(exception)] attributes:@{NSForegroundColorAttributeName: [NSColor redColor]}];
   }  
   return result;
 }
@@ -695,7 +695,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
   }
   else
   {
-    if ([[[tableView tableColumns] objectAtIndex:[tableView selectedColumn]] identifier] == externalColumnIdentifier)
+    if ([[tableView tableColumns][[tableView selectedColumn]] identifier] == externalColumnIdentifier)
     {
       [modifyButton  setEnabled:NO];
     }

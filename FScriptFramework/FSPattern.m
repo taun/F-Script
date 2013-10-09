@@ -35,12 +35,12 @@
     level = [FSArray array];
     for (i = 0; i < nb; i++)
     {
-      id e = [ap objectAtIndex:i]; // e may be an NSArray or [NSNull null]
+      id e = ap[i]; // e may be an NSArray or [NSNull null]
       if (e == [NSNull null] || (NSInteger)[e count] < j+1)
         l = zero;
       else
       { 
-        l = [e objectAtIndex:j];
+        l = e[j];
         again = YES;
       }  
       [level addObject:l];     
@@ -50,7 +50,7 @@
     for (i = 0, level_count = [level count]; i < level_count; i++) 
     {
       NSInteger k;
-      long lcou = [[level objectAtIndex:i] doubleValue];
+      long lcou = [level[i] doubleValue];
       if (lcou > 1)
       {
         long lcou2 ; 
@@ -58,7 +58,7 @@
         lcou2_min = 0;
         for (k = 0; k < level_count; k++)
         {
-          lcou2 = [[level objectAtIndex:k] doubleValue];
+          lcou2 = [level[k] doubleValue];
           if (lcou2 < lcou && lcou2 > lcou2_min)
             lcou2_min = lcou2;
         }
@@ -66,9 +66,9 @@
         {
           for (k = 0; k < level_count; k++)
           {
-            long lcou3 = [[level objectAtIndex:k] doubleValue];
+            long lcou3 = [level[k] doubleValue];
             if (lcou3 >= lcou)
-              [level replaceObjectAtIndex:k withObject:[FSNumber numberWithDouble:1+lcou3-(lcou-lcou2_min)]];
+              level[k] = [FSNumber numberWithDouble:1+lcou3-(lcou-lcou2_min)];
           }
         }   
       }
@@ -77,8 +77,8 @@
     deep = 0;
     for (i = 0, level_count = [level count]; i < level_count; i++) 
     {
-      if ([[level objectAtIndex:i] doubleValue] > deep)
-        deep = [[level objectAtIndex:i] doubleValue];
+      if ([level[i] doubleValue] > deep)
+        deep = [level[i] doubleValue];
     }
         
     [patternTab addObject:[FSPattern patternWithDeep:deep level:level nextPattern:nil]];
@@ -87,9 +87,9 @@
   }
   
   for (i=0,patternTab_count=[patternTab count]-2 ; i < patternTab_count; i++)
-    [[patternTab objectAtIndex:i] setNextPattern:[patternTab objectAtIndex:i+1]];
+    [patternTab[i] setNextPattern:patternTab[i+1]];
   
-  return [patternTab objectAtIndex:0];  
+  return patternTab[0];  
 }
 
 - (NSString *)description
@@ -117,7 +117,7 @@
     levelCount = [theLevel count];
     level = NSAllocateCollectable(sizeof(int)*levelCount, 0);
     for (i = 0; i < levelCount; i++)
-      level[i] = [[theLevel objectAtIndex:i] doubleValue];
+      level[i] = [theLevel[i] doubleValue];
     nextPattern = [theNextPattern retain];
     return self;
   }
@@ -173,7 +173,7 @@
     [coder encodeInt:deep forKey:@"deep"];
         
     _level = [NSMutableArray arrayWithCapacity:levelCount];
-    for (i = 0; i < levelCount; i++) [_level addObject:[NSNumber numberWithInt:level[i]]];
+    for (i = 0; i < levelCount; i++) [_level addObject:@(level[i])];
     [coder encodeObject:_level forKey: @"level"];   
     
     [coder encodeObject:nextPattern forKey:@"nextPattern"];
@@ -201,7 +201,7 @@
     _level = [coder decodeObjectForKey:@"level"];
     levelCount = [_level count];
     level = NSAllocateCollectable(sizeof(int)*levelCount, 0);
-    for (i = 0; i < levelCount; i++) level[i] = [[_level objectAtIndex:i] intValue];
+    for (i = 0; i < levelCount; i++) level[i] = [_level[i] intValue];
     
     nextPattern = [[coder decodeObjectForKey:@"nextPattern"] retain];   
   }

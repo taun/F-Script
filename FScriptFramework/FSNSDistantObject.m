@@ -180,7 +180,7 @@
 
 - _ul_objectAtIndex:(NSUInteger)index 
 { 
-  return [self isKindOfClass:[NSArray class]] ? [(id)self objectAtIndex:index] : [self self];
+  return [self isKindOfClass:[NSArray class]] ? ((id)self)[index] : [self self];
 }
  
 /*+ (id)superclass

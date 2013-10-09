@@ -161,7 +161,7 @@ static NSMutableCharacterSet *letterDigitUnderscoreCharacterSet;
 
   for (i = 0, count = [completionStrings count]; i < count; i++)
   {
-    NSString *completionCandidate = [completionStrings objectAtIndex:i];
+    NSString *completionCandidate = completionStrings[i];
     if ([completionCandidate hasPrefix:stringToComplete])
       [result addObject:completionCandidate];
   }

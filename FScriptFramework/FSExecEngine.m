@@ -60,7 +60,7 @@ void __attribute__ ((constructor)) initializeFSExecEngine(void)
 {
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
-  [[NSUserDefaults standardUserDefaults] registerDefaults:[NSDictionary dictionaryWithObject:@"YES" forKey:@"MaintainFScript1EqualityOperatorsSemantics"]];
+  [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"MaintainFScript1EqualityOperatorsSemantics": @"YES"}];
   issuedWarnings = [[NSMutableSet alloc] init];  
   
   [pool release];
@@ -127,15 +127,15 @@ id FSMapToObject(void *valuePtr, NSUInteger index, char fsEncodedType, const cha
       case 'B': if ( ((_Bool *)valuePtr)[index] ) return fsTrue; else return fsFalse; 
       case 'i': return [FSNumber numberWithDouble:((int *)valuePtr)[index]];       
       case 's': return [FSNumber numberWithDouble:((short *)valuePtr)[index]];   
-      case 'l': return [NSNumber numberWithLong:((long *)valuePtr)[index]]; 
+      case 'l': return @(((long *)valuePtr)[index]); 
       case 'C': return [FSNumber numberWithDouble:((unsigned char *)valuePtr)[index]];
       case 'I': return [FSNumber numberWithDouble:((unsigned int *)valuePtr)[index]];
       case 'S': return [FSNumber numberWithDouble:((unsigned short *)valuePtr)[index]]; 
-      case 'L': return [NSNumber numberWithUnsignedLong:((unsigned long *)valuePtr)[index]];
+      case 'L': return @(((unsigned long *)valuePtr)[index]);
       case 'f': return [FSNumber numberWithDouble:((float *)valuePtr)[index]];
       case 'd': return [FSNumber numberWithDouble:((double *)valuePtr)[index]];
-      case 'q': return [NSNumber numberWithLongLong:((long long *)valuePtr)[index]]; 
-      case 'Q': return [NSNumber numberWithUnsignedLongLong:((unsigned long long *)valuePtr)[index]];       
+      case 'q': return @(((long long *)valuePtr)[index]); 
+      case 'Q': return @(((unsigned long long *)valuePtr)[index]);       
       case ':': return [FSBlock blockWithSelector:((SEL *)valuePtr)[index]];
       case fscode_NSRange: return [NSValue valueWithRange:((NSRange *)valuePtr)[index]];
       case fscode_NSPoint:
@@ -416,7 +416,7 @@ void assign(FSCNBase *lnode, id rvalue, FSSymbolTable *symbolTable)
     
     for (NSUInteger i = 0; i < ((FSCNArray *)lnode)->count; i++) 
     {
-      assign( ((FSCNArray *)lnode)->elements[i], [rvalue objectAtIndex:i], symbolTable );
+      assign( ((FSCNArray *)lnode)->elements[i], rvalue[i], symbolTable );
     }
     break;
   }         
@@ -470,7 +470,7 @@ id sendMsgNoPattern(id receiver, SEL selector, NSUInteger argumentCount, id *arg
     }
     else if (selector == @selector(_ul_objectAtIndex:) && [receiver isProxy])
     {
-      return ([receiver isKindOfClass:[NSArray class]] ? [receiver objectAtIndex:[args[2] doubleValue]] : [receiver self]);
+      return ([receiver isKindOfClass:[NSArray class]] ? receiver[[args[2] unsignedIntegerValue]] : [receiver self]);
     }
     else if ([receiver isKindOfClass:[NSArray class]]) 
     {     
@@ -765,7 +765,7 @@ id sendMsgNoPattern(id receiver, SEL selector, NSUInteger argumentCount, id *arg
 	{
 	  for (NSUInteger i = 0, count = [mappedFSObjectPointers count]; i < count; i++)
 	  {
-        [[mappedFSObjectPointers objectAtIndex:i] autoreleaseAll];
+        [mappedFSObjectPointers[i] autoreleaseAll];
 		
 		@try
         {
@@ -773,7 +773,7 @@ id sendMsgNoPattern(id receiver, SEL selector, NSUInteger argumentCount, id *arg
 		}
         @finally
         {
-          [[mappedFSObjectPointers objectAtIndex:i] retainAll];
+          [mappedFSObjectPointers[i] retainAll];
 		}	    
 	  }
 	} 
@@ -1003,7 +1003,7 @@ id sendMsgPattern(id receiver, SEL selector, NSUInteger argumentCount, id *args,
       is_void = is_void && res_sub_msg == fsVoid;
     }
     
-    if (currentDeep == 0)  return is_void ? fsVoid : [r_tab[0] objectAtIndex:0];
+    if (currentDeep == 0)  return is_void ? fsVoid : r_tab[0][0];
       
     ready = NO;
     while(!ready)
@@ -1025,7 +1025,7 @@ id sendMsgPattern(id receiver, SEL selector, NSUInteger argumentCount, id *args,
             r_tab[currentDeep] = [FSArray arrayWithCapacity:r_size_tab[currentDeep]]; 
             currentDeep--; 
             if (currentDeep == 0)
-              return is_void ? fsVoid : [r_tab[0] objectAtIndex:0];
+              return is_void ? fsVoid : r_tab[0][0];
             ready = NO;
             break;
           }    
@@ -1091,10 +1091,10 @@ struct res_exec executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, 
     if (!(userInfo = [[[exception userInfo] mutableCopy] autorelease])) 
       userInfo = [[[NSMutableDictionary alloc] initWithCapacity:1] autorelease];
     
-    if (!(blockStack = [userInfo objectForKey:@"FScriptBlockStack"]))
+    if (!(blockStack = userInfo[@"FScriptBlockStack"]))
     { // This blockStack will represent the callStack of blocks. We construct it in order to be able to have it when the exception is returned to the top level FSInterpreter (in order for example to provide it in the FSInterpreterResult) or to a block exception handler (see method -onException: of class FSBlock to see how to use an exception handler at the F-Script language level)
       blockStack = [[NSMutableArray alloc] init];
-      [userInfo setObject:blockStack forKey:@"FScriptBlockStack"]; 
+      userInfo[@"FScriptBlockStack"] = blockStack; 
       [blockStack release];
     }  
         
@@ -1126,7 +1126,7 @@ static void checkNoShadowingOfInheritedIvars(NSString *className, NSArray *ivarN
     
     for (unsigned int i = 0; i < ivarCount; i++)
     {
-      [superclassIvarNames addObject:[NSString stringWithUTF8String:ivar_getName(ivars[i])]];
+      [superclassIvarNames addObject:@(ivar_getName(ivars[i]))];
     }
     
     free(ivars);
@@ -1476,7 +1476,7 @@ id execute_rec(FSCNBase *codeNode, FSSymbolTable *localSymbolTable, NSInteger *e
         }
         else
         {
-          [r setObject:value forKey:key];       
+          r[key] = value;       
         }
       }  
     }

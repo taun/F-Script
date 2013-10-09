@@ -67,7 +67,7 @@
     id result = [sys blockFromString:self onError:bl]; // May raise
   
     if ([result isKindOfClass:[FSArray class]]) 
-      result = [errorBlock value:[result objectAtIndex:0] value:[result objectAtIndex:1] value:[result objectAtIndex:2]];
+      result = [errorBlock value:result[0] value:result[1] value:result[2]];
     else
       [result setInterpreter:interpreter];
     
@@ -121,11 +121,11 @@
     i = 0;
     nb = [index count];
     
-    while (i < nb && [index objectAtIndex:i] == nil) i++; // ignore the nil value
+    while (i < nb && index[i] == nil) i++; // ignore the nil value
     
     if (i == nb) return (id)[NSMutableString string];
     
-    elem_index = [index objectAtIndex:i];
+    elem_index = index[i];
 
     if ([elem_index isKindOfClass:[FSBoolean class]])
     {
@@ -134,14 +134,14 @@
       
       while (i < nb)
       {
-        elem_index = [index objectAtIndex:i];          
+        elem_index = index[i];          
         range.location = i; range.length =1;
         
         if (elem_index != fsTrue && elem_index != fsFalse && ![elem_index isKindOfClass:[FSBoolean class]])
           FSExecError(@"indexing with a mixed array");        
         else if ([elem_index isTrue]) [r appendString:[self substringWithRange:range]];          
         i++;
-        while (i < nb && [index objectAtIndex:i] == nil) i++; // ignore the nil value
+        while (i < nb && index[i] == nil) i++; // ignore the nil value
       }
     }  
     else if ([elem_index isKindOfClass:[NSNumber class]])
@@ -149,7 +149,7 @@
       r = [NSMutableString stringWithCapacity:nb];
       while (i < nb)
       {        
-        elem_index = [index objectAtIndex:i];
+        elem_index = index[i];
         if (![elem_index isKindOfClass:[NSNumber class]])
           FSExecError(@"indexing with a mixed array");
         
@@ -163,7 +163,7 @@
         [r appendString:[self substringWithRange:range]];
         
         i++;
-        while (i < nb && [index objectAtIndex:i] == nil) i++; // ignore the nil value
+        while (i < nb && index[i] == nil) i++; // ignore the nil value
       }
     }  
     else // elem_index is neither an NSNumber nor a FSBoolean

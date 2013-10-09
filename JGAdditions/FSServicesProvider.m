@@ -151,7 +151,7 @@ static id globalServicesProvider;
   NSString *command=[pboard stringForType:NSStringPboardType];
   NSString *ret=[self execute:command];
   if (ret) {
-    NSArray *newTypes=[NSArray arrayWithObject:NSStringPboardType];
+    NSArray *newTypes=@[NSStringPboardType];
     [pboard declareTypes:newTypes owner:nil];
     [pboard setString:ret forType:NSStringPboardType];
   } else {
@@ -175,11 +175,11 @@ static id globalServicesProvider;
     commands=[commandsString componentsSeparatedByString:lineSeparator];
   } else {
     multiLineMode=NO;
-    commands=[NSArray arrayWithObject:commandsString];
+    commands=@[commandsString];
   }
   count=[commands count];
   for (i=0;(i<count) && !doExit;i++) {
-    command=[commands objectAtIndex:i];
+    command=commands[i];
     if (![command isEqualToString:@""]) {
       result=[self execute:command];
       if (!result) {

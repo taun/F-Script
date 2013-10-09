@@ -22,7 +22,7 @@
   if (error)
   { 
     NSLog(@"Error when fetching an ArrayRepFetchRequest: %@", error);
-    objects = [NSArray array];
+    objects = @[];
   }
 
   return [ArrayRepId arrayWithArray:objects];  

@@ -31,9 +31,9 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
   NSArray *visibleItems = [[self toolbar] visibleItems];
   for (NSUInteger i = 0, count = [visibleItems count]; i < count; i++)
   {
-    if ([[[visibleItems objectAtIndex:i] itemIdentifier] isEqualToString:@"Filter"])
+    if ([[visibleItems[i] itemIdentifier] isEqualToString:@"Filter"])
     {
-      return (NSSearchField *)[((NSToolbarItem *)[visibleItems objectAtIndex:i]) view];
+      return (NSSearchField *)[((NSToolbarItem *)visibleItems[i]) view];
     }
   }
   return nil;  

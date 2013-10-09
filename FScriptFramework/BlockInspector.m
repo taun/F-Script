@@ -93,7 +93,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 - (IBAction)evaluateBlockAction:(id)sender
 {
-  NSForm *f = [[[[sender window] contentView] subviews] objectAtIndex:0];
+  NSForm *f = [[[sender window] contentView] subviews][0];
   NSInteger nbarg = [f numberOfRows];
   FSArray *arguments = [FSArray arrayWithCapacity:nbarg]; // FSArray instead of NSMutableArray in order to support nil
   NSInteger i;
@@ -274,7 +274,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
       
       for (i = 0; i < argumentCount; i++)
       {      
-        [f addEntry:[argumentsNames objectAtIndex:i]];
+        [f addEntry:argumentsNames[i]];
       }
         
       [f setTextFont:[NSFont userFixedPitchFontOfSize:userFixedPitchFontSize()]];

@@ -42,7 +42,7 @@ void __attribute__ ((constructor)) initializeFSGlobalScope(void)
   
   @synchronized(self)
   {
-    object = [globals objectForKey:symbol]; 
+    object = globals[symbol]; 
   }
   
   *found = object ? YES : NO;
@@ -57,7 +57,7 @@ void __attribute__ ((constructor)) initializeFSGlobalScope(void)
   
   @synchronized(self)
   {
-    [globals setObject:object forKey:symbol]; 
+    globals[symbol] = object; 
   }
 }
 

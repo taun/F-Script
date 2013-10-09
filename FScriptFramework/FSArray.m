@@ -89,7 +89,7 @@ void __attribute__ ((constructor)) initializeFSArray(void)
     NSArray *remoteReplicationArray = operand;
       
     operand = [FSArray arrayWithCapacity:nb]; 
-    for (i = 0; i < nb; i++) [(FSArray *)operand addObject:[remoteReplicationArray objectAtIndex:i]];
+    for (i = 0; i < nb; i++) [(FSArray *)operand addObject:remoteReplicationArray[i]];
   } 
 
   if ([rep respondsToSelector:@selector(replicateWithArray:)] && [operand isKindOfClass:[FSArray class]])
@@ -219,7 +219,7 @@ typedef struct fs_objc_object {
       id *data = [otherArray dataPtr];
       for (i = 0; i < otherArrayCount; i++) [self addObject:data[i]];
     }
-    else for (i = 0; i < otherArrayCount; i++) [self addObject:[otherArray objectAtIndex:i]];
+    else for (i = 0; i < otherArrayCount; i++) [self addObject:otherArray[i]];
   }            
 }
 
@@ -239,7 +239,7 @@ typedef struct fs_objc_object {
     [r addObjectsFromFSArray:(FSArray*)otherArray];
   else
     for (i = 0, count = [otherArray count]; i < count; i++)
-      [r addObject:[otherArray objectAtIndex:i]];
+      [r addObject:otherArray[i]];
   
   return r;
 }
@@ -252,8 +252,8 @@ typedef struct fs_objc_object {
   NSUInteger i, count;
   for (i = 0, count = [self count]; i < count; i++)
   {
-    if ([[self objectAtIndex:i] isKindOfClass:ReplacementForCoderForNilInArrayClass]) 
-      [self replaceObjectAtIndex:i withObject:nil];
+    if ([self[i] isKindOfClass:ReplacementForCoderForNilInArrayClass]) 
+      self[i] = nil;
   }   
   return self;
 }
@@ -393,11 +393,11 @@ typedef struct fs_objc_object {
   {
     NSUInteger i = range.location;
     NSUInteger end = (range.location + range.length -1);
-    id elem = [self objectAtIndex:i];
+    id elem = self[i];
     while ( i <= end && !( identical ? elem == anObject : ([elem isEqual:anObject] || (elem == nil && anObject == nil)) ) )
     {
       i++;
-      elem = [self objectAtIndex:i];
+      elem = self[i];
     }   
     return (i > end) ? NSNotFound : i;
   }    
@@ -516,8 +516,8 @@ typedef struct fs_objc_object {
   
   for (i = 0; i < count; i++)
   {
-    id e1 = [self objectAtIndex:i];
-    id e2 = [anArray objectAtIndex:i];
+    id e1 = self[i];
+    id e2 = anArray[i];
     if (![e1 isEqual:e2] && !(e1 == nil && e2 == nil))
       break;
   }
@@ -553,7 +553,7 @@ typedef struct fs_objc_object {
   
   case FETCH_REQUEST:
     [self becomeArrayOfId];
-    return [self objectAtIndex:index];    
+    return self[index];    
   } // end switch
 
   return nil; // W
@@ -600,7 +600,7 @@ typedef struct fs_objc_object {
     NSUInteger i, count;
     for (i = 0, count = [self count]; i < count; i++)
     {
-      id elem = [self objectAtIndex:i];
+      id elem = self[i];
       if (elem == nil) 
         [r addObject:replacementForNil];
       else
@@ -634,7 +634,7 @@ typedef struct fs_objc_object {
     else
     {
       [self becomeArrayOfId];  
-      [(ArrayRepId *)rep replaceObjectAtIndex:index withObject:anObject];
+      ((ArrayRepId *)rep)[index] = anObject;
     }
   }
   else if (type == BOOLEAN && (anObject == fsTrue || anObject == fsFalse))
@@ -642,7 +642,7 @@ typedef struct fs_objc_object {
   else 
   {
     if (type != FS_ID) [self becomeArrayOfId];  
-    [(ArrayRepId *)rep replaceObjectAtIndex:index withObject:anObject];
+    ((ArrayRepId *)rep)[index] = anObject;
   }    
 }  
 
@@ -669,7 +669,7 @@ typedef struct fs_objc_object {
       NSUInteger nb = [operand count];    
       type = EMPTY;
       rep = [[ArrayRepEmpty alloc] initWithCapacity:nb];
-      for(i = 0; i < nb; i++) [self addObject:[operand objectAtIndex:i]];
+      for(i = 0; i < nb; i++) [self addObject:operand[i]];
     } 
     else
     {
@@ -708,7 +708,7 @@ typedef struct fs_objc_object {
   case DOUBLE :       return [FSNumber numberWithDouble:((ArrayRepDouble *)rep)->t[index]];
   case BOOLEAN:       return ((ArrayRepBoolean *)rep)->t[index] ? (id)fsTrue : (id)fsFalse;
   case EMPTY  :       assert(0);
-  case FETCH_REQUEST: return [self objectAtIndex:index];
+  case FETCH_REQUEST: return self[index];
   }
   return nil; // W
 }

@@ -28,7 +28,7 @@ void RestartWithCorrectGarbageCollectionSettingIfNecessary()
   
   NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   
-  NSDictionary* garbageCollectionUserDefaults = [NSDictionary dictionaryWithObjectsAndKeys:[NSNumber numberWithBool:YES], @"FScriptRunWithObjCAutomaticGarbageCollection", nil];
+  NSDictionary* garbageCollectionUserDefaults = @{@"FScriptRunWithObjCAutomaticGarbageCollection": @YES};
   [[NSUserDefaults standardUserDefaults] registerDefaults:garbageCollectionUserDefaults];
 
   BOOL requireRestart = NO;
@@ -150,17 +150,17 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
 { 
   NSMutableDictionary *registrationDict = [NSMutableDictionary dictionary];
 
-  [registrationDict setObject:[NSNumber numberWithDouble:[[NSFont userFixedPitchFontOfSize:-1] pointSize]] forKey:@"FScriptFontSize"];
-  [registrationDict setObject:@"NO"  forKey:@"FScriptShouldJournal"];
-  [registrationDict setObject:@"NO"  forKey:@"FScriptConfirmWhenQuitting"];
-  [registrationDict setObject:@"YES" forKey:@"FScriptDisplayObjectBrowserAtLaunchTime"];
-  [registrationDict setObject:@"YES" forKey:@"FScriptRunWithObjCAutomaticGarbageCollection"]; 
-  [registrationDict setObject:@"YES" forKey:@"FScriptAutomaticallyIntrospectDeclaredProperties"];  
+  registrationDict[@"FScriptFontSize"] = @([[NSFont userFixedPitchFontOfSize:-1] pointSize]);
+  registrationDict[@"FScriptShouldJournal"] = @"NO";
+  registrationDict[@"FScriptConfirmWhenQuitting"] = @"NO";
+  registrationDict[@"FScriptDisplayObjectBrowserAtLaunchTime"] = @"YES";
+  registrationDict[@"FScriptRunWithObjCAutomaticGarbageCollection"] = @"YES"; 
+  registrationDict[@"FScriptAutomaticallyIntrospectDeclaredProperties"] = @"YES";  
   
-  [registrationDict setObject:@"NO"  forKey:@"FScriptShowDemoAssistant"];
+  registrationDict[@"FScriptShowDemoAssistant"] = @"NO";
   
-  [registrationDict setObject:@"NO"  forKey:@"FScriptLoadSystemFrameworks"];
-  [registrationDict setObject:@"NO"  forKey:@"FScriptLoadPrivateSystemFrameworks"];
+  registrationDict[@"FScriptLoadSystemFrameworks"] = @"NO";
+  registrationDict[@"FScriptLoadPrivateSystemFrameworks"] = @"NO";
  
   [[NSUserDefaults standardUserDefaults] registerDefaults:registrationDict];
 }
@@ -231,7 +231,7 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
       NSArray *pathArray = NSSearchPathForDirectoriesInDomains(NSLibraryDirectory, NSUserDomainMask, YES);
       
       if ([pathArray count] > 0) 
-        [fileManager createDirectoryAtPath:[[pathArray objectAtIndex:0] stringByAppendingPathComponent:@"Application Support"] withIntermediateDirectories:NO attributes:nil error:NULL];
+        [fileManager createDirectoryAtPath:[pathArray[0] stringByAppendingPathComponent:@"Application Support"] withIntermediateDirectories:NO attributes:nil error:NULL];
     }
     
     applicationSupportDirectoryPath = findPathToFileInLibraryWithinUserDomain(@"Application Support");
@@ -378,7 +378,7 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
     FSArray *elems  = [filename asArray];
     NSUInteger i, nb;
     for (i = 0, nb = [elems count]; i < nb; i++)
-      if ([[elems objectAtIndex:i] isEqual:@"\\"]) [elems replaceObjectAtIndex:i withObject:@"/"];
+      if ([elems[i] isEqual:@"\\"]) elems[i] = @"/";
     filename = [elems operator_backslash:[@"#++" asBlock]];
   }
   
@@ -464,8 +464,8 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
   }
   [infoPanel makeKeyAndOrderFront:nil];
   */
-  NSMutableAttributedString *s = [[[NSMutableAttributedString alloc] initWithString:@"http://www.fscript.org" attributes:[NSDictionary dictionaryWithObject:@"http://www.fscript.org" forKey:NSLinkAttributeName]] autorelease];
-  [NSApp orderFrontStandardAboutPanelWithOptions:[NSDictionary dictionaryWithObject:s forKey:@"Credits"]];
+  NSMutableAttributedString *s = [[[NSMutableAttributedString alloc] initWithString:@"http://www.fscript.org" attributes:@{NSLinkAttributeName: @"http://www.fscript.org"}] autorelease];
+  [NSApp orderFrontStandardAboutPanelWithOptions:@{@"Credits": s}];
 }
 
 - (void)showPreferencePanel:(id)sender

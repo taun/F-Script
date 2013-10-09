@@ -117,7 +117,7 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
       
       if (execResult.errorStr)
       {
-        id callStack = [execResult.exception isKindOfClass:[NSException class]] ? [[execResult.exception userInfo] objectForKey:@"FScriptBlockStack"] : nil;
+        id callStack = [execResult.exception isKindOfClass:[NSException class]] ? [execResult.exception userInfo][@"FScriptBlockStack"] : nil;
         r = [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange(execResult.errorFirstCharIndex, 1+execResult.errorLastCharIndex - execResult.errorFirstCharIndex) errorMessage:execResult.errorStr callStack:callStack];              
       }
       else
@@ -262,7 +262,7 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
   
   fileAttributes = [[NSFileManager defaultManager] attributesOfItemAtPath:filename error:NULL];
   
-  if ([[fileAttributes objectForKey:NSFileSize] unsignedLongLongValue] > maxLength)
+  if ([fileAttributes[NSFileSize] unsignedLongLongValue] > maxLength)
   {
     NSData *journalData = [NSData dataWithContentsOfFile:filename];
     NSData *truncatedJournalData = [journalData subdataWithRange:NSMakeRange([journalData length]-(maxLength/2), (maxLength/2))];

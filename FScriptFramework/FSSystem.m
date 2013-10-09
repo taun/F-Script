@@ -64,7 +64,7 @@ static BOOL loadNonKeyedArchives;
   for (NSUInteger i = 0, count = [entities count]; i < count; i++)
   {
     NSError *error;
-    NSEntityDescription *entity = [entities objectAtIndex:i]; 
+    NSEntityDescription *entity = entities[i]; 
     [request setEntity:entity];
     
     NSArray *objects = [objectContext executeFetchRequest:request error:&error];
@@ -153,7 +153,7 @@ static BOOL loadNonKeyedArchives;
   
   for (i = 0, count = [identifiers count]; i < count; i++)
   {
-    NSString *identifier = [identifiers objectAtIndex:i];
+    NSString *identifier = identifiers[i];
     if (![identifier isEqualToString:@"sys"])
 	  [self clear:identifier];
   }

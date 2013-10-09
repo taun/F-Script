@@ -133,7 +133,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   while ([scanner scanString:@"_" intoString:NULL])
   {  
     [scanner scanUpToCharactersFromSet:charSet intoString:&subObjCOperatorName];
-    if (!(subFSOperator = [symbol_operator_dict objectForKey:subObjCOperatorName])) return nil;
+    if (!(subFSOperator = symbol_operator_dict[subObjCOperatorName])) return nil;
     [r appendString:subFSOperator];
   } 
   return r;
@@ -179,7 +179,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   FSSymbolTable *symbolTable = [FSSymbolTable symbolTable];
   FSCNSuper   *receiver = [[[FSCNSuper alloc] initWithLocationInContext:[symbolTable insertSymbol:@"self" object:nil status:UNDEFINED] className:className isInClassMethod:NO] autorelease];
   FSCNMessage *code     = [[[FSCNUnaryMessage alloc] initWithReceiver:receiver selectorString:@"dealloc" pattern:nil] autorelease];
-  FSMethod    *method   = [[[FSMethod alloc] initWithSelector:@selector(dealloc) fsEncodedTypes:@"v@:" types:@"v@:" typesByArgument:[NSArray arrayWithObjects:@"@", @":", nil] argumentCount:2 code:code symbolTable:symbolTable] autorelease]; 
+  FSMethod    *method   = [[[FSMethod alloc] initWithSelector:@selector(dealloc) fsEncodedTypes:@"v@:" types:@"v@:" typesByArgument:@[@"@", @":"] argumentCount:2 code:code symbolTable:symbolTable] autorelease]; 
   return method;
 }
 
@@ -228,20 +228,20 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       symbol_operator_tab['\\'] = @"backslash";
     
       symbol_operator_dict = [[NSMutableDictionary alloc] init];
-      [symbol_operator_dict setObject:@"+"  forKey:@"plus"];
-      [symbol_operator_dict setObject:@"-"  forKey:@"hyphen"];
-      [symbol_operator_dict setObject:@"<"  forKey:@"less"];
-      [symbol_operator_dict setObject:@">"  forKey:@"greater"];
-      [symbol_operator_dict setObject:@"="  forKey:@"equal"];
-      [symbol_operator_dict setObject:@"*"  forKey:@"asterisk"];
-      [symbol_operator_dict setObject:@"/"  forKey:@"slash"];
-      [symbol_operator_dict setObject:@"?"  forKey:@"question"];
-      [symbol_operator_dict setObject:@"~"  forKey:@"tilde"];
-      [symbol_operator_dict setObject:@"!"  forKey:@"exclam"];
-      [symbol_operator_dict setObject:@"%"  forKey:@"percent"];
-      [symbol_operator_dict setObject:@"&"  forKey:@"ampersand"];
-      [symbol_operator_dict setObject:@"|"  forKey:@"bar"];
-      [symbol_operator_dict setObject:@"\\" forKey:@"backslash"];
+      symbol_operator_dict[@"plus"] = @"+";
+      symbol_operator_dict[@"hyphen"] = @"-";
+      symbol_operator_dict[@"less"] = @"<";
+      symbol_operator_dict[@"greater"] = @">";
+      symbol_operator_dict[@"equal"] = @"=";
+      symbol_operator_dict[@"asterisk"] = @"*";
+      symbol_operator_dict[@"slash"] = @"/";
+      symbol_operator_dict[@"question"] = @"?";
+      symbol_operator_dict[@"tilde"] = @"~";
+      symbol_operator_dict[@"exclam"] = @"!";
+      symbol_operator_dict[@"percent"] = @"%";
+      symbol_operator_dict[@"ampersand"] = @"&";
+      symbol_operator_dict[@"bar"] = @"|";
+      symbol_operator_dict[@"backslash"] = @"\\";
       
       constant_dict = [[NSMutableDictionary alloc] initWithCapacity:8500];
       FSConstantsInitialization(constant_dict);
@@ -258,7 +258,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   NSAssert(rawCString, @"sel_get_name() returned NULL !");
   if (!rawCString) return @"FS_NULL_SELECTOR";
   
-  rawString = [NSString stringWithUTF8String:rawCString];
+  rawString = @(rawCString);
   if ((strncmp(rawCString,"operator_", 9) == 0) && (r = FSOperatorFromObjCOperatorName(rawString)))
     return r;
   else
@@ -367,7 +367,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       free(buf);
       
       // Is this a predefined constant ? 
-      if ((predefinedObject = [constant_dict objectForKey:rs.value]) != nil)
+      if ((predefinedObject = constant_dict[rs.value]) != nil)
       {
         // This is a predefined constant
         rs.type = PREDEFINED_OBJECT;
@@ -715,7 +715,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       // in order to optimize out the non-local return machinery which is unneeded in this case 
       // (it is also unneeded in other cases, but they are not as easy to detect)
 
-      [statements replaceObjectAtIndex:[statements count]-1 withObject:((FSCNReturn *)[statements lastObject])->expression];
+      statements[[statements count]-1] = ((FSCNReturn *)[statements lastObject])->expression;
     }
     else
     {
@@ -724,11 +724,11 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   }
   
   if ([statements count] == 1) 
-    return [statements objectAtIndex:0];
+    return statements[0];
   else
   {
     FSCNStatementList *result = [[[FSCNStatementList alloc] initWithStatements:statements] autorelease];
-    [result setFirstCharIndex:((FSCNBase *)[statements objectAtIndex:0])->firstCharIndex lastCharIndex:((FSCNBase *)[statements lastObject])->lastCharIndex];
+    [result setFirstCharIndex:((FSCNBase *)statements[0])->firstCharIndex lastCharIndex:((FSCNBase *)[statements lastObject])->lastCharIndex];
     return result;
   }
 } 
@@ -880,7 +880,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 
   for (i = 0, pattern_count = [patternElements count], nsnull = [NSNull null]; i < pattern_count; i++)
   {
-    if ([patternElements objectAtIndex:i] != nsnull) break; 
+    if (patternElements[i] != nsnull) break; 
   }
   
   if (i == pattern_count)
@@ -925,7 +925,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   if (pattern_elt == [NSNull null] && pattern_elt_next == [NSNull null])
     pattern = nil;
   else
-    pattern = [FSPattern patternFromIntermediateRepresentation:[NSArray arrayWithObjects:pattern_elt, pattern_elt_next, nil]];
+    pattern = [FSPattern patternFromIntermediateRepresentation:@[pattern_elt, pattern_elt_next]];
   
   exp2_res = [self exp2WithCompilationContext:compilationContext];          
 
@@ -954,7 +954,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self checkToken:NAME :@"unary message expected"];
   
   if (pattern_elt == [NSNull null]) pattern = nil;
-  else                              pattern = [FSPattern patternFromIntermediateRepresentation:[NSArray arrayWithObject:pattern_elt]];
+  else                              pattern = [FSPattern patternFromIntermediateRepresentation:@[pattern_elt]];
   
   r = [[[FSCNUnaryMessage alloc] initWithReceiver:left selectorString:rs.value pattern:pattern] autorelease];
 
@@ -1644,7 +1644,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     [self syntaxError:[NSString stringWithFormat:@"unknown type \"%@\"", typeBeforePointerMarks]];
   }  
   
-  [encodedtype appendString:[NSString stringWithUTF8String:encoded]];
+  [encodedtype appendString:@(encoded)];
   
   while (rs.type == OPERATOR)
   {

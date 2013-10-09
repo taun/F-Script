@@ -750,7 +750,7 @@ static id objectFromKeyModifierMask(NSUInteger mask)
     
   NSMutableString *str = [NSMutableString string];
    
-  if (devideDependentMask != 0) [str appendString:[[NSNumber numberWithUnsignedLong:(unsigned long)devideDependentMask] description]];
+  if (devideDependentMask != 0) [str appendString:[@((unsigned long)devideDependentMask) description]];
   
   if (devideIndependentMask & NSAlphaShiftKeyMask)    [str appendString:[str length] == 0 ? @"NSAlphaShiftKeyMask" : @" + NSAlphaShiftKeyMask"];
   if (devideIndependentMask & NSShiftKeyMask)         [str appendString:[str length] == 0 ? @"NSShiftKeyMask"      : @" + NSShiftKeyMask"];
@@ -1601,7 +1601,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     [view addPropertyLabel:@"Attributes" toMatrix:m];
     for (NSUInteger i = 0, count = [attributeKeys count]; i < count; i++)
     {
-      NSString *key = [attributeKeys objectAtIndex:i];
+      NSString *key = attributeKeys[i];
       ADD_OBJECT([o valueForKey:key], key)
     }
     
@@ -1609,7 +1609,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     [view addPropertyLabel:@"Relationships" toMatrix:m];
     for (NSUInteger i = 0, count = [relationshipKeys count]; i < count; i++)
     {
-      NSString *key = [relationshipKeys objectAtIndex:i];
+      NSString *key = relationshipKeys[i];
       ADD_OBJECT([o valueForKey:key], key)
     }
     
@@ -1738,7 +1738,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     else if ([object isKindOfClass:[FSCNStatementList class]])
     {
       FSCNStatementList *o = object;
-      [view addObject:[NSNumber numberWithUnsignedInteger:o->statementCount] withLabel:@"Number of statements" toMatrix:m classLabel:@"" selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];           
+      [view addObject:@(o->statementCount) withLabel:@"Number of statements" toMatrix:m classLabel:@"" selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];           
       [view addObjects:[NSArray arrayWithObjects:o->statements count:o->statementCount] withLabel:@"Statements" toMatrix:m classLabel:@"" selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];
     }
     else if ([object isKindOfClass:[FSCNReturn class]])
@@ -1767,7 +1767,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
         
         for (i = 0; i < count; i++) 
         {
-          NSString *propertyName = [NSString stringWithUTF8String:property_getName(properties[i])];
+          NSString *propertyName = @(property_getName(properties[i]));
           id propertyValue = nil; // initialized to nil in order to shut down a spurious warning
           NSString *errorMessage = nil;
           
@@ -1814,7 +1814,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
     if (exposedBindings)
     {
       for (i = 0, count = [exposedBindings count]; i < count; i++)
-        if ([object infoForBinding:[exposedBindings objectAtIndex:i]])  
+        if ([object infoForBinding:exposedBindings[i]])  
           break;
       
       if (i < count && count > 0)
@@ -1824,7 +1824,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
         
         for (i = 0, count = [exposedBindings count]; i < count; i++)
         {
-          [view addBindingForObject:object withName:[exposedBindings objectAtIndex:i] toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];
+          [view addBindingForObject:object withName:exposedBindings[i] toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject];
         }  
         
         ADD_OBJECT(exposedBindings, @"Exposed Bindings");

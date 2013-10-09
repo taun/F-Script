@@ -62,10 +62,10 @@
 
     toolbarItem = [[[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier: itemIdent] autorelease];
          
-    while (![[[[[self class] customButtons] objectAtIndex:i] identifier] isEqualToString:itemIdent])
+    while (![[[[self class] customButtons][i] identifier] isEqualToString:itemIdent])
       i++;
       
-    button = [[[[[self class] customButtons] objectAtIndex:i] copy] autorelease];
+    button = [[[[self class] customButtons][i] copy] autorelease];
     [button setTarget:self]; 
     [toolbarItem setView:button];
     [button setToolbarItem:toolbarItem];
@@ -247,7 +247,7 @@
   // Required delegate method   Returns the ordered list of items to be shown in the toolbar by default
   // If during the toolbar's initialization, no overriding values are found in the user defaults, or if the
   // user chooses to revert to the default items self set will be used
-  return [NSArray arrayWithObjects: @"Workspace", @"Classes", @"Select View", @"Name", @"Inspect", @"Browse", @"Refresh", @"Filter", nil];
+  return @[@"Workspace", @"Classes", @"Select View", @"Name", @"Inspect", @"Browse", @"Refresh", @"Filter"];
 }
 
 - (NSArray *) toolbarAllowedItemIdentifiers: (NSToolbar *) toolbar 
@@ -256,17 +256,17 @@
   // does not assume any items are allowed, even the separator   So, every allowed item must be explicitly listed
   // The set of allowed items is used to construct the customization palette
   
-  return [NSArray arrayWithObjects: @"Workspace", @"Classes", @"Select View", @"Name", @"Inspect", @"Browse",
+  return @[@"Workspace", @"Classes", @"Select View", @"Name", @"Inspect", @"Browse",
                                     @"Refresh", @"Filter", @"Custom1", @"Custom2", @"Custom3", @"Custom4", 
                                     @"Custom5", @"Custom6", @"Custom7", @"Custom8", @"Custom9", @"Custom10", /* @"ApplyBlockMenu",*/
                                     NSToolbarCustomizeToolbarItemIdentifier, NSToolbarFlexibleSpaceItemIdentifier, 
-                                    NSToolbarSpaceItemIdentifier, NSToolbarSeparatorItemIdentifier, nil];
+                                    NSToolbarSpaceItemIdentifier, NSToolbarSeparatorItemIdentifier];
 }
  
 
 - (void)toolbarDidRemoveItem:(NSNotification *)notification 
 {
-    NSToolbarItem *removedItem = [[notification userInfo] objectForKey: @"item"];
+    NSToolbarItem *removedItem = [notification userInfo][@"item"];
     if ([[removedItem itemIdentifier] isEqual:@"Filter"]) 
     {
       [(NSSearchField*)[removedItem view] setStringValue:@""];

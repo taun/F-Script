@@ -268,9 +268,9 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
     locals = NSAllocateCollectable(localCount * sizeof(struct FSContextValueWrapper), NSScannedOption);
     for (NSUInteger i = 0; i < localCount; i++)
     {
-      locals[i].status = [((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) status]; 
-      locals[i].value  = [[((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) value] retain]; 
-      locals[i].symbol = [[((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) symbol] retain]; 
+      locals[i].status = [((SymbolTableValueWrapper *)localsArray[i]) status]; 
+      locals[i].value  = [[((SymbolTableValueWrapper *)localsArray[i]) value] retain]; 
+      locals[i].symbol = [[((SymbolTableValueWrapper *)localsArray[i]) symbol] retain]; 
     }    
     tryToAttachWhenDecoding = [coder decodeBoolForKey:@"tryToAttachWhenDecoding"];
     if (tryToAttachWhenDecoding && !parent && [coder isKindOfClass:[FSKeyedUnarchiver class]])
@@ -302,9 +302,9 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
       locals = NSAllocateCollectable(localCount * sizeof(struct FSContextValueWrapper), NSScannedOption); 
       for (NSUInteger i = 0; i < localCount; i++)
       {
-        locals[i].status = [((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) status]; 
-        locals[i].value  = [[((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) value] retain]; 
-        locals[i].symbol = [[((SymbolTableValueWrapper *)[localsArray objectAtIndex:i]) symbol] retain]; 
+        locals[i].status = [((SymbolTableValueWrapper *)localsArray[i]) status]; 
+        locals[i].value  = [[((SymbolTableValueWrapper *)localsArray[i]) value] retain]; 
+        locals[i].symbol = [[((SymbolTableValueWrapper *)localsArray[i]) symbol] retain]; 
       }    
     }        
     [coder decodeValueOfObjCType:@encode(typeof(tryToAttachWhenDecoding)) at:&tryToAttachWhenDecoding];

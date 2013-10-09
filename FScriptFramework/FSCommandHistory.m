@@ -11,7 +11,7 @@
   {
     head = (head+1) % [array count];
     if (head == queue) queue = (queue+1) % [array count];  
-    [array replaceObjectAtIndex:head withObject:str];
+    array[head] = str;
     [self goToLast];
   } 
   return self;  
@@ -89,13 +89,13 @@
   
 - (NSString *)getMostRecentlyInsertedStr
 {
-  if ([array count] != 0) return [array objectAtIndex:head];
+  if ([array count] != 0) return array[head];
   else                    return(@"");
 }
 
 - (NSString *)getStr
 {
-  if ([array count] != 0) return [array objectAtIndex:cursor];
+  if ([array count] != 0) return array[cursor];
   else                    return(@"");    
 }  
 

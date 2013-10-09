@@ -11,7 +11,7 @@
 
 - (id)at:(id)aKey
 {
-  return [self objectForKey:aKey];
+  return self[aKey];
 }
 
 
@@ -54,7 +54,7 @@
       
     [result appendString:printString(key)];
     [result appendString:@" -> "];
-    [result appendString:printString([self objectForKey:key])];
+    [result appendString:printString(self[key])];
   }
   
   if      ([self count] > 1)  [result appendString:@"\n"];

@@ -56,7 +56,7 @@
 
 - tags 
 {
-  return [NSArray arrayWithObject:@"FSTestObjCClass1"];
+  return @[@"FSTestObjCClass1"];
 }
 
 

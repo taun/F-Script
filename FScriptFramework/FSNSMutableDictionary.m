@@ -13,7 +13,7 @@
    else if (anObject == nil)
      FSExecError(@"argument 2 of method \"at:put:\" must not be nil");
    else
-     [self setObject:anObject forKey:aKey];
+     self[aKey] = anObject;
 }
 
 @end

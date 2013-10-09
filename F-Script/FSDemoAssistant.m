@@ -57,7 +57,7 @@
   
   for (unsigned int i = 0, n = [fragments count]; i < n; i++)
   {
-    [interpreterView putCommand:[fragments objectAtIndex:i]];
+    [interpreterView putCommand:fragments[i]];
     [interpreterView putCommand:@" "];
 	[interpreterView display];
     [NSThread sleepUntilDate:[NSDate dateWithTimeIntervalSinceNow:0.05]];

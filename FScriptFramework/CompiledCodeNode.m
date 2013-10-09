@@ -88,7 +88,7 @@
   [r appendFormat:@", \n subnodeList ( %ld elements)", [subnodes count]];
 
   for (i = 0; i < [subnodes count]; i++)
-    [r appendString:[[subnodes objectAtIndex:i] description]];  
+    [r appendString:[subnodes[i] description]];  
 
   return r;
 }
@@ -206,7 +206,7 @@
       
     case MESSAGE:
       if (operator != nil) 
-        r = [[FSCNBinaryMessage alloc] initWithReceiver:(id)receiver selectorString:selector pattern:[self pattern] argument:[subnodes objectAtIndex:0]];
+        r = [[FSCNBinaryMessage alloc] initWithReceiver:(id)receiver selectorString:selector pattern:[self pattern] argument:subnodes[0]];
       else if ([subnodes count] == 0)
         r = [[FSCNUnaryMessage alloc] initWithReceiver:(id)receiver selectorString:selector pattern:[self pattern]];
       else
@@ -235,7 +235,7 @@
       break;
     
     case ASSIGNMENT:
-      r = [[FSCNAssignment alloc] initWithLeft:[subnodes objectAtIndex:0] right:[subnodes objectAtIndex:1]];
+      r = [[FSCNAssignment alloc] initWithLeft:subnodes[0] right:subnodes[1]];
       break;
     default:
       FSExecError(@"Internal error in method awakeAfterUsingCoder in class CompiledCodeNode");  
@@ -345,7 +345,7 @@
 - (CompiledCodeNode *)getSubnode:(unsigned)pos
 {
   //assert(pos >= 0 && pos < [subnodes count]);
-  return [subnodes objectAtIndex:pos];
+  return subnodes[pos];
 }  
 
 /*- (Array *)getListSubnode
@@ -391,7 +391,7 @@
 
 - setSubnode:(CompiledCodeNode *)subnode at:(unsigned)pos
 {
-  [subnodes replaceObjectAtIndex:pos withObject:subnode];
+  subnodes[pos] = subnode;
   return self;
 }  
 
@@ -496,7 +496,7 @@
   if (nodeType == MESSAGE)
     [receiver translateCharRange:translation];
   for (i = 0, nb = [subnodes count]; i <nb; i++)
-    [[subnodes objectAtIndex:i] translateCharRange:translation];  
+    [subnodes[i] translateCharRange:translation];  
 }                  
 
 @end

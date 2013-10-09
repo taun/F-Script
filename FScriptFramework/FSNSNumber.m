@@ -80,7 +80,7 @@
 - (NSNumber *)bitAnd:(NSNumber *)operand
 {
   FSVerifClassArgsNoNil(@"bitAnd:",1,operand,[NSNumber class]);
-  NSNumber *zero = [NSNumber numberWithInt:0];
+  NSNumber *zero = @0;
   if ([self compare:zero] == NSOrderedAscending) FSExecError(@"receiver of message \"bitAnd:\" must be a positive integer"); 
   if ([[self fractionPart] compare:zero] != NSOrderedSame) FSExecError(@"receiver of message \"bitAnd:\" must be an integer");
   if ([operand compare:zero] == NSOrderedAscending) FSExecError(@"argument of message \"bitAnd:\" must be a positive integer"); 
@@ -104,7 +104,7 @@
 - (NSNumber *)bitOr:(NSNumber *)operand
 {
   FSVerifClassArgsNoNil(@"bitOr:",1,operand,[NSNumber class]);
-  NSNumber *zero = [NSNumber numberWithInt:0];
+  NSNumber *zero = @0;
   if ([self compare:zero] == NSOrderedAscending)              FSExecError(@"receiver of message \"bitOr:\" must be a positive integer"); 
   if ([[self fractionPart] compare:zero] != NSOrderedSame)    FSExecError(@"receiver of message \"bitOr:\" must be an integer");
   if ([operand compare:zero] == NSOrderedAscending)           FSExecError(@"argument of message \"bitOr:\" must be a positive integer"); 
@@ -128,7 +128,7 @@
 - (NSNumber *)bitXor:(NSNumber *)operand
 {
   FSVerifClassArgsNoNil(@"bitXor:",1,operand,[NSNumber class]);
-  NSNumber *zero = [NSNumber numberWithInt:0];
+  NSNumber *zero = @0;
   if ([self compare:zero] == NSOrderedAscending)              FSExecError(@"receiver of message \"bitXor:\" must be a positive integer"); 
   if ([[self fractionPart] compare:zero] != NSOrderedSame)    FSExecError(@"receiver of message \"bitXor:\" must be an integer");
   if ([operand compare:zero] == NSOrderedAscending)           FSExecError(@"argument of message \"bitXor:\" must be a positive integer"); 

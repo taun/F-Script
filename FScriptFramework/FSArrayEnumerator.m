@@ -33,7 +33,7 @@
     return nil;
   else
   {
-    id r = [array objectAtIndex:next];
+    id r = array[next];
     iterationCompleted = (next == last);
     next += increment;
     return r;

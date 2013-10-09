@@ -120,7 +120,7 @@ static int comp(const void *a,const void *b)
     if (ind >= count)         FSExecError(@"index of an array must be a number less than the size of the array");
     if (ind != (NSUInteger)ind) FSExecError(@"index of an array must be an integer");    
 
-    return [self objectAtIndex:(NSUInteger)ind];
+    return self[(NSUInteger)ind];
   }
   else if ([index isKindOfClass:[NSArray class]])
   {
@@ -131,7 +131,7 @@ static int comp(const void *a,const void *b)
       FSArray *remoteIndex = index;
       
       index = [FSArray arrayWithCapacity:nb]; 
-      for (i = 0; i < nb; i++) [index addObject:[remoteIndex objectAtIndex:i]];
+      for (i = 0; i < nb; i++) [index addObject:remoteIndex[i]];
     } 
     
     if ([self isKindOfClass:[FSArray class]] && [index isKindOfClass:[FSArray class]] && [[(FSArray *)self arrayRep] respondsToSelector:@selector(indexWithArray:)])
@@ -143,7 +143,7 @@ static int comp(const void *a,const void *b)
       NSUInteger nb = [index count];
       id indexElement = nil; // initialization of indexElement in order to avoid a warning
       
-      while (i < nb && (indexElement = [index objectAtIndex:i]) == nil) i++;            // ignore the nil value
+      while (i < nb && (indexElement = index[i]) == nil) i++;            // ignore the nil value
       if (i == nb)
       {
         if (nb == count || nb == 0) return [FSArray array];
@@ -158,14 +158,14 @@ static int comp(const void *a,const void *b)
               
         while (i < nb)
         {             
-          if (indexElement == fsTrue) [r addObject:[self objectAtIndex:i]];
+          if (indexElement == fsTrue) [r addObject:self[i]];
           else if (indexElement != fsFalse)
           {
             if (![indexElement isKindOfClass:[FSBoolean class]]) FSExecError(@"indexing with a mixed array");
-            else if ([indexElement isTrue]) [r addObject:[self objectAtIndex:i]];
+            else if ([indexElement isTrue]) [r addObject:self[i]];
           }  
           i++;
-          while (i < nb && (indexElement = [index objectAtIndex:i]) == nil) i++;    // ignore the nil value
+          while (i < nb && (indexElement = index[i]) == nil) i++;    // ignore the nil value
         }
       }  
       else if ([indexElement isKindOfClass:NSNumberClass])
@@ -182,10 +182,10 @@ static int comp(const void *a,const void *b)
           if (ind < 0)      FSExecError(@"index of an array must be a number greater or equal to 0");              
           if (ind >= count) FSExecError(@"index of an array must be a number less than the size of the array");
 
-          [r addObject:[self objectAtIndex:(NSUInteger)ind]];
+          [r addObject:self[(NSUInteger)ind]];
           
           i++;
-          while (i < nb && (indexElement = [index objectAtIndex:i]) == nil) i++;            // ignore the nil value
+          while (i < nb && (indexElement = index[i]) == nil) i++;            // ignore the nil value
         }
       }  
       else // indexElement is neither an NSNumber nor a FSBoolean
@@ -202,7 +202,7 @@ static int comp(const void *a,const void *b)
     NSUInteger currentIndex = [index firstIndex];
     while (currentIndex != NSNotFound)
     {
-      [r addObject:[self objectAtIndex:currentIndex]];
+      [r addObject:self[currentIndex]];
       currentIndex = [index indexGreaterThanIndex:currentIndex];
     }
     return r;
@@ -229,7 +229,7 @@ static int comp(const void *a,const void *b)
 
   for (i = 0; i < count; i++)
   {
-    id elem = [self objectAtIndex:i];
+    id elem = self[i];
     if (elem) [set addObject:elem];
     else      no_nil1 = NO;
   }
@@ -238,7 +238,7 @@ static int comp(const void *a,const void *b)
 
   for (i = 0; i < op_count; i++)
   {
-    id elem = [operand objectAtIndex:i];
+    id elem = operand[i];
     if (elem) [set removeObject:elem];
     else      no_nil2 = NO;      
   }    
@@ -301,7 +301,7 @@ static int comp(const void *a,const void *b)
 
 - (FSArray *)index 
 {
-  return [[NSNumber numberWithUnsignedInteger:[self count]] iota];
+  return [@([self count]) iota];
 }  
 
 - (void) inspect
@@ -344,7 +344,7 @@ static int comp(const void *a,const void *b)
   
   for (i=0; i < count; i++)
   {
-    id elem = [self objectAtIndex:i];
+    id elem = self[i];
     if (elem) [set addObject:elem];
     else      no_nil1 = NO;
   }
@@ -353,7 +353,7 @@ static int comp(const void *a,const void *b)
   
   for (i=0; i <op_count; i++)
   {
-    id elem = [operand objectAtIndex:i];
+    id elem = operand[i];
     if (elem)
     {
       if ([set member:elem]) { [r addObject:elem]; [set removeObject:elem];}
@@ -384,8 +384,8 @@ static int comp(const void *a,const void *b)
   }
   else 
   {
-    acu = [self objectAtIndex:0];
-    for (i = 1; i < count; i++) acu = [operand value:acu value:[self objectAtIndex:i]];
+    acu = self[0];
+    for (i = 1; i < count; i++) acu = [operand value:acu value:self[i]];
     return acu;
   }  
 }
@@ -393,13 +393,13 @@ static int comp(const void *a,const void *b)
 - (NSNumber *)operator_exclam:(id)anObject
 {
   NSUInteger index = [self indexOfObject:anObject];
-  return index == NSNotFound ? [NSNumber numberWithUnsignedInteger:[self count]] : [NSNumber numberWithUnsignedInteger:index];
+  return index == NSNotFound ? @([self count]) : @(index);
 }  
 
 - (NSNumber *)operator_exclam_exclam:(id)anObject
 {
   NSUInteger index = [self indexOfObjectIdenticalTo:anObject];
-  return index == NSNotFound ? [NSNumber numberWithUnsignedInteger:[self count]] : [NSNumber numberWithUnsignedInteger:index];
+  return index == NSNotFound ? @([self count]) : @(index);
 }  
 
 - (FSArray *)operator_greater_less:(id)operand  
@@ -418,22 +418,22 @@ static int comp(const void *a,const void *b)
  
   for (i = 0; i < self_count; i++) 
   {
-    [w setObject:[self objectAtIndex:i]];
-    [dict setObject:[FSArray array] forKey:w]; // w is then copied by the dictionary
+    [w setObject:self[i]];
+    dict[w] = [FSArray array]; // w is then copied by the dictionary
   }
 
   for (i=0; i < operand_count; i++)
   {
-    [w setObject:[operand objectAtIndex:i]]; 
-    [[dict objectForKey:w] addObject:[FSNumber numberWithDouble:i]]; 
+    [w setObject:operand[i]]; 
+    [dict[w] addObject:[FSNumber numberWithDouble:i]]; 
   }
   
   r = [FSArray arrayWithCapacity:self_count];
   
   for (i = 0; i < self_count; i++)
   {
-   [w setObject:[self objectAtIndex:i]];
-   [r addObject:[dict objectForKey:w]];
+   [w setObject:self[i]];
+   [r addObject:dict[w]];
   }
   
   return r;
@@ -484,9 +484,9 @@ static int comp(const void *a,const void *b)
   
   for (i=0; i < count; i++)
   {
-    id opElem = [operand objectAtIndex:i];
+    id opElem = operand[i];
     double opElemDouble;
-    id elem = [self objectAtIndex:i]; 
+    id elem = self[i]; 
     
     if (![opElem isKindOfClass:NSNumberClass]) FSExecError(@"argument 1 of method \"replicate:\" must be an array of numbers");
     
@@ -507,7 +507,7 @@ static int comp(const void *a,const void *b)
   
   while (i != 0)
   {
-    [r addObject:[self objectAtIndex:i-1]];
+    [r addObject:self[i-1]];
 	i--;
   }
   
@@ -530,14 +530,14 @@ static int comp(const void *a,const void *b)
   
   if (op >= 0)
   {
-    for (i = op % count ; i < count; i++) [r addObject:[self objectAtIndex:i]];
-    for (i = 0; i < op % count; i++)      [r addObject:[self objectAtIndex:i]];
+    for (i = op % count ; i < count; i++) [r addObject:self[i]];
+    for (i = 0; i < op % count; i++)      [r addObject:self[i]];
   }
   else
   {
     op = -op;
-    for(i = count-(op % count) ; i < count; i++) [r addObject:[self objectAtIndex:i]];
-    for (i = 0; i < count-(op % count); i++)     [r addObject:[self objectAtIndex:i]];
+    for(i = count-(op % count) ; i < count; i++) [r addObject:self[i]];
+    for (i = 0; i < count-(op % count); i++)     [r addObject:self[i]];
   }     
   return r;            
 }
@@ -556,10 +556,10 @@ static int comp(const void *a,const void *b)
   
   if (count == 0) return r;
 
-  acu = [self objectAtIndex:0];
+  acu = self[0];
   [r addObject:acu]; 
 
-  for (i = 1; i < count; i++) {acu = [operand value:acu value:[self objectAtIndex:i]]; [r addObject:acu];}
+  for (i = 1; i < count; i++) {acu = [operand value:acu value:self[i]]; [r addObject:acu];}
  
   return r;
 }
@@ -573,7 +573,7 @@ static int comp(const void *a,const void *b)
 
   if (count == 0) return [FSArray array]; // mergesort() crashes if passed an empty array 
   
-  if (count >= 2 && ([self objectAtIndex:0] && ![[self objectAtIndex:0] respondsToSelector:@selector(operator_less:)] || [self objectAtIndex:count/2] && ![[self objectAtIndex:count/2] respondsToSelector:@selector(operator_less:)]))
+  if (count >= 2 && (self[0] && ![self[0] respondsToSelector:@selector(operator_less:)] || self[count/2] && ![self[count/2] respondsToSelector:@selector(operator_less:)]))
       FSExecError(@"elements must responds to \"<\"");
   
   @try
@@ -582,7 +582,7 @@ static int comp(const void *a,const void *b)
     for (i = 0; i < count; i++)
     {
       tab[i].index = i;
-      tab[i].object = [self objectAtIndex:i];
+      tab[i].object = self[i];
     }
     
     if (mergesort(tab,count,sizeof(struct sort_elem),comp) != 0)
@@ -620,7 +620,7 @@ static int comp(const void *a,const void *b)
   {
     FSArray *sub_r = [FSArray arrayWithCapacity:size];
     
-    for (j=0; j < size; j++) [sub_r addObject:[self objectAtIndex:i+j]];
+    for (j=0; j < size; j++) [sub_r addObject:self[i+j]];
     
     [r addObject:sub_r];
   }    
@@ -631,19 +631,19 @@ static int comp(const void *a,const void *b)
 - (FSArray *) shape
 {
   FSArray *r;
-  if ([self count] && [[self objectAtIndex:0] isKindOfClass:[FSArray class]])
+  if ([self count] && [self[0] isKindOfClass:[FSArray class]])
   {
-    r = [[self objectAtIndex:0] shape];
-    [r insertObject:[NSNumber numberWithUnsignedInteger:[self count]] atIndex:0];
+    r = [self[0] shape];
+    [r insertObject:@([self count]) atIndex:0];
     return r;
   }
   else
-    return [FSArray arrayWithObject:[NSNumber numberWithUnsignedInteger:[self count]]];
+    return [FSArray arrayWithObject:@([self count])];
 }
 
 + (FSArray *) arrayWithShape:(FSArray *)shape
 {
-  NSUInteger capacity = [shape count] ? [[shape objectAtIndex:0] doubleValue] : 0;
+  NSUInteger capacity = [shape count] ? [shape[0] doubleValue] : 0;
   NSUInteger i;
   FSArray *r = [FSArray arrayWithCapacity:capacity];
  
@@ -677,9 +677,9 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
       pos[transposition_vector[depth]] = i;
       
       for (j = 0, target = result; j < pos_count-1; j++)
-        target = [target objectAtIndex:pos[j]];
+        target = target[pos[j]];
 
-      [target addObject:[arrayToTranspose objectAtIndex:i]];
+      [target addObject:arrayToTranspose[i]];
       // may raise if arrayToTranspose is not an FSArray  
     }
   }
@@ -689,7 +689,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
     {
       pos[transposition_vector[depth]] = i;
 
-      transpose_rec([arrayToTranspose objectAtIndex:i], pos, pos_count, depth+1,transposition_vector,result);
+      transpose_rec(arrayToTranspose[i], pos, pos_count, depth+1,transposition_vector,result);
       // may raise if arrayToTranspose is not an FSArray
     }
   } 
@@ -733,7 +733,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
   transposition_vector = malloc(sizeof(NSInteger)*[transposition_vector_array count]);
 
   for (i = 0; i < [transposition_vector_array count]; i++)
-    transposition_vector[i] = [[transposition_vector_array objectAtIndex:i] doubleValue];
+    transposition_vector[i] = [transposition_vector_array[i] doubleValue];
 
   logText = @"receiver of message \"transposedBy:\" must be an array structured as an hypercube";
   
@@ -769,7 +769,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
   
   for (i=0; i <count; i++)
   {
-    id elem = [self objectAtIndex:i];
+    id elem = self[i];
    
     if (elem) [set addObject:elem];
     else      no_nil = NO;
@@ -779,7 +779,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
   
   for (i=0; i <op_count; i++)
   {
-    id elem = [operand objectAtIndex:i];
+    id elem = operand[i];
     if (elem) [set addObject:elem];
     else      no_nil = NO;
   }    
@@ -811,16 +811,16 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
     
     for (i = 0; i < count; i++) 
     {
-      boolean = [booleans objectAtIndex:i];
+      boolean = booleans[i];
       
       if (boolean == fsFalse || boolean == nil) 
         continue;
       else if (boolean == fsTrue)
-        [result addObject:[self objectAtIndex:i]];
+        [result addObject:self[i]];
       else if ([boolean isKindOfClass:[FSBoolean class]])
       {
         if ([boolean isTrue])
-          [result addObject:[self objectAtIndex:i]];
+          [result addObject:self[i]];
       }
       else
         FSExecError(@"argument of method \"where:\" must be an array of booleans");
@@ -845,7 +845,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
   
   if (lim > 0)
   {
-    elemStr = printString([self objectAtIndex:0]);
+    elemStr = printString(self[0]);
     [str appendString:elemStr];  
   }          
     
@@ -854,7 +854,7 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
     [str appendString:@", "];
     if ([elemStr length] > 20) [str appendString:@"\n"];
     
-    elemStr = printString([self objectAtIndex:i]);
+    elemStr = printString(self[i]);
     [str appendString:elemStr];      
   }
   
@@ -867,6 +867,6 @@ void transpose_rec(NSArray *arrayToTranspose, NSInteger *pos, NSUInteger pos_cou
 
 -(NSUInteger) _ul_count  { return [self count]; }
 
-- _ul_objectAtIndex:(NSUInteger)index { return [self objectAtIndex:index];}
+- _ul_objectAtIndex:(NSUInteger)index { return self[index];}
 
 @end

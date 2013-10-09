@@ -110,7 +110,7 @@ static NSTimeInterval maxInterval=10.0;
   if (!inputString)
     inputString=@"";
   if (!args)
-    args = [NSArray array];
+    args = @[];
   if (!program)
     return @"error: programName must be set";
   if (doIt) {

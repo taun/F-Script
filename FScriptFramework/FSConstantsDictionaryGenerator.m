@@ -31,13 +31,13 @@
 #import <InstantMessage/IMService.h>
 #import <InstantMessage/IMAVManager.h>
 #import <IOBluetooth/IOBluetooth.h>
-#import <IOBluetooth/objc/IOBluetoothHandsFreeGateway.h>
-#import <IOBluetooth/objc/IOBluetoothRFCOMMAudioController.h>
+//#import <IOBluetooth/objc/IOBluetoothHandsFreeGateway.h>
+//#import <IOBluetooth/objc/IOBluetoothRFCOMMAudioController.h>
 #import <IOBluetoothUI/IOBluetoothUI.h>
 //#import <JavaScriptCore/JavaScriptCore.h>
 //#import <JavaVM/JavaVM.h>
 #import <LatentSemanticMapping/LatentSemanticMapping.h>
-#import <Message/NSMailDelivery.h>
+//#import <Message/MessageExport.h>
 //#import <OpenDirectory/OpenDirectory.h>
 #import <OpenGL/OpenGL.h>
 #import <OpenGL/glu.h>

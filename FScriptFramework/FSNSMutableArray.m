@@ -18,7 +18,7 @@
 
 - (id)at:(id)index put:(id)elem
 {
-  double ind;
+  NSUInteger ind;
   NSUInteger count = [self count];
     
   if (!index) FSExecError(@"index of an array must not be nil");    
@@ -30,7 +30,7 @@
     NSUInteger currentIndex = [index firstIndex];
     while (currentIndex != NSNotFound)
     {
-      [newIndex addObject:[NSNumber numberWithDouble:currentIndex]];
+      [newIndex addObject:@(currentIndex)];
       currentIndex = [index indexGreaterThanIndex:currentIndex];
     }
     index = newIndex;
@@ -38,12 +38,12 @@
   
   if ([index isKindOfClass:[NSNumber class]])
   {      
-    ind = [index doubleValue];
+    ind = [index unsignedIntegerValue];
                                                
-    if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");              
+    //if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");
     if (ind >= count) FSExecError(@"index of an array must be a number less than the size of the array");
     
-    [self replaceObjectAtIndex:ind withObject:elem];
+    self[ind] = elem;
   }
   else if ([index isKindOfClass:[NSArray class]])
   {
@@ -59,7 +59,7 @@
     
     if (elemIsArray) elem_count = [elem count];
             
-    while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+    while (i < nb && !index[i]) i++; // ignore the nil value
     
     if (i == nb)
     {
@@ -67,7 +67,7 @@
       else FSExecError(@"invalid index");
     }
     
-    elem_index = [index objectAtIndex:i];
+    elem_index = index[i];
 
     if ([elem_index isKindOfClass:[FSBoolean class]])
     {
@@ -79,7 +79,7 @@
       {  
         for (k=i, trueCount=0; k<nb; k++)
         {
-          elem_index = [index objectAtIndex:k];
+          elem_index = index[k];
           if (elem_index == fsTrue || (elem_index != fsFalse && [elem_index isKindOfClass:[FSBoolean class]] && [elem_index isTrue]))
             trueCount++;
         }
@@ -89,17 +89,17 @@
                                    
       while (i < nb)
       {
-        elem_index = [index objectAtIndex:i];
+        elem_index = index[i];
         
         if (elem_index == fsTrue || (elem_index != fsFalse && [elem_index isKindOfClass:[FSBoolean class]] && [elem_index isTrue]) )
         {
-          [self replaceObjectAtIndex:i withObject:elemIsArray ? [elem objectAtIndex:j] : elem];
+          self[i] = elemIsArray ? elem[j] : elem;
           j++;
         }
         else if (elem_index != fsFalse && ![elem_index isKindOfClass:[FSBoolean class]]) FSExecError(@"indexing with a mixed array");
         
         i++;
-        while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+        while (i < nb && !index[i]) i++; // ignore the nil value
       }
       return elem;
     }  
@@ -110,7 +110,7 @@
       
       for (k=i; k<nb; k++)
       {
-        elem_index = [index objectAtIndex:k];
+        elem_index = index[k];
         if (![elem_index isKindOfClass:[NSNumber class]]) FSExecError(@"array indexing by a mixed array");
         ind = [elem_index doubleValue];
         if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");              
@@ -119,11 +119,11 @@
       
       while (i < nb)
       {        
-        elem_index = [index objectAtIndex:i];
+        elem_index = index[i];
         ind = [elem_index doubleValue];        
-        [self replaceObjectAtIndex:ind withObject:elemIsArray ? [elem objectAtIndex:i] : elem];
+        self[ind] = elemIsArray ? elem[i] : elem;
         i++;
-        while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+        while (i < nb && !index[i]) i++; // ignore the nil value
       }
     }  
     else // elem_index is neither an NSNumber nor a FSBoolean
@@ -176,7 +176,7 @@
     
     indexSet = [NSMutableIndexSet indexSet];
                 
-    while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+    while (i < nb && !index[i]) i++; // ignore the nil value
     
     if (i == nb)
     {
@@ -184,7 +184,7 @@
       else FSExecError(@"invalid index");
     }
     
-    id elem_index = [index objectAtIndex:i];
+    id elem_index = index[i];
 
     if ([elem_index isKindOfClass:[FSBoolean class]])
     {
@@ -193,7 +193,7 @@
                                          
       while (i < nb)
       {
-        elem_index = [index objectAtIndex:i];
+        elem_index = index[i];
         
         if (elem_index == fsTrue || (elem_index != fsFalse && [elem_index isKindOfClass:[FSBoolean class]] && [elem_index isTrue]) )
           [indexSet addIndex:i];
@@ -201,7 +201,7 @@
           FSExecError(@"indexing with a mixed array");
         
         i++;
-        while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+        while (i < nb && !index[i]) i++; // ignore the nil value
       }
     }  
     else if ([elem_index isKindOfClass:[NSNumber class]])
@@ -211,7 +211,7 @@
       
       for (k=i; k<nb; k++)
       {
-        elem_index = [index objectAtIndex:k];
+        elem_index = index[k];
         if (![elem_index isKindOfClass:[NSNumber class]]) FSExecError(@"indexing with a mixed array");
         ind = [elem_index doubleValue];
         if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");              
@@ -220,11 +220,11 @@
       
       while (i < nb)
       {        
-        elem_index = [index objectAtIndex:i];
+        elem_index = index[i];
         ind = [elem_index doubleValue];        
         [indexSet addIndex:ind];
         i++;
-        while (i < nb && ![index objectAtIndex:i]) i++; // ignore the nil value
+        while (i < nb && !index[i]) i++; // ignore the nil value
       }
     }  
     else // elem_index is neither an NSNumber nor a FSBoolean
@@ -258,7 +258,7 @@
   
   for (NSUInteger i = 0; i < count; i++)
   {
-    id boolean = [booleans objectAtIndex:i];
+    id boolean = booleans[i];
     
     if (boolean != fsFalse && boolean != fsTrue && boolean != nil && ![boolean isKindOfClass:FSBooleanClass]) 
       FSExecError(@"argument of method \"removeWhere:\" must be an array of booleans");
@@ -266,7 +266,7 @@
   
   for (NSUInteger i = count; i > 0; i--)
   {
-    id boolean = [booleans objectAtIndex:i-1];
+    id boolean = booleans[i-1];
     
     if (boolean == fsFalse || boolean == nil) 
       continue;
@@ -297,7 +297,7 @@
     
   for (NSUInteger i = 0; i < count; i++)
   {
-    id boolean = [booleans objectAtIndex:i];
+    id boolean = booleans[i];
     
     if (boolean == fsFalse || boolean == nil) 
       continue;
@@ -320,11 +320,11 @@
   
   for (NSUInteger i = 0, j = 0; i < count; i++) 
   {
-    id boolean = [booleans objectAtIndex:i];
+    id boolean = booleans[i];
     
     if (boolean == fsTrue || (boolean != fsFalse && [boolean isKindOfClass:FSBooleanClass] && [boolean isTrue]))
     {
-      [self replaceObjectAtIndex:i withObject:elemIsArray ? [elem objectAtIndex:j] : elem];
+      self[i] = elemIsArray ? elem[j] : elem;
       j++;
     }
   }

@@ -327,9 +327,9 @@ void inspectCollection(id collection, FSSystem *system, NSArray *blocks)  // Fac
   if (blocks)
     for (i=0, count=[blocks count]; i < count; i++)
     {
-      if (![[blocks objectAtIndex:i] isKindOfClass:[FSBlock class]])
+      if (![blocks[i] isKindOfClass:[FSBlock class]])
         FSExecError(@"argument 2 of method \"inspectWithSystem:blocks:\" must be an array of blocks");
-      if ([[blocks objectAtIndex:i] argumentCount] > 1)
+      if ([blocks[i] argumentCount] > 1)
         FSExecError(@"argument 2 of method \"inspectWithSystem:blocks:\" must be an array of blocks taking no more than one argument");
     }
   
@@ -343,7 +343,7 @@ void FSInspectBlocksInCallStackForException(id exception)
     id blockStack;
     NSDictionary *userInfo = [[[exception userInfo] retain] autorelease]; // to be sure it stay alive during the rest of the current method    
 
-    if (userInfo && (blockStack = [userInfo objectForKey:@"FScriptBlockStack"]) )
+    if (userInfo && (blockStack = userInfo[@"FScriptBlockStack"]) )
       inspectBlocksInCallStack(blockStack);
   }
 }      
@@ -362,7 +362,7 @@ void inspectBlocksInCallStack(NSArray *callStack)
 
   for (i = [callStack count]-1, openedInspectors = 0; i >= 0 && openedInspectors < 40; i--)
   {
-    blockStackElem = [callStack objectAtIndex:i];
+    blockStackElem = callStack[i];
     
     if (![distinctBlocks containsObject:[blockStackElem block]])
     {

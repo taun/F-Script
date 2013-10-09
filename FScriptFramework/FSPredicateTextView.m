@@ -13,7 +13,7 @@ static NSAttributedString *predicatePrompt;
   if (!initialized) 
   { 
     NSColor *txtColor = [NSColor grayColor];
-    NSDictionary *txtDict = [NSDictionary dictionaryWithObjectsAndKeys:txtColor, NSForegroundColorAttributeName, nil];
+    NSDictionary *txtDict = @{NSForegroundColorAttributeName: txtColor};
     predicatePrompt = [[NSAttributedString alloc] initWithString:@" <Enter a predicate here>" attributes:txtDict];
   } 
 } 

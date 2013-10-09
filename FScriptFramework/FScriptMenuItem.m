@@ -11,8 +11,8 @@
 {  
   NSMutableDictionary *registrationDict = [NSMutableDictionary dictionary];
 
-  [registrationDict setObject:[NSNumber numberWithDouble:[[NSFont userFixedPitchFontOfSize:-1] pointSize]] forKey:@"FScriptFontSize"];
-  [registrationDict setObject:@"YES" forKey:@"FScriptAutomaticallyIntrospectDeclaredProperties"];  
+  registrationDict[@"FScriptFontSize"] = @([[NSFont userFixedPitchFontOfSize:-1] pointSize]);
+  registrationDict[@"FScriptAutomaticallyIntrospectDeclaredProperties"] = @"YES";  
  
   [[NSUserDefaults standardUserDefaults] registerDefaults:registrationDict];
 }

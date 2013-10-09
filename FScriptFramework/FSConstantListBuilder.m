@@ -91,9 +91,9 @@ b constantsInitializerString.
   
   ////////////////// Processing "constant" elements
     
-  NSString *CFStringRefEncode  = [NSString stringWithUTF8String:@encode(CFStringRef)];
-  NSString *CFNumberRefEncode  = [NSString stringWithUTF8String:@encode(CFNumberRef)];
-  NSString *CFBooleanRefEncode = [NSString stringWithUTF8String:@encode(CFBooleanRef)];
+  NSString *CFStringRefEncode  = @(@encode(CFStringRef));
+  NSString *CFNumberRefEncode  = @(@encode(CFNumberRef));
+  NSString *CFBooleanRefEncode = @(@encode(CFBooleanRef));
   NSArray *constants = [signatures elementsForName:@"constant"];
   
   for (NSXMLElement *constant in constants) 

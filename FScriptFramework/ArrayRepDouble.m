@@ -1274,7 +1274,7 @@ static int comp(const void *a,const void *b)
     
     for (NSUInteger i = 0; i < count; i++) 
     {
-      boolean = [booleans objectAtIndex:i];
+      boolean = booleans[i];
       
       if (boolean == fsFalse || boolean == nil) 
         continue;
