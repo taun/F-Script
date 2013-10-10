@@ -368,10 +368,10 @@ void assign(FSCNBase *lnode, id rvalue, FSSymbolTable *symbolTable)
     if (![symbolTable setObject:rvalue forIndex:((FSCNIdentifier *)lnode)->locationInContext])
     {
       id s;
-      
-      if (symbolTable->localCount != 0 && [symbolTable->locals[0].symbol isEqualToString:@"self"] && symbolTable->locals[0].status == DEFINED)
+      FSContextValueWrapper* localsZero = (FSContextValueWrapper*)symbolTable.locals[0];
+      if (symbolTable.locals.count != 0 && [localsZero.symbol isEqualToString:@"self"] && localsZero.status == DEFINED)
       {
-        s = symbolTable->locals[0].value;      
+        s = localsZero.value;
       }
       else
       {
@@ -1049,14 +1049,14 @@ id sendMsg(id receiver, SEL selector, NSUInteger argumentCount, id *args, FSPatt
   else         return sendMsgNoPattern(receiver, selector, argumentCount, args, msgContext, ancestorToStartWith);
 }
     
-struct res_exec execute(FSCNBase *codeNode, FSSymbolTable *symbolTable) // may raise
+ExecException* execute(FSCNBase *codeNode, FSSymbolTable *symbolTable) // may raise
 {
   return executeForBlock(codeNode, symbolTable, nil);
 }    
     
-struct res_exec executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, FSBlock* executedBlock) // may raise
+ExecException* executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, FSBlock* executedBlock) // may raise
 {
-  struct res_exec r = {-1, -1, nil, nil, nil}; // initialized to avoid spurious warnings
+  ExecException* r = [ExecException new]; // initialized to avoid spurious warnings
   NSInteger errorFirstCharIndex = -1;
   NSInteger errorLastCharIndex  = -1;
 
@@ -1234,10 +1234,10 @@ id execute_rec(FSCNBase *codeNode, FSSymbolTable *localSymbolTable, NSInteger *e
       id s;
       
       // Look up instance variables
-
-      if (localSymbolTable->localCount != 0 && [localSymbolTable->locals[0].symbol isEqualToString:@"self"] && localSymbolTable->locals[0].status == DEFINED)
+      FSContextValueWrapper* localsZero = (FSContextValueWrapper*)localSymbolTable.locals[0];
+      if (localSymbolTable.locals.count != 0 && [localsZero.symbol isEqualToString:@"self"] && localsZero.status == DEFINED)
       {
-        s = localSymbolTable->locals[0].value;      
+        s = localsZero.value;
       }
       else
       {
