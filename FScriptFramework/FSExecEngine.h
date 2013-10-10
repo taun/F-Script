@@ -11,14 +11,15 @@
 @class FSBlock;
 @class FSObjectPointer;
 
-struct res_exec
-{
- NSInteger errorFirstCharIndex;
- NSInteger errorLastCharIndex;
- NSString *errorStr;
- id exception;
- id result;
-};
+@interface ExecException : NSObject
+
+    @property(nonatomic,assign) NSInteger errorFirstCharIndex;
+    @property(nonatomic,assign) NSInteger errorLastCharIndex;
+    @property(nonatomic,copy) NSString *errorStr;
+    @property(nonatomic,strong) id exception;
+    @property(nonatomic,strong) id result;
+
+@end
 
 union ObjCValue
 {
@@ -56,9 +57,9 @@ void FSMapFromObject(void *valuePtr, NSUInteger index, char fsEncodedType, id ob
 
 id FSMapToObject(void *valuePtr, NSUInteger index, char fsEncodedType, const char *foundationStyleEncodedType, NSString *unsuportedTypeErrorMessage, NSString *ivarName);
 
-struct res_exec execute(FSCNBase *codeNode, FSSymbolTable *symbolTable); // may raise 
+ExecException* execute(FSCNBase *codeNode, FSSymbolTable *symbolTable); // may raise
 
-struct res_exec executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, FSBlock* executedBlock); // may raise
+ExecException* executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, FSBlock* executedBlock); // may raise
 
 id execute_rec(FSCNBase *codeNode, FSSymbolTable *localSymbolTable, NSInteger *errorFirstCharIndexPtr, NSInteger *errorLastCharIndexPtr);  
 
