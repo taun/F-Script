@@ -54,16 +54,19 @@
 #import "FSAssociation.h"
 #import "FSNewlyAllocatedObject.h"
 
+@implementation ExecException
+
+
+@end
+
 static NSMutableSet *issuedWarnings;
 
 void __attribute__ ((constructor)) initializeFSExecEngine(void) 
 {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-  
-  [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"MaintainFScript1EqualityOperatorsSemantics": @"YES"}];
-  issuedWarnings = [[NSMutableSet alloc] init];  
-  
-  [pool release];
+  @autoreleasepool {
+    [[NSUserDefaults standardUserDefaults] registerDefaults:@{@"MaintainFScript1EqualityOperatorsSemantics": @"YES"}];
+    issuedWarnings = [[NSMutableSet alloc] init];
+  }
 }
 
 
@@ -368,7 +371,7 @@ void assign(FSCNBase *lnode, id rvalue, FSSymbolTable *symbolTable)
     if (![symbolTable setObject:rvalue forIndex:((FSCNIdentifier *)lnode)->locationInContext])
     {
       id s;
-      FSContextValueWrapper* localsZero = (FSContextValueWrapper*)symbolTable.locals[0];
+      SymbolTableValueWrapper* localsZero = (SymbolTableValueWrapper*)symbolTable.locals[0];
       if (symbolTable.locals.count != 0 && [localsZero.symbol isEqualToString:@"self"] && localsZero.status == DEFINED)
       {
         s = localsZero.value;
@@ -1234,7 +1237,7 @@ id execute_rec(FSCNBase *codeNode, FSSymbolTable *localSymbolTable, NSInteger *e
       id s;
       
       // Look up instance variables
-      FSContextValueWrapper* localsZero = (FSContextValueWrapper*)localSymbolTable.locals[0];
+      SymbolTableValueWrapper* localsZero = (SymbolTableValueWrapper*)localSymbolTable.locals[0];
       if (localSymbolTable.locals.count != 0 && [localsZero.symbol isEqualToString:@"self"] && localsZero.status == DEFINED)
       {
         s = localsZero.value;

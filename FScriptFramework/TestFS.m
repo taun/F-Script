@@ -1182,7 +1182,7 @@ void logFloat(int dummy, ...)
 
 + (BOOL)tollFreeTest
 {
-  return @NO == (id)kCFBooleanFalse;
+  return [@NO  isEqual: (id)kCFBooleanFalse];
 }
 
 + (NSInteger)iii

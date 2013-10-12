@@ -4,6 +4,12 @@
 #import "FScriptMenuItem.h"
 #import "FSInterpreter.h"
 #import "FSInterpreterView.h"
+#import "FSObjectBrowser.h"
+
+@interface FScriptMenuItem ()
+
+
+@end
 
 @implementation FScriptMenuItem
  
@@ -71,7 +77,7 @@
 
 - (IBAction)openObjectBrowser:(id)sender
 {
-  [[[self interpreterView] interpreter] browse]; 
+  [[[self interpreterView] interpreter] browse];
 } 
 
 - (IBAction)showConsole:(id)sender

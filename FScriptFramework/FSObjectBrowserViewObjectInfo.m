@@ -1471,7 +1471,6 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
   //[m scrollCellToVisibleAtRow:[matrix selectedRow] column:0];
   [m setNeedsDisplay];
                     
-  [objectHelper release];
 }
 
 @end 
@@ -1501,7 +1500,7 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
 
 #define ADD_POINT(POINT,LABEL)             @try { [view addObject:[NSValue valueWithPoint:(POINT)]    withLabel:(LABEL) toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject]; } @catch (id exception) { NSLog(@"%@",exception); }
 
-#define ADD_POINTER(POINTER,LABEL)         @try { if (POINTER == NULL) ADD_OBJECT(nil,LABEL) else [view addObject:[[[FSGenericPointer alloc] initWithCPointer:(POINTER) freeWhenDone:NO type:@encode(void)] autorelease] withLabel:(LABEL) toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject]; } @catch (id exception) { NSLog(@"%@",exception); }
+#define ADD_POINTER(POINTER,LABEL)         @try { if (POINTER == NULL) ADD_OBJECT(nil,LABEL) else [view addObject:[[FSGenericPointer alloc] initWithCPointer:(POINTER) freeWhenDone:NO type:@encode(void)] withLabel:(LABEL) toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject]; } @catch (id exception) { NSLog(@"%@",exception); }
 
 #define ADD_RANGE(RANGE,LABEL)             @try { [view addObject:[NSValue valueWithRange:(RANGE)]      withLabel:(LABEL) toMatrix:m classLabel:classLabel selectedClassLabel:selectedClassLabel selectedLabel:selectedLabel selectedObject:selectedObject]; } @catch (id exception) { NSLog(@"%@",exception); }
 
@@ -1523,28 +1522,21 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
       return nil;
     }
     
-    view = [theView autorelease];
+    view = theView;
   }
   
   return self;
 }
 
-- (void)dealloc
-{
-  [baseClasses release];
-  
-  [super dealloc];
-}
 
 - (void)fillMatrix:(NSMatrix *)theMatrix withObject:(id)object
 {
   
-  [object retain]; // (1) To be sure object will not be deallocated as a side effect of the removing of rows
   
   m = theMatrix;
-  selectedCell = [[[m selectedCell] retain] autorelease];        // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
-  selectedClassLabel = [[[selectedCell classLabel] copy] autorelease]; // copy and autorelease in order to avoid premature invalidation as a side effect of the removing of rows
-  selectedLabel      = [[[selectedCell label] copy] autorelease];      // copy and autorelease in order to avoid premature invalidation as a side effect of the removing of rows
+  selectedCell = [m selectedCell];        // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
+  selectedClassLabel = [[selectedCell classLabel] copy]; // copy and autorelease in order to avoid premature invalidation as a side effect of the removing of rows
+  selectedLabel      = [[selectedCell label] copy];      // copy and autorelease in order to avoid premature invalidation as a side effect of the removing of rows
   selectedObject            = [selectedCell representedObject];
   classLabel = @"";
   
@@ -1552,7 +1544,6 @@ static id objectFromWritingDirection(NSWritingDirection writingDirection)
   [m renewRows:0 columns:1]; 
   
   [view addObject:object toMatrix:m label:@"" classLabel:@"" indentationLevel:0 leaf:YES];
-  [object release]; // It's now safe to match the retain in instruction (1)
   
   if (selectedObject == object && [selectedClassLabel isEqualToString:@""] && [selectedLabel isEqualToString:@""])
     [m selectCellAtRow:[m numberOfRows]-1 column:0];

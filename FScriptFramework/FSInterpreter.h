@@ -2,16 +2,20 @@
 /*   This software is open source. See the license.  */  
 
 #import <Foundation/Foundation.h>
+#import <AppKit/AppKit.h>
+
 #import "FSInterpreterResult.h"
 
 @class FSExecutor;
+@class FSObjectBrowser;
 
-@interface FSInterpreter : NSObject <NSCoding>
+
+@interface FSInterpreter : NSObject <NSCoding, NSWindowDelegate>
 {
-  FSExecutor *executor;
+  FSExecutor *_executor;
 }
 
-+ (FSInterpreter *)interpreter;
++ (FSInterpreter *)newInterpreter;
 + (BOOL) validateSyntaxForIdentifier:(NSString *)identifier;
 
 - (void) browse;

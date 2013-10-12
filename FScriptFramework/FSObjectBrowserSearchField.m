@@ -21,22 +21,22 @@
   self = [super initWithFrame:frame];
   if (self) 
   {
-    NSMenu *cellMenu = [[[NSMenu alloc] initWithTitle:@"Search Menu"] autorelease];
+    NSMenu *cellMenu = [[NSMenu alloc] initWithTitle:@"Search Menu"];
     NSMenuItem *item1, *item2, *item3, *item4, *item5, *item6, *item7 ;
 
-    item1 = [[[NSMenuItem alloc] initWithTitle:@"Recent Searches" action: @selector(limitOne:) keyEquivalent:@""] autorelease];
+    item1 = [[NSMenuItem alloc] initWithTitle:@"Recent Searches" action: @selector(limitOne:) keyEquivalent:@""];
     [item1 setTag:NSSearchFieldRecentsTitleMenuItemTag];
     [cellMenu insertItem:item1 atIndex:0];
 
-    item2 = [[[NSMenuItem alloc] initWithTitle:@"Recents" action:@selector(limitTwo:) keyEquivalent:@""]  autorelease];
+    item2 = [[NSMenuItem alloc] initWithTitle:@"Recents" action:@selector(limitTwo:) keyEquivalent:@""];
     [item2 setTag:NSSearchFieldRecentsMenuItemTag];
     [cellMenu insertItem:item2 atIndex:1];
 
-    item3 = [[[NSMenuItem alloc] initWithTitle:@"Clear" action:@selector(limitThree:) keyEquivalent:@""]  autorelease];
+    item3 = [[NSMenuItem alloc] initWithTitle:@"Clear" action:@selector(limitThree:) keyEquivalent:@""];
     [item3 setTag:NSSearchFieldClearRecentsMenuItemTag];
     [cellMenu insertItem:item3 atIndex:2];
 
-    item4 = [[[NSMenuItem alloc] initWithTitle:@"No Recent Searches" action:@selector(limitFour:) keyEquivalent:@""]  autorelease];
+    item4 = [[NSMenuItem alloc] initWithTitle:@"No Recent Searches" action:@selector(limitFour:) keyEquivalent:@""];
     [item4 setTag:NSSearchFieldNoRecentsMenuItemTag];
     [cellMenu insertItem:item4 atIndex:3];
     
@@ -44,12 +44,12 @@
     item5 = (id)[NSMenuItem separatorItem];
     [cellMenu insertItem:item5 atIndex:4];
     
-    item6 = [[[NSMenuItem alloc] initWithTitle:@"Do Not Show Selectors Starting With \"_\"" action:@selector(changeUnderscoreFilterPreference:) keyEquivalent:@""] autorelease];
+    item6 = [[NSMenuItem alloc] initWithTitle:@"Do Not Show Selectors Starting With \"_\"" action:@selector(changeUnderscoreFilterPreference:) keyEquivalent:@""];
     [item6 setTarget:self];
     [item6 setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"FScriptDoNotShowSelectorsStartingWithUnderscore"] ? NSOnState : NSOffState];
     [cellMenu insertItem:item6 atIndex:5];
     
-    item7 = [[[NSMenuItem alloc] initWithTitle:@"Do Not Show Selectors Starting With \"accessibility\"" action:@selector(changeAccessibilityFilterPreference:) keyEquivalent:@""] autorelease];
+    item7 = [[NSMenuItem alloc] initWithTitle:@"Do Not Show Selectors Starting With \"accessibility\"" action:@selector(changeAccessibilityFilterPreference:) keyEquivalent:@""];
     [item7 setTarget:self];
     [item7 setState:[[NSUserDefaults standardUserDefaults] boolForKey:@"FScriptDoNotShowSelectorsStartingWithAccessibility"] ? NSOnState : NSOffState];
     [cellMenu insertItem:item7 atIndex:6];

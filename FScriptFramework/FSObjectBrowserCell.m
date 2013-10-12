@@ -9,22 +9,16 @@
 
 + (NSImage *)branchImage {return nil; /* No branch image */ } 
 
-- (id) autorelease 
-{
-  //NSLog(@"autorelease called");
-  return [super autorelease];
-}
+//- (id) autorelease 
+//{
+//  //NSLog(@"autorelease called");
+//  return [super autorelease];
+//}
 
 - (enum FSObjectBrowserCellType)objectBrowserCellType { return objectBrowserCellType; }
 
 - (NSString *)classLabel { return classLabel; }
 
--(void) dealloc
-{
-  [label release];               
-  [classLabel release];          
-  [super dealloc];
-}
 
 - init
 {
@@ -38,11 +32,11 @@
 
 - (NSString *)label { return label; }
 
-- (oneway void) release
-{
-  //NSLog(@"release called");
-  [super release];
-}
+//- (oneway void) release
+//{
+//  //NSLog(@"release called");
+//  [super release];
+//}
 
 - (id)representedObject
 {
@@ -74,15 +68,11 @@
 
 - (void) setClassLabel:(NSString *)theClassLabel
 { 
-  [theClassLabel retain];
-  [classLabel release];
   classLabel = theClassLabel;
 }
 
 - (void) setLabel:(NSString *)theLabel
 { 
-  [theLabel retain];
-  [label release];
   label = theLabel;
 }
 

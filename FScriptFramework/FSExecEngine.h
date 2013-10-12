@@ -21,9 +21,10 @@
 
 @end
 
+#pragma message "need to investigate life of object referenced in ObjCValue union."
 union ObjCValue
 {
-  id                 idValue;
+  id   __unsafe_unretained     idValue;
   Class              ClassValue;
   SEL                SELValue;
   _Bool              _BoolValue;

@@ -25,6 +25,7 @@ static BOOL isEmpty(NSString *str)
 }  
 
 @interface FSInterpreterView(FSInterpreterViewPrivate)
+
 - (CLIView *)cliView;
 @end
 
@@ -75,7 +76,7 @@ static BOOL isEmpty(NSString *str)
 
   if (isEmpty(aString)) return;
 
-  execResult = [interpreter execute:aString];
+  execResult = [self.interpreter execute:aString];
 
   if ([execResult isOK])
   {
@@ -103,13 +104,6 @@ static BOOL isEmpty(NSString *str)
   }
 }
 
-- (void) dealloc
-{
-  //NSLog(@"FSInterpreterView dealloc");
-  [interpreter release];
-  [super dealloc];
-}
-
 - (void)encodeWithCoder:(NSCoder *)coder
 {
   //id sub;
@@ -124,11 +118,11 @@ static BOOL isEmpty(NSString *str)
 
   if ([coder allowsKeyedCoding]) 
   {
-    [coder encodeObject:interpreter forKey:@"interpreter"];
+    [coder encodeObject: self.interpreter forKey:@"interpreter"];
   }
   else
   {
-    [coder encodeObject:interpreter];
+    [coder encodeObject: self.interpreter];
   }  
 
   //[[[self subviews] objectAtIndex:0] setDocumentView:sub]; 
@@ -183,11 +177,11 @@ static BOOL isEmpty(NSString *str)
   
   if ([coder allowsKeyedCoding]) 
   {
-    interpreter = [[coder decodeObjectForKey:@"interpreter"] retain];  
+    _interpreter = [coder decodeObjectForKey:@"interpreter"];
   }
   else
   {
-    interpreter = [[coder decodeObject] retain];  
+    _interpreter = [coder decodeObject];
   }  
   return self;
 }
@@ -197,7 +191,7 @@ static BOOL isEmpty(NSString *str)
   self = [super initWithFrame:frameRect];
   if (self)
   {
-    CLIView *cliView =[[[CLIView alloc] initWithFrame:[self bounds]] autorelease]; 
+    CLIView *cliView =[[CLIView alloc] initWithFrame:[self bounds]];
     
     [cliView setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable]; 
     [cliView setCommandHandler:self];
@@ -207,19 +201,14 @@ static BOOL isEmpty(NSString *str)
     [self setAutoresizingMask:NSViewWidthSizable | NSViewHeightSizable]; 
     [self setFontSize:[[NSUserDefaults standardUserDefaults] floatForKey:@"FScriptFontSize"]];
     
-    interpreter = [[FSInterpreter alloc] init];
+    _interpreter = [[FSInterpreter alloc] init];
   }
   return self;
 }
 
-- (FSInterpreter *)interpreter
-{
-  return interpreter;
-}
-
 - (void)newBigBrowser:sender // deprecated
 {
-  FSObjectBrowser *bb = [FSObjectBrowser objectBrowserWithRootObject:nil interpreter:interpreter];
+  FSObjectBrowser *bb = [FSObjectBrowser objectBrowserWithRootObject:nil interpreter: self.interpreter];
   [bb browseWorkspace];
   [bb makeKeyAndOrderFront:nil];  
 }
@@ -242,31 +231,25 @@ static BOOL isEmpty(NSString *str)
 -(void) setObject1:(id)obj
 {
   //NSLog(@"FSInterpreterView, setObject1:");
-  [interpreter setObject:obj forIdentifier:@"object1"];
+  [self.interpreter setObject:obj forIdentifier:@"object1"];
 }
 
--(void) setObject2:(id)obj {[interpreter setObject:obj forIdentifier:@"object2"];}
+-(void) setObject2:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object2"];}
 
--(void) setObject3:(id)obj {[interpreter setObject:obj forIdentifier:@"object3"];}
+-(void) setObject3:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object3"];}
 
--(void) setObject4:(id)obj {[interpreter setObject:obj forIdentifier:@"object4"];}
+-(void) setObject4:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object4"];}
 
--(void) setObject5:(id)obj {[interpreter setObject:obj forIdentifier:@"object5"];} 
+-(void) setObject5:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object5"];}
 
--(void) setObject6:(id)obj {[interpreter setObject:obj forIdentifier:@"object6"];}
+-(void) setObject6:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object6"];}
 
--(void) setObject7:(id)obj {[interpreter setObject:obj forIdentifier:@"object7"];}
+-(void) setObject7:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object7"];}
 
--(void) setObject8:(id)obj {[interpreter setObject:obj forIdentifier:@"object8"];}
+-(void) setObject8:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object8"];}
 
--(void) setObject9:(id)obj {[interpreter setObject:obj forIdentifier:@"object9"];}
+-(void) setObject9:(id)obj {[self.interpreter setObject:obj forIdentifier:@"object9"];}
 
--(void) setInterpreter:(FSInterpreter *)theInterpreter
-{
-  [theInterpreter retain];
-  [interpreter release];
-  interpreter = theInterpreter; 
-}
 
 - (CLIView *)cliView
 {

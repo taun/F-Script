@@ -301,7 +301,7 @@ void inspect(id object, FSInterpreter *interpreter, id argument)
     @catch (id exception)
     {
       error= YES;
-      [FSGenericObjectInspector genericObjectInspectorWithObject:object];
+      [FSGenericObjectInspector newGenericObjectInspectorWithObject:object];
     }
 
     if (!error)
@@ -310,7 +310,7 @@ void inspect(id object, FSInterpreter *interpreter, id argument)
         [object inspectWithSystem:[interpreter objectForIdentifier:@"sys" found:NULL]];
       else if ([object respondsToSelector:@selector(inspect)])
         [object inspect];
-      else [FSGenericObjectInspector genericObjectInspectorWithObject:object];
+      else [FSGenericObjectInspector newGenericObjectInspectorWithObject:object];
     }  
   }    
 }
@@ -333,7 +333,7 @@ void inspectCollection(id collection, FSSystem *system, NSArray *blocks)  // Fac
         FSExecError(@"argument 2 of method \"inspectWithSystem:blocks:\" must be an array of blocks taking no more than one argument");
     }
   
-  [FSCollectionInspector collectionInspectorWithCollection:collection interpreter:(system ? [system interpreter] : [FSInterpreter interpreter]) blocks:blocks];
+  [FSCollectionInspector collectionInspectorWithCollection:collection interpreter:(system ? [system interpreter] : [FSInterpreter newInterpreter]) blocks:blocks];
 }
 
 void FSInspectBlocksInCallStackForException(id exception)

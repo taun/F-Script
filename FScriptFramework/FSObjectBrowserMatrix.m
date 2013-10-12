@@ -87,29 +87,5 @@
   else return NSDragOperationCopy;
 }*/
 
-+ allocWithZone:(NSZone *)zone
-{
-  id r = [super allocWithZone:zone];
-  //NSLog([NSString stringWithFormat:@"FSObjectBrowserMatrix %p allocWithZone:", r]);
-  return r;
-}
-
-- retain
-{
-  //NSLog([NSString stringWithFormat:@"FSObjectBrowserMatrix %p retain", self]);
-  return [super retain];
-}
-
-- (oneway void)release
-{
-  //NSLog([NSString stringWithFormat:@"FSObjectBrowserMatrix %p release", self]);
-  [super release];
-}
-
-- (void) dealloc
-{
-  //NSLog([NSString stringWithFormat:@"FSObjectBrowserMatrix %p dealloc", self]);
-  [super dealloc];
-}
 
 @end

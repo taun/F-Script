@@ -14,7 +14,7 @@ const int FSObjectBrowserBottomBarHeight;
 @interface FSObjectBrowserView : NSView <NSBrowserDelegate, NSToolbarDelegate>
 {
   id rootObject;
-  FSInterpreter *interpreter;
+  FSInterpreter *_interpreter;
   NSBrowser *browser;
   FSObjectBrowserBottomBarTextDisplay *bottomBarTextDisplay;
   id selectedView;

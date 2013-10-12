@@ -8,13 +8,11 @@
 enum FSContext_symbol_status {DEFINED, UNDEFINED};
 
 @interface SymbolTableValueWrapper : NSObject <NSCopying , NSCoding>
-{
-@public
-  enum FSContext_symbol_status status;
-  id value;
-  NSString *symbol;
-  NSUInteger retainCount;
-}   
+
+@property (nonatomic,assign) enum FSContext_symbol_status status;
+@property (nonatomic,strong) id value;
+@property (nonatomic, strong) NSString *symbol;
+
 
 - (id)copy;
 
@@ -44,28 +42,22 @@ struct FSContextIndex
  int level;
 }; 
 
-struct FSContextValueWrapper
-{
-  enum FSContext_symbol_status status;
-  id value;
-  NSString *symbol;
-};
-
 @interface FSSymbolTable : NSObject <NSCopying , NSCoding>
 {
 @package
-  __strong struct FSContextValueWrapper *locals;
-  NSUInteger localCount;
-  BOOL receiverRetained; // When entering a method, the symbol table for this method does not retain the object associated with the "self" symbol 
+  NSMutableArray*       _locals;
+  BOOL receiverRetained; // When entering a method, the symbol table for this method does not retain the object associated with the "self" symbol
                          // (i.e., the receiver), as it might not be initialized yet (if we are entering in a init... method). This BOOL will
                          // be set to NO. The F-Script run-time will then retain the receiver as soon as it determine that it is okay and set this 
                          // boolean to YES in order to remember the job has been done and thus avoid over retaining.  
 
 @private
   NSUInteger retainCount;
-  FSSymbolTable *parent;
+  FSSymbolTable *_parent;
   BOOL tryToAttachWhenDecoding;
 }
+
+@property (nonatomic, strong) NSMutableArray* locals;
 
 + (void)initialize;
 + symbolTable;
@@ -76,8 +68,6 @@ struct FSContextValueWrapper
 
 - (id)copy;
 - (id)copyWithZone:(NSZone *)zone;
-
-- (void)dealloc;
 
 - (void) didSendDeallocToSymbolAtIndex:(struct FSContextIndex)index;
 
@@ -92,7 +82,7 @@ struct FSContextValueWrapper
 - init;
 - initWithParent:(FSSymbolTable *)theParent;
 - initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry;
-- initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry locals:(struct FSContextValueWrapper *)theLocals localCount:(NSUInteger)theLocalCount;
+- initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry locals:(NSMutableArray *)theLocals;
 
 - (id)initWithCoder:(NSCoder *)coder;
 

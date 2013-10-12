@@ -48,9 +48,6 @@
 - (void) dealloc
 {
   [[NSNotificationCenter defaultCenter] removeObserver:self];
-  [block release];
-  [identifier release];
-  [super dealloc];
 }
 
 - (id) initWithFrame:(NSRect)frameRect
@@ -86,15 +83,11 @@
 
 - (void) setBlock:(FSBlock *)theBlock
 {
-  [theBlock retain];
-  [block release];
   block = theBlock;
 }
 
 - (void) setIdentifier:(NSString *)theIdentifier
 {
-  [theIdentifier retain];
-  [identifier release];
   identifier = theIdentifier;
 }
 

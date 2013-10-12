@@ -20,9 +20,9 @@ void fscript_setDynamicIvarNames(Class class, NSSet *ivarNames);
   FSSymbolTable      *symbolTable;
   FSCNBase           *code;
   NSUInteger          argumentCount; // Number of arguments, including the two hidden arguments
-  __strong char      *fsEncodedTypes;
-  __strong char      *types;
-  __strong char     **typesByArgument;
+  char      *fsEncodedTypes;
+  char      *types;
+  char     **typesByArgument;
 }
 
 - (BOOL) addToClass:(Class)class;

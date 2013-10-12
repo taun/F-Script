@@ -27,7 +27,7 @@
   }
   else 
   {
-      interpreter = [FSInterpreter interpreter];
+      interpreter = [FSInterpreter newInterpreter];
   }
   
   raw_result = [interpreter execute:commandsString];

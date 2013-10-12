@@ -175,7 +175,7 @@ static NSString *humanReadableFScriptTypeDescriptionFromEncodedObjCType(const ch
     ptr++;
     while (isalnum(*ptr) || *ptr == '_')
     {
-      [structName appendString:[[[NSString alloc] initWithBytes:ptr length:1 encoding:NSASCIIStringEncoding] autorelease]];
+      [structName appendString:[[NSString alloc] initWithBytes:ptr length:1 encoding:NSASCIIStringEncoding]];
       ptr++;
     }
     if (*ptr == '=' && ![structName isEqualToString:@""])
@@ -232,6 +232,8 @@ static NSMutableArray *customButtons = nil;
 
 @interface FSObjectBrowserView()  // Methods declaration to let the compiler know
 
+@property (nonatomic,strong) FSInterpreter* interpreter;
+
 - (void) fillMatrixForClassesBrowsing:(NSMatrix*)matrix;
 - (void) fillMatrixForWorkspaceBrowsing:(NSMatrix*)matrix; 
 // - (void) fillMatrix:(NSMatrix *)matrix withMethodsAndPropertiesForObject:(id)object;
@@ -285,7 +287,7 @@ static NSMutableArray *customButtons = nil;
       { 
         @try
         {
-          block = [[NSKeyedUnarchiver unarchiveObjectWithData:blockData] retain];
+          block = [NSKeyedUnarchiver unarchiveObjectWithData:blockData];
         }
         @catch (id exception)
         {
@@ -498,7 +500,7 @@ static NSMutableArray *customButtons = nil;
     FSObjectBrowserButtonCtxBlock *contextualizedBlock;
     SEL messageToArgumentSelector;
     
-    contextualizedBlock = [interpreter objectBrowserButtonCtxBlockFromString:[block printString]];
+    contextualizedBlock = [self.interpreter objectBrowserButtonCtxBlockFromString:[block printString]];
     [contextualizedBlock setMaster:block];
     
     if ([contextualizedBlock argumentCount] == 0)
@@ -638,7 +640,7 @@ static NSMutableArray *customButtons = nil;
 {
   NSBrowserCell *cell;
   NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: color};
-  NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict] autorelease];
+  NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict];
 
   [self addBlankRowToMatrix:matrix];
 
@@ -713,7 +715,7 @@ static NSMutableArray *customButtons = nil;
   {
     NSColor *txtColor = [NSColor purpleColor];
     NSDictionary *txtDict = @{NSForegroundColorAttributeName: txtColor};
-    NSAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:cellString attributes:txtDict] autorelease];
+    NSAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:cellString attributes:txtDict];
     [cell setAttributedStringValue:attrStr];
   }
   else
@@ -802,7 +804,7 @@ static NSMutableArray *customButtons = nil;
 {
   NSBrowserCell *cell;
   NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: [NSColor redColor]};
-  NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict] autorelease];
+  NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@   ", label] attributes:txtDict];
 
   [self addBlankRowToMatrix:matrix];
   //[matrix addRow];
@@ -817,7 +819,7 @@ static NSMutableArray *customButtons = nil;
 
 - (IBAction)browseAction:(id)sender 
 {
-  [interpreter browse:[self selectedObject]];
+  [self.interpreter browse:[self selectedObject]];
 }
 
 - (void)browser:(NSBrowser *)sender createRowsForColumn:(NSInteger)column inMatrix:(NSMatrix *)matrix // We are our own delegate 
@@ -852,7 +854,7 @@ static NSMutableArray *customButtons = nil;
     NSArray     *selectorComponents = [NSStringFromSelector(selector) componentsSeparatedByString:@":"];
     NSInteger    nbarg              = [selectorComponents count]-1;
     id           selectedObject     = [self selectedObject];  
-    FSMsgContext  *msgContext         = [[[FSMsgContext alloc] init] autorelease];
+    FSMsgContext  *msgContext         = [[FSMsgContext alloc] init];
     NSInteger    unsupportedArgumentIndex;
 
     if ([selectedObject isKindOfClass:[FSNewlyAllocatedObjectHolder class]]) selectedObject = [selectedObject object];
@@ -875,7 +877,7 @@ static NSMutableArray *customButtons = nil;
     else if (nbarg == 0)
     {
       // NSBrowserCell *cell;
-      [self sendMessageTo:selectedObject selectorString:selectedString arguments:@[] putResultInMatrix:matrix];
+      [self sendMessageTo:selectedObject selectorString:selectedString arguments: [FSArray new] putResultInMatrix:matrix];
     
       /*if (cell = [matrix cellAtRow:0 column:0])
       {
@@ -898,15 +900,16 @@ static NSMutableArray *customButtons = nil;
       argumentsWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(100,100,baseWidth,baseHeight) styleMask:NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
       [argumentsWindow setMinSize:NSMakeSize(240,baseHeight+22)];
       [argumentsWindow setMaxSize:NSMakeSize(1400,baseHeight+22)];
+      [argumentsWindow setReleasedWhenClosed: NO];
       
-      f = [[[NSForm alloc] initWithFrame:NSMakeRect(20,60,baseWidth-40,baseHeight-80)] autorelease];
+      f = [[NSForm alloc] initWithFrame:NSMakeRect(20,60,baseWidth-40,baseHeight-80)];
       [f setAutoresizingMask:NSViewWidthSizable];
       [f setInterlineSpacing:8]; 
       [[argumentsWindow contentView] addSubview:f]; // The form must be the first subview 
                                                     // (this is used by method sendMessageAction:)
       [argumentsWindow setInitialFirstResponder:f];                                              
                                                           
-      sendButton = [[[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2,13,125,30)] autorelease];
+      sendButton = [[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2,13,125,30)];
       [sendButton setBezelStyle:1];
       [sendButton setTitle:@"Send Message"];   
       [sendButton setAction:@selector(sendMessageAction:)];
@@ -914,7 +917,7 @@ static NSMutableArray *customButtons = nil;
       [sendButton setKeyEquivalent:@"\r"];
       [[argumentsWindow contentView] addSubview:sendButton];
       
-      cancelButton = [[[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2-95,13,95,30)] autorelease];
+      cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2-95,13,95,30)];
       [cancelButton setBezelStyle:1];
       [cancelButton setTitle:@"Cancel"];   
       [cancelButton setAction:@selector(cancelArgumentsSheetAction:)];
@@ -963,16 +966,14 @@ static NSMutableArray *customButtons = nil;
 - (void) browseNothing
 {
   browsingMode = FSBrowsingNothing;
-  [rootObject release];
-  rootObject = nil;  
+  rootObject = nil;
   [browser loadColumnZero];
 }
 
 - (void) browseWorkspace
 {
   browsingMode = FSBrowsingWorkspace;
-  [rootObject release];
-  rootObject = nil;  
+  rootObject = nil;
   [browser loadColumnZero];
 }
 
@@ -992,22 +993,8 @@ static NSMutableArray *customButtons = nil;
 - (void) classesAction:(id)sender
 {
   browsingMode = FSBrowsingClasses;
-  [rootObject release];
-  rootObject = nil;  
+  rootObject = nil;
   [browser loadColumnZero];
-}
-
-- (void) dealloc
-{
-  // NSLog(@"FSObjectBrowserView dealloc");
-    
-  [matrixes release];
-  [rootObject release];
-  [interpreter release];
-  [browser release];
-  [bottomBarTextDisplay release]; 
-  [filterString release];
-  [super dealloc];
 }
 
 - (void) doubleClickAction:(id)sender
@@ -1021,7 +1008,7 @@ static NSMutableArray *customButtons = nil;
   FSArray *classNames = allClassNames();
   NSUInteger count = [classNames count];
   FSObjectBrowserCell *cell;
-  FSObjectBrowserCell *selectedCell = [[[matrix selectedCell] retain] autorelease]; // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
+  FSObjectBrowserCell *selectedCell = [matrix selectedCell]; // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
   NSString *selectedObjectName  = [selectedCell  objectBrowserCellType] == FSOBCLASS ? [selectedCell stringValue] : nil ;
   
   [classNames sortUsingFunction:FSCompareClassNamesForAlphabeticalOrder context:NULL];
@@ -1049,13 +1036,13 @@ static NSMutableArray *customButtons = nil;
 
 - (void)fillMatrixForWorkspaceBrowsing:(NSMatrix*)matrix 
 {
-  NSArray *identifiers = [interpreter identifiers];
+  NSArray *identifiers = [self.interpreter identifiers];
   NSUInteger count = [identifiers count];
   FSObjectBrowserCell *cell;
   NSString *cellString; 
   id object;
-  FSObjectBrowserCell *selectedCell = [[[matrix selectedCell] retain] autorelease]; // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
-  NSString *selectedLabel      = [[[selectedCell label] copy] autorelease];    // copy and autorelease in order to avoid prmature invalidation as a side effect of the removing of rows
+  FSObjectBrowserCell *selectedCell = [matrix selectedCell]; // retain and autorelease in order to avoid premature deallocation as a side effect of the removing of rows
+  NSString *selectedLabel      = [[selectedCell label] copy];    // copy and autorelease in order to avoid prmature invalidation as a side effect of the removing of rows
   id selectedObject            = [selectedCell representedObject];
 
   //for (int i = [matrix numberOfRows]-1; i >= 0; i--) [matrix removeRow:i]; // Remove all rows. As a side effect, this will supress the selection.
@@ -1064,7 +1051,7 @@ static NSMutableArray *customButtons = nil;
   for (NSInteger i = 0; i < count; i++)
   {
     NSString *identifier = identifiers[i];
-    object = [interpreter objectForIdentifier:identifier found:NULL];
+    object = [self.interpreter objectForIdentifier:identifier found:NULL];
     NSString *objectPrintString = printStringForObjectBrowser(object);
     if ([self hasEmptyFilterString] || containsString(identifier, filterString, NSCaseInsensitiveSearch) || containsString(objectPrintString, filterString, NSCaseInsensitiveSearch) || (object == selectedObject && [identifier isEqualToString:selectedLabel]))
     {
@@ -1180,7 +1167,7 @@ static NSMutableArray *customButtons = nil;
     FSObjectBrowserCell *cell;
     NSMutableArray *selectorStrings = [NSMutableArray arrayWithCapacity:400];
     NSDictionary *txtDict = @{NSForegroundColorAttributeName: [NSColor whiteColor], NSBackgroundColorAttributeName: [NSColor blueColor]};
-    NSMutableAttributedString *attrStr = [[[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@ Methods  ", [cls printString]] attributes:txtDict] autorelease];
+    NSMutableAttributedString *attrStr = [[NSMutableAttributedString alloc] initWithString:[NSString stringWithFormat:@"   %@ Methods  ", [cls printString]] attributes:txtDict];
     [attrStr setAlignment:NSCenterTextAlignment range:NSMakeRange(0,[attrStr length])];
 
     //[matrix addRow];
@@ -1470,13 +1457,13 @@ static NSMutableArray *customButtons = nil;
 
 - (void) inspectAction:(id)sender
 {
-  inspect([self selectedObject], interpreter, nil);
+  inspect([self selectedObject], self.interpreter, nil);
 }
 
 - (void)menuWillSendAction:(NSNotification *)notification;
 {
   NSMenuItem *item = [notification userInfo][@"MenuItem"];
-  selectedView = [item retain];
+  selectedView = item;
 }
 
 @class FSObjectBrowser;
@@ -1513,17 +1500,18 @@ static NSMutableArray *customButtons = nil;
   }
   
   nameSheet = [[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,baseWidth,baseHeight) styleMask:NSTitledWindowMask|NSClosableWindowMask backing:NSBackingStoreBuffered defer:NO];
+  [nameSheet setReleasedWhenClosed: NO];
   [nameSheet setMinSize:NSMakeSize(130,80)];
    
-  field = [[[NSTextField alloc] initWithFrame:NSMakeRect(20,baseHeight-(15+fontSize+9),baseWidth-40,fontSize+10)] autorelease];
+  field = [[NSTextField alloc] initWithFrame:NSMakeRect(20,baseHeight-(15+fontSize+9),baseWidth-40,fontSize+10)];
   [field setFont:[NSFont systemFontOfSize:fontSize]];
   [field setTarget:self];
   [field setAction:@selector(okNameSheetAction:)];
-  [field setFormatter:[[[FSIdentifierFormatter alloc] init] autorelease]];
+  [field setFormatter:[[FSIdentifierFormatter alloc] init]];
   
   [[nameSheet contentView] addSubview:field];
 
-  nameButton = [[[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2,13,95,30)] autorelease];
+  nameButton = [[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2,13,95,30)];
   [nameButton setBezelStyle:1];
   [nameButton setTitle:@"Name"];   
   [nameButton setAction:@selector(performClick:)]; // Will make field to send its action message
@@ -1531,7 +1519,7 @@ static NSMutableArray *customButtons = nil;
   [nameButton setKeyEquivalent:@"\r"];
   [[nameSheet contentView] addSubview:nameButton];
       
-  cancelButton = [[[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2-95,13,95,30)] autorelease];
+  cancelButton = [[NSButton alloc] initWithFrame:NSMakeRect(baseWidth/2-95,13,95,30)];
   [cancelButton setBezelStyle:1];
   [cancelButton setTitle:@"Cancel"];   
   [cancelButton setAction:@selector(cancelNameSheetAction:)];
@@ -1558,7 +1546,7 @@ static NSMutableArray *customButtons = nil;
   }
   else if ([FSCompiler isValidIdentifier:[sender stringValue]])
   {
-    [interpreter setObject:[self selectedObject] forIdentifier:[sender stringValue]];
+    [self.interpreter setObject:[self selectedObject] forIdentifier:[sender stringValue]];
     [NSApp endSheet:[sender window]];
     [[sender window] close];
   }
@@ -1669,7 +1657,7 @@ static NSMutableArray *customButtons = nil;
   NSDate   *distantFuture = [NSDate distantFuture];
   
   NSRect infoRect = NSMakeRect(0, 0, 290, 100);
-  NSTextView *infoView = [[[NSTextView alloc] initWithFrame:NSZeroRect] autorelease];
+  NSTextView *infoView = [[NSTextView alloc] initWithFrame:NSZeroRect];
   [infoView setEditable:NO];
   [infoView setSelectable:NO];
   [infoView setDrawsBackground:NO];
@@ -1679,13 +1667,14 @@ static NSMutableArray *customButtons = nil;
   //[infoView setAutoresizingMask:NSViewHeightSizable|NSViewMinYMargin];
   [infoView setVerticallyResizable:NO];
   
-  NSMutableParagraphStyle *paragraphStyle = [[[NSParagraphStyle defaultParagraphStyle] mutableCopy] autorelease];
+  NSMutableParagraphStyle *paragraphStyle = [[NSParagraphStyle defaultParagraphStyle] mutableCopy];
   [paragraphStyle setLineBreakMode:NSLineBreakByTruncatingTail];
   [infoView setDefaultParagraphStyle:paragraphStyle];
           
-  NSPanel *infoWindow = [[[NSPanel alloc] initWithContentRect:infoRect styleMask:NSHUDWindowMask /*| NSTitledWindowMask*/ | NSUtilityWindowMask backing:NSBackingStoreBuffered defer:NO] autorelease];  
+  NSPanel *infoWindow = [[NSPanel alloc] initWithContentRect:infoRect styleMask:NSHUDWindowMask /*| NSTitledWindowMask*/ | NSUtilityWindowMask backing:NSBackingStoreBuffered defer:NO];
   [infoWindow setLevel:NSFloatingWindowLevel];
   [infoWindow setContentView:infoView];
+  [infoWindow setReleasedWhenClosed: NO]; // the default for NSPanel
   
  // NSWindow *focusWindow = [[[NSWindow alloc] initWithContentRect:NSZeroRect styleMask:NSBorderlessWindowMask backing:NSBackingStoreBuffered defer:NO] autorelease];
   
@@ -1694,6 +1683,7 @@ static NSMutableArray *customButtons = nil;
   [focusWindow setBackgroundColor:[NSColor selectedTextBackgroundColor]];
   [focusWindow setAlphaValue:0.7];
   [focusWindow setIgnoresMouseEvents:YES];
+  [focusWindow setReleasedWhenClosed: NO]; // ARC will handle the release
 
   [cursor push];
   
@@ -1782,7 +1772,10 @@ static NSMutableArray *customButtons = nil;
   [cursor pop];
   [[focusWindow parentWindow] removeChildWindow:focusWindow];
   [focusWindow close];
+  focusWindow = nil; // force release
+  
   [infoWindow close];
+  infoWindow = nil;
   
   if ( !([event type] == NSKeyDown && [[event characters] characterAtIndex:0] == ESCAPE) )
   {
@@ -1792,7 +1785,6 @@ static NSMutableArray *customButtons = nil;
       view = selectedView;
     
     [self setRootObject:view];
-    [selectedView release];
     [[self window] performSelector:@selector(makeKeyAndOrderFront:) withObject:nil afterDelay:0];
     [NSApp activateIgnoringOtherApps:YES];    
   }
@@ -1855,13 +1847,13 @@ static NSMutableArray *customButtons = nil;
   {
     NSFormCell *cell = [f cellAtIndex:i];
     NSString *argumentString = [cell stringValue];
-    FSInterpreterResult *result = [interpreter execute:argumentString];
+    FSInterpreterResult *result = [self.interpreter execute:argumentString];
 
     if ([result isOK])
       [arguments addObject:[result result]];
     else
     {
-      NSMutableString *errorArgumentString = [NSString stringWithFormat:@"Argument %ld %@", (long)(i+1), [result errorMessage]];
+      NSString *errorArgumentString = [NSString stringWithFormat:@"Argument %ld %@", (long)(i+1), [result errorMessage]];
 
       [result inspectBlocksInCallStack];
       [f selectTextAtIndex:i];
@@ -1907,20 +1899,21 @@ static NSMutableArray *customButtons = nil;
 
 - (BOOL) sendMessageTo:(id)receiver selectorString:(NSString *)selectorStr arguments:(FSArray *)arguments putResultInMatrix:(NSMatrix *)matrix
 { 
-  NSInteger nbarg = [arguments count];
-  id args[nbarg+2]; 
   SEL selector = [FSCompiler selectorFromString:selectorStr];
   NSInteger i;
   id result = nil; // To avoid a warning "might be used uninitialized"
    
-  if ([receiver isKindOfClass:[FSNewlyAllocatedObjectHolder class]]) receiver = [receiver object];      
-  args[0] = receiver;
-  args[1] = selectorStr;
-  for (i = 0; i < nbarg; i++) args[i+2] = arguments[i];
+  if ([receiver isKindOfClass:[FSNewlyAllocatedObjectHolder class]]) receiver = [receiver object];
+  
+  NSMutableArray* args = [[NSMutableArray alloc] initWithObjects: receiver, selectorStr, nil];
+  [args addObject: receiver];
+  [args addObject: selectorStr];
+  
+  for (i = 0; i < arguments.count; i++) [args addObject: arguments[i]];
     
   @try
   {
-    result = sendMsgNoPattern(receiver, selector, nbarg+2, args, [FSMsgContext msgContext], nil);
+    result = sendMsgNoPattern(receiver, selector, args.count, &args, [FSMsgContext msgContext], nil);
   }
   @catch (id exception)
   {
@@ -1938,24 +1931,13 @@ static NSMutableArray *customButtons = nil;
   return YES;
 }
 
--(void)setInterpreter:(FSInterpreter *)theInterpreter
-{
-  [theInterpreter retain];
-  [interpreter release];
-  interpreter = theInterpreter;
-}
-
 -(void)setFilterString:(NSString *)theFilterString
 {
-  [theFilterString retain];
-  [filterString release];
   filterString = theFilterString;
 }
 
 -(void)setRootObject:(id)theRootObject 
 {
-  [theRootObject retain];
-  [rootObject release]; 
   rootObject = theRootObject;
   browsingMode = FSBrowsingObject;
   [browser loadColumnZero];

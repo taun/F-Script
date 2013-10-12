@@ -8,18 +8,18 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 @implementation FSGenericObjectInspector
 
-+(FSGenericObjectInspector *)genericObjectInspectorWithObject:(id)object
++(FSGenericObjectInspector *)newGenericObjectInspectorWithObject:(id)object
 {
-  return [[[self alloc] initWithObject:object] autorelease]; 
+  return [[self alloc] initWithObject:object]; 
 }
  
 -(FSGenericObjectInspector *)initWithObject:(id)object 
 {
   if ((self = [super init]))
   {
-    inspectedObject = [object retain];
+    inspectedObject = object;
     [NSBundle loadNibNamed:@"genObjInspector.nib" owner:self];
-    [self retain]; // To balance the autorelease in windowWillClose:
+     // To balance the autorelease in windowWillClose:
     [self updateAction:nil];
     topLeftPoint = [window cascadeTopLeftFromPoint:topLeftPoint];
     [window makeKeyAndOrderFront:nil];
@@ -28,12 +28,6 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
   return nil;
 }
 
--(void) dealloc
-{
-  //NSLog(@"\n FSGenericObjectInspector dealloc\n");
-  [inspectedObject release];
-  [super dealloc];
-}
 
 - (void)updateAction:(id)sender
 {
@@ -46,8 +40,8 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 - (void)windowWillClose:(NSNotification *)aNotification
 {
-  [self autorelease];
-} 
+//  [self autorelease];
+}
 
 
 @end

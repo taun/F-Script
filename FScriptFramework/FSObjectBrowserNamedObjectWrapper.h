@@ -6,8 +6,8 @@
 
 @interface FSObjectBrowserNamedObjectWrapper : NSObject 
 {
-  NSString *name;
-  id object;
+  NSString *_name;
+  id _object;
 }
 
 + (id)namedObjectWrapperWithObject:(id)theObject name:(NSString *)theName;

@@ -20,11 +20,6 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
  
 - (void) browseWorkspace { [[self contentView] browseWorkspace]; } 
  
--(void) dealloc
-{
-  //NSLog(@"\n FSObjectBrowser dealloc\n");
-  [super dealloc];
-} 
 
 - (NSSearchField *)visibleSearchField
 {
@@ -43,7 +38,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 {
   FSObjectBrowserView *bbv;
   
-  [super initWithContentRect:NSMakeRect(100,100,830,400) styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask /*| NSTexturedBackgroundWindowMask*/ backing:NSBackingStoreBuffered defer:NO];
+  if (!(self = [super initWithContentRect:NSMakeRect(100,100,830,400) styleMask:NSTitledWindowMask | NSClosableWindowMask | NSMiniaturizableWindowMask | NSResizableWindowMask /*| NSTexturedBackgroundWindowMask*/ backing:NSBackingStoreBuffered defer:NO])) return nil;
   
   [self setMinSize:NSMakeSize(130,130)]; // FSObjectBrowserView has weird behavior if the window becomes too tiny
     
@@ -58,7 +53,6 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
       [bbv setupToolbarWithWindow:self]; // defined in FSObjectBrowserToolBar.m
   }
   // jg added to here
-  [bbv release];
   
   NSSearchField *searchField = [self visibleSearchField]; 
   if (searchField) [self setInitialFirstResponder:searchField];  

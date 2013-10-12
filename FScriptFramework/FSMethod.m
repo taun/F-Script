@@ -72,12 +72,12 @@ static id executeMethod(FSMethod *method, FSSymbolTable *symbolTable, id receive
   {
     if (method->selector == @selector(dealloc))
     {
-      // The receiver has been deallocated. Therefore, we must ensure that when symbolTable gets deallocated, it does not send a release message to this deallocated object.  
-      symbolTable->locals[0].value = nil;      
+      // The receiver has been deallocated. Therefore, we must ensure that when symbolTable gets deallocated, it does not send a release message to this deallocated object.
+      SymbolTableValueWrapper* firstContext = (SymbolTableValueWrapper*)symbolTable.locals[0];
+      firstContext.value = nil;
     }
     else if (! symbolTable->receiverRetained)
     {
-      [symbolTable->locals[0].value retain];
       symbolTable->receiverRetained = YES;
     }
   } 
@@ -101,21 +101,23 @@ static void dispatch(ffi_cif *cif, void *result, void **args, void *userdata)
   
   FSSymbolTable *symbolTable = [[method->symbolTable copyWithZone:NULL] autorelease];
   
-  symbolTable->locals[0].value  = receiver; 
+  SymbolTableValueWrapper* firstContext = (SymbolTableValueWrapper*)symbolTable.locals[0];
+
+  firstContext.value  = receiver;
   symbolTable->receiverRetained = NO;
-  symbolTable->locals[0].status = DEFINED;
+  firstContext.status = DEFINED;
   
   for (NSUInteger i = 2; i < method->argumentCount; i++)
   {
     char fsEncodedType = method->fsEncodedTypes[i+1];
     
-    if (fsEncodedType == '@')
-      symbolTable->locals[i-1].value = *(id *)args[i];
-    else
-      symbolTable->locals[i-1].value = FSMapToObject(args[i], 0, fsEncodedType, method->typesByArgument[i], nil, nil);
+    SymbolTableValueWrapper* currentContext = (SymbolTableValueWrapper*)symbolTable.locals[i-1];
     
-    [symbolTable->locals[i-1].value retain];
-    symbolTable->locals[i-1].status = DEFINED;
+    if (fsEncodedType == '@')
+      currentContext.value = *(id *)args[i];
+    else
+      currentContext.value = FSMapToObject(args[i], 0, fsEncodedType, method->typesByArgument[i], nil, nil);
+      currentContext.status = DEFINED;
   }
   
   char returnType = method->fsEncodedTypes[0];

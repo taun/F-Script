@@ -113,8 +113,8 @@
         elem_index = index[k];
         if (![elem_index isKindOfClass:[NSNumber class]]) FSExecError(@"array indexing by a mixed array");
         ind = [elem_index doubleValue];
-        if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");              
-        else if (ind >= count) FSExecError(@"index of an array must be a number less than the size of the array");                                                
+        //if (ind < 0) FSExecError(@"index of an array must be a number greater or equal to 0");
+        if (ind >= count) FSExecError(@"index of an array must be a number less than the size of the array");                                                
       }      
       
       while (i < nb)

@@ -30,7 +30,7 @@
 - (void) setupToolbarWithWindow:(NSWindow *)window
 {
   // Create a new toolbar instance, and attach it to our document window
-  NSToolbar *toolbar = [[(NSToolbar *)[NSToolbar alloc] initWithIdentifier: @"FSObjectBrowserToolbar"] autorelease];
+  NSToolbar *toolbar = [(NSToolbar *)[NSToolbar alloc] initWithIdentifier: @"FSObjectBrowserToolbar"];
 
   // Set up toolbar properties: Allow customization, give a default display mode, and remember state in user defaults
   [toolbar setAllowsUserCustomization: YES];
@@ -60,17 +60,17 @@
     FSObjectBrowserToolbarButton *button;
     NSInteger i = 0;
 
-    toolbarItem = [[[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier: itemIdent] autorelease];
+    toolbarItem = [[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier: itemIdent];
          
     while (![[[[self class] customButtons][i] identifier] isEqualToString:itemIdent])
       i++;
       
-    button = [[[[self class] customButtons][i] copy] autorelease];
+    button = [[[self class] customButtons][i] copy];
     [button setTarget:self]; 
     [toolbarItem setView:button];
     [button setToolbarItem:toolbarItem];
     
-    menuFormRep = [[[NSMenuItem alloc] init] autorelease];
+    menuFormRep = [[NSMenuItem alloc] init];
     [menuFormRep setAction:@selector(selectedFromMenuItem:)];
     [menuFormRep setTarget:button];
     [menuFormRep setTitle:[button name]];
@@ -85,9 +85,9 @@
   }
   else if ([itemIdent isEqualToString:@"Filter"])
   {
-    FSObjectBrowserSearchField *searchField = [[[FSObjectBrowserSearchField alloc] initWithFrame:NSMakeRect(0,0,93,32)] autorelease];
+    FSObjectBrowserSearchField *searchField = [[FSObjectBrowserSearchField alloc] initWithFrame:NSMakeRect(0,0,93,32)];
         
-    toolbarItem = [[[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier:itemIdent] autorelease];
+    toolbarItem = [[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier:itemIdent];
     [toolbarItem setView:searchField];
     [toolbarItem setAction:@selector(filterAction:)];
     [toolbarItem setTarget:self]; 
@@ -126,7 +126,7 @@
     NSString *toolTip=nil;
     SEL action=nil;
 
-    toolbarItem = [[[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier: itemIdent] autorelease];
+    toolbarItem = [[FSObjectBrowserToolbarItem alloc] initWithItemIdentifier: itemIdent];
   
     // defaults
     buttonTitle=itemIdent; 
@@ -173,7 +173,7 @@
     if (action) 
     {
       NSMenuItem *menuFormRep = nil;
-      NSSegmentedControl *button = [[[NSSegmentedControl alloc] init] autorelease];
+      NSSegmentedControl *button = [[NSSegmentedControl alloc] init];
 	  
 	  [button setSegmentCount:1];
 	  [button setSegmentStyle:NSSegmentStyleTexturedSquare];
@@ -203,7 +203,7 @@
       //[toolbarItem setMaxSize:([button frame].size.width < 93 ? NSMakeSize(93, [button frame].size.height) : [[button cell] cellSize])];
       [toolbarItem setToolTip:toolTip];
 
-      menuFormRep = [[[NSMenuItem alloc] init] autorelease];
+      menuFormRep = [[NSMenuItem alloc] init];
       [menuFormRep setTitle: buttonTitle];
       [menuFormRep setAction:action];
       [menuFormRep setTarget:[toolbarItem target]];
@@ -213,7 +213,7 @@
       NSMenu *submenu = [[self class] customBlockMenu]; // always the same instance (allows us to add to submenu in one place only)
       NSMenuItem *menuFormRep = nil;
       NSRect r=NSMakeRect(0.0,0.0,150.0,30.0);
-      NSPopUpButton *popUpButton=[[[NSPopUpButton alloc] initWithFrame:r pullsDown:NO] autorelease];
+      NSPopUpButton *popUpButton=[[NSPopUpButton alloc] initWithFrame:r pullsDown:NO];
 	  
       [popUpButton setMenu:submenu];
       [popUpButton setTitle:@"Custom Actions"];
@@ -229,7 +229,7 @@
   
       // By default, in text only mode, a custom items label will be shown as disabled text, but you can provide a
       // custom menu of your own by using <item> setMenuFormRepresentation]
-      menuFormRep = [[[NSMenuItem alloc] init] autorelease];
+      menuFormRep = [[NSMenuItem alloc] init];
       [menuFormRep setSubmenu: submenu];
       [menuFormRep setTitle: [toolbarItem label]];
       [toolbarItem setMenuFormRepresentation: menuFormRep];
@@ -286,7 +286,7 @@
 + (void) addCustomBlockMenuIdentifier:(NSString *)blockIdentifier
 {
   NSMenu *menu=[self customBlockMenu];
-  NSMenuItem *item = [[[NSMenuItem alloc] initWithTitle:blockIdentifier action:@selector(customBlockMenuAction:) keyEquivalent:@""] autorelease];
+  NSMenuItem *item = [[NSMenuItem alloc] initWithTitle:blockIdentifier action:@selector(customBlockMenuAction:) keyEquivalent:@""];
   [menu addItem:item];
 }
 + (void) removeCustomBlockMenuIdentifier:(NSString *)blockIdentifier
@@ -303,7 +303,7 @@
   BOOL found;
   NSString *title=[sender title];
 //  id selectedObject = [self selectedObject];
-  id block=[interpreter objectForIdentifier:title found:&found];
+  id block=[[FSInterpreter newInterpreter] objectForIdentifier:title found:&found];
   if (!found) {
     NSInteger choice=NSRunAlertPanel(@"Undefined block", [NSString stringWithFormat:@"Could not find block with name %@", title], @"Cancel", @"Remove Menu Entry", nil);
     if (choice) {

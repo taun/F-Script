@@ -113,7 +113,7 @@ static NSString *externalColumnIdentifier = @"externalColumnIdentifier";
     [tableView setRowHeight:dataFontSize + 4];
     if ([tableView respondsToSelector:@selector(setGridStyleMask:)]) [tableView setGridStyleMask:NSTableViewSolidVerticalGridLineMask];
 
-    [self setCollection:@[] interpreter:[FSInterpreter interpreter] blocks:@[] showExternals:YES];   
+    [self setCollection:@[] interpreter:[FSInterpreter newInterpreter] blocks:@[] showExternals:YES];   
   }
   return self;
 }

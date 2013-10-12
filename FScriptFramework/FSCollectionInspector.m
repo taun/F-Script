@@ -22,7 +22,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 + (FSCollectionInspector *)collectionInspectorWithCollection:(id)theCollection interpreter:(FSInterpreter *)theInterpreter blocks:(NSArray *)blocks showExternals:(BOOL)showExternals
 {
-  return [[[self alloc] initWithCollection:theCollection interpreter:theInterpreter blocks:blocks showExternals:showExternals] autorelease];
+  return [[self alloc] initWithCollection:theCollection interpreter:theInterpreter blocks:blocks showExternals:showExternals];
 }
 
 + (FSCollectionInspector *)collectionInspectorWithCollection:(id)theCollection interpreter:(FSInterpreter *)theInterpreter blocks:(NSArray *)blocks 
@@ -30,17 +30,12 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
   return [self collectionInspectorWithCollection:theCollection interpreter:theInterpreter blocks:blocks showExternals:YES];
 }
 
-- (void)dealloc 
-{
-  //NSLog(@"FSCollectionInspector dealloc");
-  [super dealloc];
-}
 
 - (FSCollectionInspector *)initWithCollection:(id)theCollection interpreter:(FSInterpreter *)theInterpreter blocks:(NSArray *)blocks showExternals:(BOOL)showExternals
 {
   if (self = [super init])
   {
-    [self retain]; // we must stay alive while our window exist cause we are its delegate (and NSWindow doesn't retain its delegate).
+     // we must stay alive while our window exist cause we are its delegate (and NSWindow doesn't retain its delegate).
  
     [NSBundle loadNibNamed:@"FSCollectionInspector.nib" owner:self];
 
@@ -62,7 +57,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 - (void)windowWillClose:(NSNotification *)aNotification 
 {
-  [self autorelease];
+  //[self autorelease];
 } 
 
 @end

@@ -340,7 +340,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   
   if (string_index == string_size)
   {
-    rs.type = END;
+    rsType = END;
     return;
   }
   
@@ -363,24 +363,24 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     if(k == sizeof(keywords)/sizeof(char *))/*This is not a keyword */
     {
       id predefinedObject;
-      rs.value = [NSMutableString stringWithUTF8String:buf];
+      rsValue = [NSMutableString stringWithUTF8String:buf];
       free(buf);
       
       // Is this a predefined constant ? 
-      if ((predefinedObject = constant_dict[rs.value]) != nil)
+      if ((predefinedObject = constant_dict[rsValue]) != nil)
       {
         // This is a predefined constant
-        rs.type = PREDEFINED_OBJECT;
-        rs.value = predefinedObject; 
+        rsType = PREDEFINED_OBJECT;
+        rsValue = predefinedObject; 
       }
       else // This is not a predefined constant           
       {
-        rs.type = NAME;
+        rsType = NAME;
       }
     }    
     else                           /* This is a keyword */
     {
-      rs.type = keyword_type[k];
+      rsType = keyword_type[k];
       free(buf);
     }
     return;          
@@ -388,17 +388,17 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   
   switch (string[string_index])
   {
-  case '[' :rs.type = OPEN_BRACKET     ; string_index++; return;
-  case ']' :rs.type = CLOSE_BRACKET    ; string_index++; return;
-  case '(' :rs.type = OPEN_PARENTHESE  ; string_index++; return;
-  case ')' :rs.type = CLOSE_PARENTHESE ; string_index++; return;
-  case '{' :rs.type = OPEN_BRACE       ; string_index++; return;
-  case '}' :rs.type = CLOSE_BRACE      ; string_index++; return;
-  case ',' :rs.type = COMMA            ; string_index++; return;
-  case ';' :rs.type = SEMICOLON        ; string_index++; return;
-  case '@' :rs.type = AT               ; string_index++; return;
-  case '.' :rs.type = PERIOD           ; string_index++; return;
-  case '^' :rs.type = CARET            ; string_index++; return;
+  case '[' :rsType = OPEN_BRACKET     ; string_index++; return;
+  case ']' :rsType = CLOSE_BRACKET    ; string_index++; return;
+  case '(' :rsType = OPEN_PARENTHESE  ; string_index++; return;
+  case ')' :rsType = CLOSE_PARENTHESE ; string_index++; return;
+  case '{' :rsType = OPEN_BRACE       ; string_index++; return;
+  case '}' :rsType = CLOSE_BRACE      ; string_index++; return;
+  case ',' :rsType = COMMA            ; string_index++; return;
+  case ';' :rsType = SEMICOLON        ; string_index++; return;
+  case '@' :rsType = AT               ; string_index++; return;
+  case '.' :rsType = PERIOD           ; string_index++; return;
+  case '^' :rsType = CARET            ; string_index++; return;
   case '#' :
   {
     j = string_index;
@@ -406,7 +406,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     
     if (string[string_index] == '{')
     {
-      rs.type = DICTIONARY_BEGIN;
+      rsType = DICTIONARY_BEGIN;
       string_index++; 
       return;
     }
@@ -429,11 +429,11 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       }
       else [self syntaxError:@"open brace or method selector expected"];
         
-      rs.type = COMPACT_BLOCK;
+      rsType = COMPACT_BLOCK;
       buf =  malloc(1+string_index-j);
       memcpy(buf,&(string[j]),string_index-j);
       buf[string_index-j] = '\0';
-      rs.value = [NSMutableString stringWithUTF8String:buf];
+      rsValue = [NSMutableString stringWithUTF8String:buf];
       free(buf); 
       return;
     }           
@@ -441,12 +441,12 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   case ':' :
     if (string[string_index+1] == '=')
     {
-      rs.type = SASSIGNMENT ;
+      rsType = SASSIGNMENT ;
       string_index += 2; return; 
     }
     else         
     {
-      rs.type = COLON;
+      rsType = COLON;
       string_index ++  ; return; 
     }
   case '\'': 
@@ -464,7 +464,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     }  
     if (string_index < string_size)
     {
-      rs.type = SSTRING;
+      rsType = SSTRING;
       buf =  malloc(string_index-j+1);
       
       k = 0;
@@ -501,7 +501,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       buf[k] = '\0';
       
       
-      rs.value = [NSMutableString stringWithUTF8String:buf];
+      rsValue = [NSMutableString stringWithUTF8String:buf];
       free(buf);
    
       string_index++; 
@@ -517,16 +517,16 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   {
      char ch;
   
-     rs.value = [NSMutableString stringWithFormat:@"%c",string[string_index]];
+     rsValue = [NSMutableString stringWithFormat:@"%c",string[string_index]];
      string_index++;
      ch = string[string_index];
      while(symbol_operator_tab[(unsigned char)ch])
      {
-       [rs.value appendFormat:@"%c",ch];
+       [rsValue appendFormat:@"%c",ch];
        string_index++;
        ch = string[string_index];
      }  
-     rs.type = OPERATOR;  
+     rsType = OPERATOR;  
   }
   else if (isdigit(string[string_index]))
   {
@@ -578,7 +578,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       }  
     }      
     
-    rs.type = SNUMBER;
+    rsType = SNUMBER;
     buf = malloc(string_index-firstDigitIndex+1);
     memcpy(buf, &(string[firstDigitIndex]), string_index-firstDigitIndex);
     buf[string_index-firstDigitIndex] = '\0';
@@ -593,7 +593,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     
     if (exponentLetterIndex != -1) buf[exponentLetterIndex - firstDigitIndex] = 'e'; 
     
-    rs.value = [NSMutableString stringWithUTF8String:buf];
+    rsValue = [NSMutableString stringWithUTF8String:buf];
     free(buf);
   }        
   else
@@ -632,7 +632,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 
 - (void)checkToken:(enum e_token_type)type :(NSString *)str
 {
-  if (rs.type != type)
+  if (rsType != type)
     [self syntaxError:str];
 }  
 
@@ -667,7 +667,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     }         
                     
     /* NO SYNTAX ERROR */
-    if (rs.type == END) 
+    if (rsType == END) 
        return [FSCompilationResult compilationResultWithType:OK errorMessage:nil errorFirstCharacterIndex:-1 errorLastCharacterIndex:-1 code:code];       
     else
     {
@@ -702,12 +702,12 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   {
     [statements addObject:[self statementWithCompilationContext:compilationContext]];
     
-    if (rs.type == PERIOD) [self scan]; 
+    if (rsType == PERIOD) [self scan]; 
     else                   break;
   } 
-  while (rs.type != CLOSE_BRACKET && rs.type != CLOSE_BRACE && rs.type != END);
+  while (rsType != CLOSE_BRACKET && rsType != CLOSE_BRACE && rsType != END);
   
-  if (rs.type == CLOSE_BRACE)
+  if (rsType == CLOSE_BRACE)
   {
     if ( ((FSCNBase *)[statements lastObject])->nodeType == RETURN )
     {
@@ -736,7 +736,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 
 - (FSCNBase *) statementWithCompilationContext:(struct compilationContext)compilationContext
 {
-  if (rs.type == CARET) 
+  if (rsType == CARET) 
     return [self returnStatementWithCompilationContext:compilationContext];
   else                  
     return [self expWithCompilationContext:compilationContext];
@@ -761,11 +761,11 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 {   
   struct codeNodePatternElementPair exp1_res;
   FSCNBase *node;
-  BOOL messageToSuper = (rs.type == KW_SUPER);
+  BOOL messageToSuper = (rsType == KW_SUPER);
       
   exp1_res = [self exp1WithCompilationContext:compilationContext];
   
-  if (rs.type == NAME || rs.type == COLON)
+  if (rsType == NAME || rsType == COLON)
   { 
     node = [self keywordSelWithCompilationContext:compilationContext receiver:exp1_res.codeNode patternElement:exp1_res.patternElement] ; 
   }
@@ -773,7 +773,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   {
     [self syntaxError:@"message expected"]; assert(0); return nil;
   }
-  else if (rs.type == SASSIGNMENT)
+  else if (rsType == SASSIGNMENT)
   {
     int32_t firstCharIndex = token_first_char_index;
     int32_t lastCharIndex  = string_index;
@@ -790,7 +790,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   }
   else node = exp1_res.codeNode;
   
-  if (rs.type == SEMICOLON)
+  if (rsType == SEMICOLON)
   {
     if (node->nodeType != UNARY_MESSAGE && node->nodeType != BINARY_MESSAGE && node->nodeType != KEYWORD_MESSAGE) 
       [self syntaxError:@"no cascade expected here"];
@@ -806,7 +806,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       [self scan];
       patternElement = [self patternElt];
       
-      switch (rs.type)
+      switch (rsType)
       {
       case NAME:
         if (string[string_index] == ':')  message = [self keywordSelWithCompilationContext:compilationContext receiver:nil patternElement:patternElement];
@@ -831,7 +831,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       }
       [messages addObject:message];
       
-    } while (rs.type == SEMICOLON);
+    } while (rsType == SEMICOLON);
 
     FSCNCascade *cascadeNode = [[[FSCNCascade alloc] initWithReceiver:((FSCNMessage *)node)->receiver messages:messages] autorelease]; 
     [cascadeNode setFirstCharIndex:firstCharIndex lastCharIndex:message->lastCharIndex];
@@ -856,23 +856,23 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   firstCharIndex = token_first_char_index; 
   selstr = [NSMutableString stringWithCapacity:0];
   
-  if (rs.type == NAME)
+  if (rsType == NAME)
   {
-    [selstr appendString:rs.value];
+    [selstr appendString:rsValue];
     [self scan];
     [self checkToken:COLON :@"\":\" expected"];
   }    
   
-  while (rs.type == COLON)
+  while (rsType == COLON)
   {
     [selstr appendString:@":"];
     [self scan];
     [patternElements addObject:[self patternElt]];
     argument = [self exp1WithCompilationContext:compilationContext].codeNode;
     [args addObject:argument];
-    if (rs.type == NAME)
+    if (rsType == NAME)
     {
-      [selstr appendString:rs.value];
+      [selstr appendString:rsValue];
       [self scan];
       [self checkToken:COLON :@"\":\" expected"];
     }    
@@ -897,7 +897,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 {
   struct codeNodePatternElementPair exp2_res = [self exp2WithCompilationContext:compilationContext];
   
-  if (rs.type == OPERATOR)
+  if (rsType == OPERATOR)
     return [self exp1RemainingWithCompilationContext:compilationContext left:exp2_res.codeNode patternElement:exp2_res.patternElement];
   else
     return exp2_res;
@@ -916,7 +916,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   firstCharIndex = token_first_char_index;
   lastCharIndex = string_index;
   
-  selectorString = operator_name(rs.value);
+  selectorString = operator_name(rsValue);
   [selectorString insertString:@"operator" atIndex:0];
   [selectorString appendString:@":"];
   [self scan];
@@ -932,7 +932,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   r = [[[FSCNBinaryMessage alloc] initWithReceiver:left selectorString:selectorString pattern:pattern argument:exp2_res.codeNode] autorelease];
   [r setFirstCharIndex:firstCharIndex lastCharIndex:lastCharIndex];
           
-  if (rs.type == OPERATOR) return [self exp1RemainingWithCompilationContext:compilationContext left:r patternElement:exp2_res.patternElement];
+  if (rsType == OPERATOR) return [self exp1RemainingWithCompilationContext:compilationContext left:r patternElement:exp2_res.patternElement];
   else                     return makeCodeNodePatternElementPair(r,exp2_res.patternElement);
 }
 
@@ -941,7 +941,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   FSCNBase  *exp3Node = [self exp3WithCompilationContext:compilationContext];
   NSArray *pattern_elt = [self patternElt];
 
-  if (rs.type == NAME && string[string_index] != ':') return [self exp2RemainingWithCompilationContext:compilationContext left:exp3Node patternElement:pattern_elt];
+  if (rsType == NAME && string[string_index] != ':') return [self exp2RemainingWithCompilationContext:compilationContext left:exp3Node patternElement:pattern_elt];
   else                                                return makeCodeNodePatternElementPair(exp3Node, pattern_elt);
 }
 
@@ -956,14 +956,14 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   if (pattern_elt == [NSNull null]) pattern = nil;
   else                              pattern = [FSPattern patternFromIntermediateRepresentation:@[pattern_elt]];
   
-  r = [[[FSCNUnaryMessage alloc] initWithReceiver:left selectorString:rs.value pattern:pattern] autorelease];
+  r = [[[FSCNUnaryMessage alloc] initWithReceiver:left selectorString:rsValue pattern:pattern] autorelease];
 
   [r setFirstCharIndex:token_first_char_index lastCharIndex:string_index];
   [self scan];
   
   pattern_elt_next = [self patternElt];
           
-  if (rs.type == NAME && string[string_index] != ':') return [self exp2RemainingWithCompilationContext:compilationContext left:r patternElement:pattern_elt_next];
+  if (rsType == NAME && string[string_index] != ':') return [self exp2RemainingWithCompilationContext:compilationContext left:r patternElement:pattern_elt_next];
   else                                                return makeCodeNodePatternElementPair(r, pattern_elt_next);
 }
 
@@ -972,7 +972,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 {
   CompiledCodeNode  *exp4Node = [self exp4];
   
-  if (rs.type == OPEN_BRACKET) return [self exp3_remaining:exp4Node];
+  if (rsType == OPEN_BRACKET) return [self exp3_remaining:exp4Node];
   else                         return exp4Node;
 }
 
@@ -993,7 +993,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [r addSubnode:indexNode];
   [self scan];
   
-  if (rs.type == OPEN_BRACKET) return [self exp3_remaining:r];
+  if (rsType == OPEN_BRACKET) return [self exp3_remaining:r];
   else                         return r;
 } 
 */
@@ -1002,7 +1002,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 {
   FSCNBase *r ;
   
-  switch (rs.type)
+  switch (rsType)
   {
   case NAME :
      {
@@ -1013,28 +1013,30 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
         // Save the scanner state
         int32_t string_index_beforeLookAhead           = string_index;
         int32_t token_first_char_index_beforeLookAhead = token_first_char_index;
-        struct res_scan rs_beforeLookAhead          = rs;
+        enum e_token_type rsTypeBeforeLookAhead          = rsType;
+        NSMutableString *rsValueBeforeLookAhead          = rsValue;
         
         [self scan];
         
-        if (rs.type == OPEN_BRACE)
+        if (rsType == OPEN_BRACE)
         {
           // Restore the scanner state
           string_index           = string_index_beforeLookAhead;
           token_first_char_index = token_first_char_index_beforeLookAhead;
-          rs                     = rs_beforeLookAhead;
+          rsType                     = rsTypeBeforeLookAhead;
+          rsValue                   = rsValueBeforeLookAhead;
           
           return [self categoryWithCompilationContext:compilationContext];
         }
         else
         {
-          if (rs.type == COLON)
+          if (rsType == COLON)
           {
             [self scan];
-            if (rs.type == NAME || rs.type == KW_NIL)
+            if (rsType == NAME || rsType == KW_NIL)
             {
               [self scan];
-              if (rs.type == OPEN_BRACE)
+              if (rsType == OPEN_BRACE)
                 classDefinition = YES;
             }
           }
@@ -1042,7 +1044,8 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
           // Restore the scanner state
           string_index           = string_index_beforeLookAhead;
           token_first_char_index = token_first_char_index_beforeLookAhead;
-          rs                     = rs_beforeLookAhead;
+          rsType                     = rsTypeBeforeLookAhead;
+          rsValue                   = rsValueBeforeLookAhead;
 
           if (classDefinition) return [self classDefinitionWithCompilationContext:compilationContext];
           else                 return [self identifierWithCompilationContext:compilationContext];      
@@ -1059,10 +1062,10 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       return [self number]; 
       
   case OPERATOR:
-      if ([rs.value isEqualToString:@"-"])
+      if ([rsValue isEqualToString:@"-"])
         return [self number];
       else
-        [self syntaxError:[NSString stringWithFormat:@"symbol \"%@\" not valid here",rs.value]];
+        [self syntaxError:[NSString stringWithFormat:@"symbol \"%@\" not valid here",rsValue]];
       return nil; // W        
   
   case COMPACT_BLOCK:
@@ -1070,7 +1073,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       return [self blockWithCompilationContext:compilationContext parentSymbolTable:compilationContext.symbolTable];
         
   case SSTRING:
-      r = [[[FSCNPrecomputedObject alloc] initWithObject:[[rs.value copy] autorelease]] autorelease];
+      r = [[[FSCNPrecomputedObject alloc] initWithObject:[[rsValue copy] autorelease]] autorelease];
       [r setFirstCharIndex:token_first_char_index lastCharIndex:string_index];
       [self scan];
       return r;
@@ -1107,7 +1110,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       return r;
   
   case PREDEFINED_OBJECT:
-      r = [[[FSCNPrecomputedObject alloc] initWithObject:rs.value] autorelease];
+      r = [[[FSCNPrecomputedObject alloc] initWithObject:rsValue] autorelease];
       [r setFirstCharIndex:token_first_char_index lastCharIndex:string_index];
       [self scan];
       return r; 
@@ -1123,7 +1126,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   double val;
   int32_t firstCharIndex;
   
-  if ((negative = [rs.value isEqualToString:@"-"]))
+  if ((negative = [rsValue isEqualToString:@"-"]))
   { 
     firstCharIndex = token_first_char_index;
     [self scan];
@@ -1132,7 +1135,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     firstCharIndex = token_first_char_index;
     
   [self checkToken:SNUMBER :@"number expected"];
-  val = strtod([rs.value UTF8String],(char**)NULL);
+  val = strtod([rsValue UTF8String],(char**)NULL);
   if (val == HUGE_VAL)  [self syntaxError:@"a number literal is too big"];
   if (negative)  val = -val;
   r  = [[[FSCNPrecomputedObject alloc] initWithObject:[FSNumber numberWithDouble:val]] autorelease];
@@ -1149,8 +1152,8 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     
   [self checkToken:NAME :@"identifier expected"];    
   currentSymbolTable = compilationContext.symbolTable;
-  index = [currentSymbolTable findOrInsertSymbol:rs.value]; 
-  r = [[[FSCNIdentifier alloc] initWithIdentifierString:rs.value locationInContext:index] autorelease];
+  index = [currentSymbolTable findOrInsertSymbol:rsValue]; 
+  r = [[[FSCNIdentifier alloc] initWithIdentifierString:rsValue locationInContext:index] autorelease];
   [r setFirstCharIndex:token_first_char_index lastCharIndex:string_index-1];
   [self scan];
   return r;
@@ -1165,7 +1168,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self checkToken:OPEN_BRACE :@"\"{\" expected"];
   [self scan];
   
-  if (rs.type == CLOSE_BRACE)
+  if (rsType == CLOSE_BRACE)
   {
     r = [[[FSCNArray alloc] initWithElements:elements] autorelease];
     [r setFirstCharIndex:firstCharIndex lastCharIndex:string_index];  
@@ -1174,7 +1177,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   }    
   else [elements addObject:[self expWithCompilationContext:compilationContext]];
         
-  while (rs.type == COMMA)
+  while (rsType == COMMA)
   {
     [self scan];
     [elements addObject:[self expWithCompilationContext:compilationContext]];
@@ -1203,10 +1206,10 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   BOOL hasTemporaries = NO;
   //NSMutableArray *argumentsNames = nil;
   
-  if (rs.type == COMPACT_BLOCK)
+  if (rsType == COMPACT_BLOCK)
   {  
-    const char *source_cstr    = [rs.value UTF8String];
-    NSString   *selectorString = [rs.value substringFromIndex:1];
+    const char *source_cstr    = [rsValue UTF8String];
+    NSString   *selectorString = [rsValue substringFromIndex:1];
      
     if (isalpha(source_cstr[1]))
     {
@@ -1232,7 +1235,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     blr = [[[BlockRep alloc] initWithCode:nil 
                               symbolTable:symbTab
                                 signature:signature
-                                   source:rs.value
+                                   source:rsValue
                                isCompiled:YES
                                 isCompact:YES
                                       sel:[FSCompiler selectorFromString:selectorString]
@@ -1247,18 +1250,18 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self checkToken:OPEN_BRACKET :@"\"[\" or \"#\" expected "];
   [self scan];
 
-  if (rs.type == COLON)
+  if (rsType == COLON)
   {
     symbTab = [[[FSSymbolTable alloc] initWithParent:symbTab] autorelease];
     compilationContext.symbolTable = symbTab;
     hasArguments = YES;
   
-    while (rs.type == COLON)
+    while (rsType == COLON)
     {
       [self scan];
       [self checkToken:NAME :@"argument name expected"];
-      if ([symbTab containsSymbolAtFirstLevel:rs.value]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this block",rs.value]];
-      [symbTab insertSymbol:rs.value object:nil status:UNDEFINED];
+      if ([symbTab containsSymbolAtFirstLevel:rsValue]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this block",rsValue]];
+      [symbTab insertSymbol:rsValue object:nil status:UNDEFINED];
       signature.argumentCount++;
       [self scan];
     }
@@ -1266,16 +1269,16 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 
   if (hasArguments)
   {
-    if (rs.type == OPERATOR)
+    if (rsType == OPERATOR)
     {
-      if ([rs.value isEqualToString:@"|"]) [self scan];
-      else if ([rs.value isEqualToString:@"||"]) hasTemporaries = YES;
+      if ([rsValue isEqualToString:@"|"]) [self scan];
+      else if ([rsValue isEqualToString:@"||"]) hasTemporaries = YES;
       else [self syntaxError:@"\"|\"(end of block header) expected"];
     }
     else [self syntaxError:@"\"|\"(end of block header) expected"];
   } 
     
-  if (!hasTemporaries && rs.type == OPERATOR && [rs.value isEqualToString:@"|"]) 
+  if (!hasTemporaries && rsType == OPERATOR && [rsValue isEqualToString:@"|"]) 
     hasTemporaries = YES;
     
   if (hasTemporaries)
@@ -1287,13 +1290,13 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     }
     
     [self scan];
-    while (rs.type == NAME)
+    while (rsType == NAME)
     {
-      if ([symbTab containsSymbolAtFirstLevel:rs.value]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this block", rs.value]];
-      [symbTab insertSymbol:rs.value object:nil status:UNDEFINED];
+      if ([symbTab containsSymbolAtFirstLevel:rsValue]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this block", rsValue]];
+      [symbTab insertSymbol:rsValue object:nil status:UNDEFINED];
       [self scan];
     }
-    if (rs.type == OPERATOR && [rs.value isEqualToString:@"|"])  
+    if (rsType == OPERATOR && [rsValue isEqualToString:@"|"])  
       [self scan];
     else
       [self syntaxError:@"\"|\"(end of local variables declaration) expected"];
@@ -1333,7 +1336,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self checkToken:DICTIONARY_BEGIN :@"\"#{\" expected"];
   [self scan];
   
-  if (rs.type == CLOSE_BRACE)
+  if (rsType == CLOSE_BRACE)
   {
     r = [[[FSCNDictionary alloc] initWithEntries:entries] autorelease];
     [r setFirstCharIndex:firstCharIndex lastCharIndex:string_index];  
@@ -1342,7 +1345,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   }    
   else [entries addObject:[self expWithCompilationContext:compilationContext]];
         
-  while (rs.type == COMMA)
+  while (rsType == COMMA)
   {
     [self scan];
     [entries addObject:[self expWithCompilationContext:compilationContext]];
@@ -1362,11 +1365,11 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
 {
   NSMutableArray *r;
 
-  if (rs.type != AT) return [NSNull null];
+  if (rsType != AT) return [NSNull null];
   
   r = (id)[NSMutableArray array];
   
-  while (rs.type == AT)
+  while (rsType == AT)
   {
     if (! isdigit(string[string_index]))
     {
@@ -1376,7 +1379,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     else
     {  
       [self scan];
-      if (rs.type == SNUMBER)
+      if (rsType == SNUMBER)
       {
         FSNumber *n = [self number]->object;
         if ([n hasFrac_bool])
@@ -1412,16 +1415,16 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   //*************** Handle the starting - or + *********** 
   [self checkToken:OPERATOR :@"method definition expected (note that method definition must start with \"-\" or \"+\")"];
   
-  if      ([rs.value hasPrefix:@"-"]) compilationContext.isInClassMethod = NO;
-  else if ([rs.value hasPrefix:@"+"]) compilationContext.isInClassMethod = YES;
+  if      ([rsValue hasPrefix:@"-"]) compilationContext.isInClassMethod = NO;
+  else if ([rsValue hasPrefix:@"+"]) compilationContext.isInClassMethod = YES;
   else                                [self syntaxError:@"method definition expected (note that method definition must start with \"-\" or \"+\")"];
   
-  if ([rs.value length] > 1) [rs.value deleteCharactersInRange:NSMakeRange(0,1)];
+  if ([rsValue length] > 1) [rsValue deleteCharactersInRange:NSMakeRange(0,1)];
   else [self scan];
   //******************************************************
   
   //*************** Handle the optional return type declaration **************** 
-  if (rs.type == OPEN_PARENTHESE) 
+  if (rsType == OPEN_PARENTHESE) 
   {
     NSString *type = [self typeWithCompilationContext:compilationContext];
     char fsEncodedType = FSEncode([type UTF8String]);
@@ -1443,15 +1446,15 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [typesByArgument addObject:@":"];
 
   //*************** Handle the method name and arguments **************** 
-  if (rs.type == OPERATOR)
+  if (rsType == OPERATOR)
   {
-    selectorString = operator_name(rs.value);   
+    selectorString = operator_name(rsValue);   
     [selectorString insertString:@"operator" atIndex:0];
     [selectorString appendString:@":"];
     argumentCount = 3;
     [self scan];
   
-    if (rs.type == OPEN_PARENTHESE) 
+    if (rsType == OPEN_PARENTHESE) 
     {
       NSString *type = [self typeWithCompilationContext:compilationContext];
       char fsEncodedType = FSEncode([type UTF8String]);
@@ -1470,22 +1473,22 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
     }  
 
     [self checkToken:NAME :@"argument name expected"];
-    if ([symbolTable containsSymbolAtFirstLevel:rs.value]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rs.value]];
-    [symbolTable insertSymbol:rs.value object:nil status:UNDEFINED];
+    if ([symbolTable containsSymbolAtFirstLevel:rsValue]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rsValue]];
+    [symbolTable insertSymbol:rsValue object:nil status:UNDEFINED];
     [self scan];
   }   
-  else if (rs.type == NAME)
+  else if (rsType == NAME)
   {
-    selectorString = rs.value;
+    selectorString = rsValue;
     [self scan];
     
-    while (rs.type == COLON)
+    while (rsType == COLON)
     {
       [selectorString appendString:@":"];
       argumentCount++;
       [self scan];
 
-      if (rs.type == OPEN_PARENTHESE)
+      if (rsType == OPEN_PARENTHESE)
       {
         NSString *type = [self typeWithCompilationContext:compilationContext];
         char fsEncodedType = FSEncode([type UTF8String]);
@@ -1504,12 +1507,12 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
       }  
       
       [self checkToken:NAME :@"argument name expected"];
-      if ([symbolTable containsSymbolAtFirstLevel:rs.value]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rs.value]];
-      [symbolTable insertSymbol:rs.value object:nil status:UNDEFINED];
+      if ([symbolTable containsSymbolAtFirstLevel:rsValue]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rsValue]];
+      [symbolTable insertSymbol:rsValue object:nil status:UNDEFINED];
       [self scan];
-      if (rs.type == NAME)
+      if (rsType == NAME)
       {
-        [selectorString appendString:rs.value];
+        [selectorString appendString:rsValue];
         [self scan];
         [self checkToken:COLON :@"\":\" expected"];          
       }
@@ -1537,16 +1540,16 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   
   [self scan];
   
-  if (rs.type == OPERATOR && [rs.value isEqualToString:@"|"]) 
+  if (rsType == OPERATOR && [rsValue isEqualToString:@"|"]) 
   {    
     [self scan];
-    while (rs.type == NAME)
+    while (rsType == NAME)
     {
-      if ([compilationContext.symbolTable containsSymbolAtFirstLevel:rs.value]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rs.value]];
-      [compilationContext.symbolTable insertSymbol:rs.value object:nil status:DEFINED];
+      if ([compilationContext.symbolTable containsSymbolAtFirstLevel:rsValue]) [self syntaxError:[NSString stringWithFormat:@"identifier \"%@\" already defined in this method", rsValue]];
+      [compilationContext.symbolTable insertSymbol:rsValue object:nil status:DEFINED];
       [self scan];
     }
-    if (rs.type == OPERATOR && [rs.value isEqualToString:@"|"])  
+    if (rsType == OPERATOR && [rsValue isEqualToString:@"|"])  
       [self scan];
     else
       [self syntaxError:@"\"|\"(end of local variables declaration) expected"];
@@ -1591,13 +1594,13 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self scan];
   [self checkToken:NAME :@"type declaration expected"];
   
-  [typeBeforePointerMarks appendString:rs.value];
+  [typeBeforePointerMarks appendString:rsValue];
   [self scan];
   
-  while (rs.type == NAME)
+  while (rsType == NAME)
   {
     [typeBeforePointerMarks appendString:@" "];
-    [typeBeforePointerMarks appendString:rs.value];
+    [typeBeforePointerMarks appendString:rsValue];
     [self scan];
   }
   
@@ -1632,7 +1635,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   else if ([typeBeforePointerMarks isEqualToString:@"CGAffineTransform"])         encoded = @encode(CGAffineTransform);
   else if (NSClassFromString(typeBeforePointerMarks) != nil || [typeBeforePointerMarks isEqualToString:compilationContext.className])
   {  
-    if (rs.type != OPERATOR || ![rs.value hasPrefix:@"*"]) 
+    if (rsType != OPERATOR || ![rsValue hasPrefix:@"*"]) 
       [self syntaxError:[NSString stringWithFormat:@"missing \"*\" after class name \"%@\"", typeBeforePointerMarks]];
     
     isCustomClass = YES;
@@ -1646,14 +1649,14 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   
   [encodedtype appendString:@(encoded)];
   
-  while (rs.type == OPERATOR)
+  while (rsType == OPERATOR)
   {
-    for (NSUInteger i = (isCustomClass ? 1 : 0), length = [rs.value length]; i < length; i++)
+    for (NSUInteger i = (isCustomClass ? 1 : 0), length = [rsValue length]; i < length; i++)
     {
-      if ([rs.value characterAtIndex:i] == '*') 
+      if ([rsValue characterAtIndex:i] == '*') 
         [encodedtype insertString:@"^" atIndex:0];
       else 
-        [self syntaxError:[NSString stringWithFormat:@"invalid character \"%C\" in type specification", [rs.value characterAtIndex:i]]];
+        [self syntaxError:[NSString stringWithFormat:@"invalid character \"%C\" in type specification", [rsValue characterAtIndex:i]]];
     }
     [self scan];
   }
@@ -1674,16 +1677,16 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   int32_t firstCharIndex = token_first_char_index;
   
   [self checkToken:NAME :@"class name expected"];
-  className = rs.value;
-  compilationContext.className = rs.value;
+  className = rsValue;
+  compilationContext.className = rsValue;
   
   [self scan];
   
-  if (rs.type == COLON)
+  if (rsType == COLON)
   {
     [self scan];
-    if      (rs.type == NAME)   superclassName = rs.value;
-    else if (rs.type == KW_NIL) superclassName = nil;
+    if      (rsType == NAME)   superclassName = rsValue;
+    else if (rsType == KW_NIL) superclassName = nil;
     else 
     {
       [self syntaxError:@"class name expected"]; 
@@ -1698,27 +1701,27 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   [self scan];
   
   // Instance variables and class instance variables
-  while (rs.type == NAME)
+  while (rsType == NAME)
   { 
-    NSString *name = rs.value; 
+    NSString *name = rsValue; 
     [self scan];
        
-    if (rs.type == OPEN_PARENTHESE)
+    if (rsType == OPEN_PARENTHESE)
     {
       [self scan];
       
       BOOL validAttribute = NO;
       
-      if (rs.type == NAME && [rs.value isEqualToString:@"class"])
+      if (rsType == NAME && [rsValue isEqualToString:@"class"])
       {
         [self scan];
-        if (rs.type == NAME && [rs.value isEqualToString:@"instance"])
+        if (rsType == NAME && [rsValue isEqualToString:@"instance"])
         {
           [self scan];
-          if (rs.type == NAME && [rs.value isEqualToString:@"variable"])
+          if (rsType == NAME && [rsValue isEqualToString:@"variable"])
           {
             [self scan];
-            if (rs.type == CLOSE_PARENTHESE)
+            if (rsType == CLOSE_PARENTHESE)
             {
               validAttribute = YES;
               if ([civarNames containsObject:name]) [self syntaxError:[NSString stringWithFormat:@"duplicate definition of class instance variable \"%@\"", name]];
@@ -1746,7 +1749,7 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   
   // Method definitions
   
-  while (rs.type == OPERATOR)
+  while (rsType == OPERATOR)
   {    
     FSCNMethod *newMethodNode = [self methodWithCompilationContext:compilationContext];
     
@@ -1778,18 +1781,18 @@ static NSString *FSOperatorFromObjCOperatorName(NSString *operatorName)  // ex: 
   NSMutableArray *methods = [NSMutableArray array];
   
   [self checkToken:NAME :@"class name expected"];
-  className = rs.value;
-  compilationContext.className = rs.value;
+  className = rsValue;
+  compilationContext.className = rsValue;
   [self scan];
   [self checkToken:OPEN_BRACE :@"\"{\" expected"];
     
   [self scan];
    
-  if (rs.type == NAME) 
+  if (rsType == NAME) 
     [self syntaxError:@"instance variable definition not allowed here (instance variable definitions can only appear in class definitions)" firstCharIndex:token_first_char_index lastCharIndex:string_index-1]; 
         
   // Method definitions
-  while (rs.type == OPERATOR)
+  while (rsType == OPERATOR)
   {
     [methods addObject:[self methodWithCompilationContext:compilationContext]];
   }

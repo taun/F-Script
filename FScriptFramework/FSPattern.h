@@ -8,7 +8,7 @@
 @interface FSPattern:NSObject <NSCoding>
 {
   int deep;
-  __strong int *level;
+  int *level;
   unsigned levelCount;
   FSPattern *nextPattern;
 }

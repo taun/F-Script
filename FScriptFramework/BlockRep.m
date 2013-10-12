@@ -565,7 +565,7 @@
 -(id)body_notCompact_valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block // May raise
 {
   NSUInteger i,nb;
-  struct res_exec execResult;
+  ExecException* execResult;
   FSSymbolTable *heap;
   struct FSContextIndex index;
       

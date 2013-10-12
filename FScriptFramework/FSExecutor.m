@@ -84,7 +84,7 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
 -(FSInterpreterResult *)execute:(NSString *)command
 {
   FSCompilationResult *compilationResult;
-  struct res_exec execResult;
+  ExecException* execResult;
   NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   FSInterpreterResult *r;
   

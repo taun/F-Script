@@ -12,10 +12,5 @@
   return editor;
 }
 
-- (void) dealloc
-{
-  [editor release];
-  [super dealloc];
-}
 
 @end

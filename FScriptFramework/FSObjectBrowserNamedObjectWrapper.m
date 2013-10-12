@@ -7,32 +7,25 @@
 
 + (id)namedObjectWrapperWithObject:(id)theObject name:(NSString *)theName
 {
-  return [[[self alloc] initWithObject:theObject name:theName] autorelease];
-}
-
-- (void)dealloc
-{
-  [name release];
-  [object release];
-  [super dealloc];
+  return [[self alloc] initWithObject:theObject name:theName];
 }
 
 - (id)initWithObject:(id)theObject name:(NSString *)theName
 {
   if ((self = [super init]))
   {
-    object = [theObject retain];
-    name = [theName retain];
+    _object = theObject;
+    _name = theName;
     return self;
   }
   return nil;
 }
 
-- (id)object { return object; }
+- (id)object { return _object; }
 
 - (NSString *)description
 {
-  return name;
+  return _name;
 }
 
 @end

@@ -10,7 +10,7 @@
   IBOutlet NSTextView *printStringView;  
 }
 
-+ (FSGenericObjectInspector *)genericObjectInspectorWithObject:(id)object;
++ (FSGenericObjectInspector *)newGenericObjectInspectorWithObject:(id)object;
 - (FSGenericObjectInspector *)initWithObject:(id)object;
 - (void)updateAction:(id)sender;
 

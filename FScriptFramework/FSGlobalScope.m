@@ -8,15 +8,13 @@ FSGlobalScope *FSSharedGlobalScope;
 
 void __attribute__ ((constructor)) initializeFSGlobalScope(void) 
 {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
-
-  FSSharedGlobalScope = [[FSGlobalScope alloc] init];
-  
-  [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardOutput] forSymbol:@"stdout"];
-  [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardError]  forSymbol:@"stderr"];
-  [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardInput]  forSymbol:@"stdin"];
-
-  [pool release];
+  @autoreleasepool {
+    FSSharedGlobalScope = [[FSGlobalScope alloc] init];
+    
+    [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardOutput] forSymbol:@"stdout"];
+    [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardError]  forSymbol:@"stderr"];
+    [FSSharedGlobalScope setObject:[NSFileHandle fileHandleWithStandardInput]  forSymbol:@"stdin"];
+  }
 }
 
 @implementation FSGlobalScope

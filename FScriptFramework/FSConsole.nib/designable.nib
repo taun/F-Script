@@ -8,13 +8,11 @@
 		<string key="IBDocument.HIToolboxVersion">437.00</string>
 		<dictionary class="NSMutableDictionary" key="IBDocument.PluginVersions">
 			<string key="com.apple.InterfaceBuilder.CocoaPlugin">732</string>
-			<string key="org.fscript.FScriptIBPluginFramework">2.0.12</string>
 		</dictionary>
 		<array class="NSMutableArray" key="IBDocument.EditedObjectIDs">
 			<integer value="6"/>
 		</array>
 		<array key="IBDocument.PluginDependencies">
-			<string>org.fscript.FScriptIBPluginFramework</string>
 			<string>com.apple.InterfaceBuilder.CocoaPlugin</string>
 		</array>
 		<dictionary class="NSMutableDictionary" key="IBDocument.Metadata"/>
@@ -156,7 +154,6 @@
 				<boolean value="YES" key="6.ImportedFromIB2"/>
 				<boolean value="YES" key="6.windowTemplate.hasMinSize"/>
 				<string key="6.windowTemplate.minSize">{213, 107}</string>
-				<string key="7.IBPluginDependency">org.fscript.FScriptIBPluginFramework</string>
 				<boolean value="YES" key="7.ImportedFromIB2"/>
 			</dictionary>
 			<dictionary class="NSMutableDictionary" key="unlocalizedProperties"/>

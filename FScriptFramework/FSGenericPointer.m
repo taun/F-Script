@@ -199,6 +199,7 @@ if (s == nil) return nil;
   
   FSArray *r = [FSArray arrayWithCapacity:count];
   
+    // how to fix this?
   for (NSUInteger i = 0; i < count; i++) [r addObject:[self at:[FSNumber numberWithDouble:i]]];
   
   return r;

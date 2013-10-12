@@ -49,7 +49,7 @@
 
 - (FSBlock *) asBlock
 {
-  FSInterpreter *interpreter = [FSInterpreter interpreter];
+  FSInterpreter *interpreter = [FSInterpreter newInterpreter];
   FSSystem *sys = [interpreter objectForIdentifier:@"sys" found:NULL];
   FSBlock *result = [sys blockFromString:self]; // May raise
   
@@ -61,7 +61,7 @@
 {
   FSVerifClassArgsNoNil(@"asBlockOnError:",1,errorBlock,[FSBlock class]); 
   {
-    FSInterpreter *interpreter = [FSInterpreter interpreter];
+    FSInterpreter *interpreter = [FSInterpreter newInterpreter];
     FSSystem *sys = [interpreter objectForIdentifier:@"sys" found:NULL];
     FSBlock *bl = [@"[:msg :start :stop| {msg, start, stop}]" asBlock];
     id result = [sys blockFromString:self onError:bl]; // May raise

@@ -6,12 +6,10 @@
 @class FSInterpreter;
 
 @interface FSInterpreterView : NSView
-{
-  FSInterpreter *interpreter;
-} 
+
+@property (nonatomic,strong) FSInterpreter* interpreter;
 
 - (CGFloat)fontSize;
-- (FSInterpreter *)interpreter;
 - (void)notifyUser:(NSString *)message;
 - (void)putCommand:(NSString *)command;
 - (void)setFontSize:(CGFloat)theSize;

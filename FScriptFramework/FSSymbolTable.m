@@ -28,33 +28,25 @@
  
 - (id)copyWithZone:(NSZone *)zone
 {
-  return [[SymbolTableValueWrapper allocWithZone:zone] initWrapperWithValue:value symbol:symbol status:status];
+  return [[SymbolTableValueWrapper allocWithZone:zone] initWrapperWithValue: self.value symbol: self.symbol status: self.status];
 }                             
-
-- (void)dealloc
-{ 
-  [symbol release];
-  [value release];
-  [super dealloc]; 
-}  
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-  [coder encodeInteger:status forKey:@"status"];
-  [coder encodeObject:value   forKey:@"value"];
-  [coder encodeObject:symbol  forKey:@"symbol"];
+  [coder encodeInteger: self.status forKey:@"status"];
+  [coder encodeObject: self.value   forKey:@"value"];
+  [coder encodeObject: self.symbol  forKey:@"symbol"];
 }
 
 - (id)initWithCoder:(NSCoder *)coder
 {
   self = [super init];
-  retainCount = 1;
 
   if ([coder allowsKeyedCoding]) 
   {
-    status = [coder decodeIntegerForKey:@"status"];
-    value  = [[coder decodeObjectForKey:@"value" ] retain];
-    symbol = [[coder decodeObjectForKey:@"symbol"] retain];
+    _status = [coder decodeIntegerForKey:@"status"];
+    _value  = [coder decodeObjectForKey:@"value" ];
+    _symbol = [coder decodeObjectForKey:@"symbol"];
   }
   else
   {
@@ -64,9 +56,9 @@
 	}  
     unsigned tmp;
     [coder decodeValueOfObjCType:@encode(typeof(tmp)) at:&tmp];
-    status = tmp;
-    value  = [[coder decodeObject] retain];
-    symbol = [[coder decodeObject] retain];
+    _status = tmp;
+    _value  = [coder decodeObject];
+    _symbol = [coder decodeObject];
   }  
   return self;
 }
@@ -80,38 +72,15 @@
 {
   if ((self = [super init]))
   {
-    retainCount = 1;
-    status = theStatus; 
-    value = [theValue retain];
-    symbol = [theSymbol retain];
-    return self;
+    _status = theStatus;
+    _value = theValue;
+    _symbol = theSymbol;
   }
-  return nil;
+  return self;
 }
 
-- (id)retain  { retainCount ++; return self;}
-
-- (NSUInteger)retainCount  { return retainCount;}
-
-- (oneway void)release  { if (--retainCount == 0) [self dealloc];}  
-
-- (void)setValue:(id)theValue
-{
-  [theValue retain];
-  [value release];
-  value = theValue;
-}  
-
-- (enum FSContext_symbol_status)status
-{ return status;}
-
-- (NSString *)symbol
-{ return symbol;}
-
-- (id)value
-{ return value;}
-
 @end
+
 
 
 /////////////////////////////////////////// FSSymbolTable ///////////////////////////////////////
@@ -123,6 +92,9 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   [NSKeyedUnarchiver setClass:[FSSymbolTable class] forClassName:@"SymbolTable"];
 }
 
+@interface FSSymbolTable ()
+@property (nonatomic,strong) FSSymbolTable* parent;
+@end
 
 @implementation FSSymbolTable
   
@@ -138,19 +110,26 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   
 + symbolTable
 {
-  return [[[self alloc] init] autorelease];
-}  
+  return [[self alloc] init];
+}
+
+-(NSMutableArray*) locals {
+  if (!_locals) {
+    _locals = [NSMutableArray new];
+  }
+  return _locals;
+}
   
 //------------------- public methods ---------------
 
 - (FSArray *)allDefinedSymbols
 {
   FSArray *r = [FSArray arrayWithCapacity:30];
-  for (NSUInteger i = 0; i < localCount; i++)
+  for (NSUInteger i = 0; i < self.locals.count; i++)
   {
-    if (locals[i].status == DEFINED)
+    if ([(SymbolTableValueWrapper*)(self.locals[i]) status] == DEFINED)
     {
-      [r addObject:[NSMutableString stringWithString:locals[i].symbol]];
+      [r addObject:[NSMutableString stringWithString: [(SymbolTableValueWrapper*)(self.locals[i]) symbol]]];
     }
   }  
   return r;
@@ -159,9 +138,9 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 - (BOOL) containsSymbolAtFirstLevel:(NSString *)theKey 
 // Does the receiver contains the symbol (without searching parents)
 {
-  for (NSUInteger i = 0; i < localCount; i++)
+  for (NSUInteger i = 0; i < self.locals.count; i++)
   {
-    if ([locals[i].symbol isEqualToString:theKey]) return YES;
+    if ([[(SymbolTableValueWrapper*)(self.locals[i]) symbol] isEqualToString:theKey]) return YES;
   } 
   return NO;  
 } 
@@ -171,54 +150,26 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 
 - (id)copyWithZone:(NSZone *)zone
 {
-  struct FSContextValueWrapper *rLocals = NSAllocateCollectable(localCount * sizeof(struct FSContextValueWrapper), NSScannedOption);
-  for (NSUInteger i = 0; i < localCount; i++)
-  {
-    rLocals[i] = locals[i];
-    [rLocals[i].value retain];
-    [rLocals[i].symbol retain];    
-  }    
+  NSMutableArray* rLocals = [_locals mutableCopy];
 
-  return [[FSSymbolTable allocWithZone:zone] initWithParent:parent tryToAttachWhenDecoding:tryToAttachWhenDecoding locals:rLocals localCount:localCount];          
+  return [[FSSymbolTable allocWithZone:zone] initWithParent: self.parent tryToAttachWhenDecoding:tryToAttachWhenDecoding locals:rLocals];
 }  
-
-- (void)dealloc
-{
-  //NSLog(@"FSSymbolTable dealloc");
-  [parent release];
-  if (locals)
-  { 
-    for (NSUInteger i = 0; i < localCount; i++)
-    {
-      [locals[i].symbol release];
-      [locals[i].value release];
-    }
-    free(locals);
-  }
-  [super dealloc];
-}
 
 - (void) didSendDeallocToSymbolAtIndex:(struct FSContextIndex)index
 {
   FSSymbolTable *s = self;
-  for (NSUInteger i = 0; i < index.level && s; i++) s = s->parent;
+  for (NSUInteger i = 0; i < index.level && s; i++) s = s.parent;
   
   if (s)
   {
-    s->locals[index.index].value = nil;
+    [(SymbolTableValueWrapper*)(s.locals[index.index]) setValue: nil];
   }
 }
 
 - (void)encodeWithCoder:(NSCoder *)coder
 {
-  NSMutableArray *localsArray = [NSMutableArray arrayWithCapacity:localCount];
-  for (NSUInteger i = 0; i < localCount; i++)
-  {
-    [localsArray addObject:[[[SymbolTableValueWrapper alloc] initWrapperWithValue:locals[i].value symbol:locals[i].symbol status:locals[i].status] autorelease]];
-  }
-
-  [coder encodeConditionalObject:parent forKey:@"parent"];
-  [coder encodeObject:localsArray forKey:@"localsArray"];
+  [coder encodeConditionalObject: self.parent forKey:@"parent"];
+  [coder encodeObject:self.locals forKey:@"localsArray"];
   [coder encodeBool:tryToAttachWhenDecoding forKey:@"tryToAttachWhenDecoding"];
 } 
 
@@ -228,16 +179,16 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   struct FSContextIndex r;
   NSUInteger i;
   
-  for  (i = 0; i < localCount; i++)
+  for  (i = 0; i < self.locals.count; i++)
   {
-    if ([locals[i].symbol isEqualToString:theKey]) break;
+    if ([[(SymbolTableValueWrapper*)(self.locals[i]) symbol] isEqualToString:theKey]) break;
   }  
   
-  if (i == localCount)
+  if (i == self.locals.count)
   {
-    if (parent)
+    if (self.parent)
     {
-      r = [parent findOrInsertSymbol:theKey];
+      r = [self.parent findOrInsertSymbol:theKey];
       r.level++;
       return r;
     }
@@ -261,35 +212,28 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   
   if ([coder allowsKeyedCoding]) 
   {
-    parent = [[coder decodeObjectForKey:@"parent"] retain];
-    NSArray *localsArray = [coder decodeObjectForKey: @"localsArray"]; // Try with the new key
-    if (!localsArray) localsArray = [coder decodeObjectForKey: @"valueWrappers"]; // Try with the old key
-    localCount = [localsArray count];
-    locals = NSAllocateCollectable(localCount * sizeof(struct FSContextValueWrapper), NSScannedOption);
-    for (NSUInteger i = 0; i < localCount; i++)
-    {
-      locals[i].status = [((SymbolTableValueWrapper *)localsArray[i]) status]; 
-      locals[i].value  = [[((SymbolTableValueWrapper *)localsArray[i]) value] retain]; 
-      locals[i].symbol = [[((SymbolTableValueWrapper *)localsArray[i]) symbol] retain]; 
-    }    
+    self.parent = [coder decodeObjectForKey:@"parent"];
+    NSArray* decodedArray = [coder decodeObjectForKey: @"localsArray"];
+    if (decodedArray) self.locals = [decodedArray mutableCopy];
+    
     tryToAttachWhenDecoding = [coder decodeBoolForKey:@"tryToAttachWhenDecoding"];
-    if (tryToAttachWhenDecoding && !parent && [coder isKindOfClass:[FSKeyedUnarchiver class]])
-      parent = [[(FSKeyedUnarchiver *)coder loaderEnvironmentSymbolTable] retain];  
+    if (tryToAttachWhenDecoding && !self.parent && [coder isKindOfClass:[FSKeyedUnarchiver class]])
+      self.parent = [(FSKeyedUnarchiver *)coder loaderEnvironmentSymbolTable];
   }
   else
   {
-    parent = [[coder decodeObject] retain];
+    self.parent = [coder decodeObject];
     
     if ([coder versionForClassName:@"SymbolTable"] == 0)
     {
-      id *loc;
+//      id *loc;
       unsigned int locCount;
       //NSLog(@"version == 0");
-      [coder decodeValueOfObjCType:@encode(typeof(locCount)) at:&locCount];
-      loc = malloc(locCount*sizeof(id));
-      [coder decodeArrayOfObjCType:@encode(id) count:locCount at:loc];
-      free(loc);
-    }  
+      [coder decodeValueOfObjCType: @encode(typeof(locCount)) at: &locCount];
+//      loc = malloc(locCount*sizeof(id));
+//      [coder decodeArrayOfObjCType: @encode(id) count:locCount at: loc];
+//      free(loc);
+    }
   
     if ([coder versionForClassName:@"SymbolTable"] <= 1)
     { 
@@ -297,19 +241,11 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
     }
     else
     {
-      NSArray *localsArray = [coder decodeObject];
-      localCount = [localsArray count];
-      locals = NSAllocateCollectable(localCount * sizeof(struct FSContextValueWrapper), NSScannedOption); 
-      for (NSUInteger i = 0; i < localCount; i++)
-      {
-        locals[i].status = [((SymbolTableValueWrapper *)localsArray[i]) status]; 
-        locals[i].value  = [[((SymbolTableValueWrapper *)localsArray[i]) value] retain]; 
-        locals[i].symbol = [[((SymbolTableValueWrapper *)localsArray[i]) symbol] retain]; 
-      }    
-    }        
+      self.locals = [[coder decodeObject] mutableCopy];
+    }
     [coder decodeValueOfObjCType:@encode(typeof(tryToAttachWhenDecoding)) at:&tryToAttachWhenDecoding];
-    if (tryToAttachWhenDecoding && !parent && [coder isKindOfClass:[FSUnarchiver class]])
-      parent = [[(FSUnarchiver *)coder loaderEnvironmentSymbolTable] retain];
+    if (tryToAttachWhenDecoding && !self.parent && [coder isKindOfClass:[FSUnarchiver class]])
+      self.parent = [(FSUnarchiver *)coder loaderEnvironmentSymbolTable];
   }  
   return self;
 }
@@ -319,16 +255,16 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   struct FSContextIndex r;
   NSUInteger i;
   
-  for  (i = 0; i < localCount; i++)
+  for  (i = 0; i < self.locals.count; i++)
   {
-    if ([locals[i].symbol isEqualToString:theKey]) break;
+    if ([[(SymbolTableValueWrapper*)(self.locals[i]) symbol] isEqualToString:theKey]) break;
   }  
       
-  if (i == localCount)
+  if (i == self.locals.count)
   {
-    if (parent)
+    if (self.parent)
     {
-      r = [parent indexOfSymbol:theKey];
+      r = [self.parent indexOfSymbol:theKey];
       if (r.index != -1)
         r.level++;
       return r;
@@ -359,22 +295,19 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 
 - initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry
 {
-  return [self initWithParent:theParent tryToAttachWhenDecoding:shouldTry locals:NULL localCount:0];
+  return [self initWithParent:theParent tryToAttachWhenDecoding:shouldTry locals:NULL];
 } 
 
-- initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry locals:(struct FSContextValueWrapper *)theLocals localCount:(NSUInteger)theLocalCount
+- initWithParent:(FSSymbolTable *)theParent tryToAttachWhenDecoding:(BOOL)shouldTry locals:(NSMutableArray *)theLocals
 {
   if ((self = [super init]))
   {
-    retainCount = 1; 
-    parent = [theParent retain];
-    localCount = theLocalCount;
-    locals = theLocals;
+    _parent = theParent;
+    _locals = theLocals;
     tryToAttachWhenDecoding = shouldTry;
     receiverRetained = YES;
-    return self;
   }
-  return nil;
+  return self;
 }
 
 - (struct FSContextIndex)insertSymbol:(NSString*)symbol object:(id)object
@@ -386,33 +319,34 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 -(struct FSContextIndex) insertSymbol:(NSString*)symbol object:(id)object status:(enum FSContext_symbol_status)status                                   
 {
   struct FSContextIndex r;
-  if (!locals) locals = NSAllocateCollectable(sizeof(struct FSContextValueWrapper), NSScannedOption);
-  else locals = NSReallocateCollectable(locals, (localCount+1)*sizeof(struct FSContextValueWrapper), NSScannedOption);
   
-  locals[localCount].status = status; 
-  locals[localCount].value  = [object retain];
-  locals[localCount].symbol = [symbol retain]; 
+  SymbolTableValueWrapper* newContext = [[SymbolTableValueWrapper alloc] init];
+  newContext.status = status;
+  newContext.value = object;
+  newContext.symbol = symbol;
+  
+  [self.locals addObject: newContext];
+  
   
   //[[NSNotificationCenter defaultCenter] postNotificationName:@"changed" object:self];   
-  r.index = localCount; r.level = 0;
-  localCount++;
-  return r;      
+  r.index = self.locals.count-1; r.level = 0;
+  return r;
 }      
 
-- (BOOL) isEmpty  { return (localCount == 0);}
+- (BOOL) isEmpty  { return (self.locals.count == 0);}
 
 - objectForIndex:(struct FSContextIndex)index isDefined:(BOOL *)isDefined
 {
   FSSymbolTable *s = self;
   
-  for (NSUInteger i = 0; i < index.level && s; i++) s = s->parent;
+  for (NSUInteger i = 0; i < index.level && s; i++) s = s.parent;
   
   if (s)
   {
-    if (s->locals[index.index].status == DEFINED)
+    if ([(SymbolTableValueWrapper*)(self.locals[index.index]) status] == DEFINED)
     {
       *isDefined = YES;
-      return s->locals[index.index].value;
+      return [(SymbolTableValueWrapper*)(self.locals[index.index]) value];
     }
   }
   *isDefined = NO;
@@ -445,22 +379,10 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   } 
 }
 
-- (FSSymbolTable*) parent  { return parent;}  
-
-- (id)retain  { retainCount ++; return self;}
-
-- (NSUInteger)retainCount  { return retainCount;}
-
-- (oneway void)release  { if (--retainCount == 0) [self dealloc];}  
 
 - (void) removeAllObjects
 {
-  for (NSUInteger i = 0; i < localCount; i++)
-  {
-    locals[i].status = UNDEFINED;
-    [locals[i].value release];
-    locals[i].value = nil;
-  }    
+  [self.locals removeAllObjects];
 }
 
 -(void)setObject:(id)object forSymbol:(NSString *)symbol
@@ -471,25 +393,13 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   else                 [self setObject:object forIndex:ind];
 }
 
-- (void) setParent:(FSSymbolTable *)theParent
-{
-  if (theParent == parent) return;
-  
-  [theParent retain];
-  [parent release];
-  //[parent autorelease];
-  parent = theParent;
-}  
 
 - (void)setToNilSymbolsFrom:(NSUInteger)ind
 {
-  while (ind < localCount)
-  {
-    [locals[ind].value release];
-    locals[ind].value = nil;
-    locals[ind].status = DEFINED;    
-    ind++;
-  }    
+  for (SymbolTableValueWrapper* context in self.locals) {
+    context.status = DEFINED;
+    context.value = nil;
+  }
 }
 
 
@@ -498,18 +408,16 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
   NSInteger i; 
   FSSymbolTable *s = self;
 
-  for (i = 0; i < index.level && s; i++) s = s->parent; 
+  for (i = 0; i < index.level && s; i++) s = s.parent;
   
   if (s)
-  {
-    [object retain]; // (1)
-    
+  {    
     if (index.index != 0 || s->receiverRetained) 
     {
       // We are assigning to a regular variable (i.e., not to a "self" pointing to a non-retained receiver).
       // Therefore, we release the old value, as usual. 
       
-      [s->locals[index.index].value release];
+      [(SymbolTableValueWrapper*)(self.locals[index.index]) setValue: nil];
     }
     else     
     {
@@ -520,9 +428,8 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 
       s->receiverRetained = YES;
     }
-
-    s->locals[index.index].value = object; 
-    s->locals[index.index].status = DEFINED;
+    [(SymbolTableValueWrapper*)(self.locals[index.index]) setValue: object];
+    [(SymbolTableValueWrapper*)(self.locals[index.index]) setStatus: DEFINED];
     return self;
   }  
   else return nil;
@@ -532,9 +439,9 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 {
   FSSymbolTable *s = self;
   
-  for (NSUInteger i = 0; i < index.level && s; i++) s = s->parent;
+  for (NSUInteger i = 0; i < index.level && s; i++) s = s.parent;
   
-  if (s) return s->locals[index.index].symbol;
+  if (s) return [(SymbolTableValueWrapper*)(self.locals[index.index]) symbol];
   else   return nil;
 }
 
@@ -542,20 +449,20 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
 -(void) undefineSymbolAtIndex:(struct FSContextIndex)index
 {
   FSSymbolTable *s = self;
-  for (NSUInteger i = 0; i < index.level && s; i++) s = s->parent;
+  for (NSUInteger i = 0; i < index.level && s; i++) s = s.parent;
 
   if (s)
   {
-    s->locals[index.index].status = UNDEFINED;
-    [s->locals[index.index].value release];
-    s->locals[index.index].value = nil;
+    SymbolTableValueWrapper* context = self.locals[index.index];
+    context.status = UNDEFINED;
+    context.value = nil;
   }
 }
 
 - (void) willSendReleaseToSymbolAtIndex:(struct FSContextIndex)index
 {
   FSSymbolTable *s = self;
-  for (NSUInteger i = 0; i < index.level && s; i++) s = s->parent;
+  for (NSUInteger i = 0; i < index.level && s; i++) s = s.parent;
   
   if (s && index.index == 0 && !s->receiverRetained)
   {
@@ -566,7 +473,6 @@ void __attribute__ ((constructor)) initializeForSymbolTabletoFSSymbolTableTransi
     // The release message might lead to a premature dealloction, and consequently break correct semantic. We retain this receiver in
     // order to avoid such premature deallocation. Note that we can safely retain it because the fact it is going to receive a release
     // message means that it is not actually an uninitialized object (unless there is programming error in the F-Script user code of course).
-    [s->locals[0].value retain];
     s->receiverRetained = YES; 
   }
 }

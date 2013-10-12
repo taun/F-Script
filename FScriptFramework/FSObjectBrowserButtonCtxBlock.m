@@ -6,19 +6,11 @@
 
 @implementation FSObjectBrowserButtonCtxBlock
 
-- (void)dealloc
-{
-  //NSLog(@"FSObjectBrowserButtonCtxBlock dealloc"); 
-  [master release];
-  [super dealloc];
-}  
 
 - (BlockInspector *)inspector { return [master inspector]; } 
 
 - (void) setMaster:(FSBlock *)theMaster
 {
-  [theMaster retain];
-  [master release];
   master = theMaster;
 }
 

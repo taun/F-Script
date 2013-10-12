@@ -12,6 +12,18 @@
 #import "FSObjectBrowser.h"
 #import "FSCompiler.h"
 
+@interface FSInterpreter ()
+
+@property (nonatomic,strong) FSExecutor* executor;
+
+/*!
+ Keep a strong reference to each brwoser window as they are opened.
+ The browserWindow is removed and released when WindowWillClose: is called.
+*/
+@property (nonatomic,strong) NSMutableSet* browserWindows;
+
+@end
+
 @implementation FSInterpreter
 
 + (BOOL) validateSyntaxForIdentifier:(NSString *)identifier
@@ -48,67 +60,82 @@
   } 
 }
 
-+ (FSInterpreter *)interpreter
++ (FSInterpreter *)newInterpreter
 {
-  return [[[self alloc] init] autorelease];
+  return [[self alloc] init];
+}
+
+-(NSMutableSet*) browserWindows {
+  if (_browserWindows == nil) {
+    _browserWindows = [NSMutableSet new];
+  }
+  return _browserWindows;
 }
 
 - (FSObjectBrowserButtonCtxBlock *) objectBrowserButtonCtxBlockFromString:(NSString *)source // May raise
 {
-  return [FSObjectBrowserButtonCtxBlock blockWithSource:source parentSymbolTable:[executor symbolTable]]; // May raise
+  return [FSObjectBrowserButtonCtxBlock blockWithSource:source parentSymbolTable:[self.executor symbolTable]]; // May raise
 }
 
-- (void)browse 
+- (void)browse
 {
   FSObjectBrowser *bb = [FSObjectBrowser objectBrowserWithRootObject:nil interpreter:self];
   [bb browseWorkspace];
+  [bb setReleasedWhenClosed: NO];
   [bb makeKeyAndOrderFront:nil];
+  [bb setDelegate: self];
+  [self.browserWindows addObject: bb];
 }
 
 - (void)browse:(id)anObject
 {
-  [[FSObjectBrowser objectBrowserWithRootObject:anObject interpreter:self] makeKeyAndOrderFront:nil];
+  FSObjectBrowser *bb = [FSObjectBrowser objectBrowserWithRootObject:anObject interpreter:self];
+  [bb setReleasedWhenClosed: NO];
+  [bb  makeKeyAndOrderFront:nil];
+  [bb setDelegate: self];
+  [self.browserWindows addObject: bb];
 }
 
 -(void)dealloc
 {
   //NSLog(@"FSInterpreter dealloc");
-  [executor breakCycles];
-  [executor interpreterIsDeallocating];
-  [executor release];
-  [super dealloc];
+  [_executor breakCycles];
+  [_executor interpreterIsDeallocating];
+  _executor = nil;
+  
+  [_browserWindows removeAllObjects];
+  _browserWindows = nil;
 }
 
 - (NSArray *) identifiers
 {
-  return [executor allDefinedSymbols];
+  return [self.executor allDefinedSymbols];
 }
 
 -(void)encodeWithCoder:(NSCoder *)coder
 {
   if ([coder allowsKeyedCoding]) 
   {
-    [coder encodeObject:executor forKey:@"executor"];
+    [coder encodeObject: self.executor forKey:@"executor"];
   }
   else
   {
-    [coder encodeObject:executor];
+    [coder encodeObject: self.executor];
   }  
 }
 
 -(FSInterpreterResult *)execute:(NSString *)command
 {
-  return [executor execute:command];
+  return [self.executor execute:command];
 }
 
 -(id)init
 {
   if ((self = [super init]))
   {
-    executor = [[FSExecutor alloc] initWithInterpreter:self];
-    return self;
+    _executor = [[FSExecutor alloc] initWithInterpreter:self];
   }
-  return nil;
+  return self;
 }
 
 - (id)initWithCoder:(NSCoder *)coder
@@ -116,41 +143,50 @@
   self = [super init];
   if ([coder allowsKeyedCoding]) 
   {
-    executor = [[coder decodeObjectForKey:@"executor"] retain];    
+    self.executor = [coder decodeObjectForKey:@"executor"];
   }
   else
   {
-    executor = [[coder decodeObject] retain];  
+    self.executor = [coder decodeObject];
   }  
   return self;
 }
 
 - (void) installFlightTutorial
 {
-  [executor installFlightTutorial];
+  [self.executor installFlightTutorial];
 }
 
 - (id)objectForIdentifier:(NSString *)identifier found:(BOOL *)found
 {
-  return [executor objectForSymbol:identifier found:found];
+  return [self.executor objectForSymbol:identifier found:found];
 }
 
 - (BOOL)setJournalName:(NSString *)filename
 {
-  return [executor setJournalName:filename];
+  return [self.executor setJournalName:filename];
 }
 
 -(void)setObject:(id)object forIdentifier:(NSString *)identifier
 {
-  [executor setObject:object forSymbol:identifier];
+  [self.executor setObject:object forSymbol:identifier];
 }
 
 - (void)setShouldJournal:(BOOL)shouldJournal
 {
-  [executor setShouldJournal:shouldJournal];
+  [self.executor setShouldJournal:shouldJournal];
 }
 
 - (BOOL)shouldJournal
-{ return [executor shouldJournal]; }
+{ return [self.executor shouldJournal]; }
+
+#pragma mark - WindowDelegate protocol
+
+-(void) windowWillClose:(NSNotification *)notification {
+  NSWindow* theWindow = (NSWindow*)[notification object];
+  if ([self.browserWindows containsObject: theWindow]) {
+    [self.browserWindows removeObject: theWindow];
+  }
+}
 
 @end
