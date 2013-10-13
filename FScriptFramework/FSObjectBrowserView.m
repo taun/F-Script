@@ -233,6 +233,7 @@ static NSMutableArray *customButtons = nil;
 @interface FSObjectBrowserView()  // Methods declaration to let the compiler know
 
 @property (nonatomic,strong) FSInterpreter* interpreter;
+@property (nonatomic,strong) NSWindow*      tempInputWindow;
 
 - (void) fillMatrixForClassesBrowsing:(NSMatrix*)matrix;
 - (void) fillMatrixForWorkspaceBrowsing:(NSMatrix*)matrix; 
@@ -896,8 +897,8 @@ static NSMutableArray *customButtons = nil;
       NSForm *f;
       NSWindow *argumentsWindow;
       NSMethodSignature *signature = [selectedObject methodSignatureForSelector:selector];
-      
-      argumentsWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(100,100,baseWidth,baseHeight) styleMask:NSResizableWindowMask backing:NSBackingStoreBuffered defer:NO];
+  
+      argumentsWindow = [[NSWindow alloc] initWithContentRect:NSMakeRect(100,100,baseWidth,baseHeight) styleMask: NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO];
       [argumentsWindow setMinSize:NSMakeSize(240,baseHeight+22)];
       [argumentsWindow setMaxSize:NSMakeSize(1400,baseHeight+22)];
       [argumentsWindow setReleasedWhenClosed: NO];
@@ -955,9 +956,22 @@ static NSMutableArray *customButtons = nil;
       [f setAutosizesCells:YES]; 
       [f setTarget:sendButton];
       [f setAction:@selector(performClick:)];
-      [f selectTextAtIndex:0]; 
+      [f selectTextAtIndex:0];
+      self.tempInputWindow = argumentsWindow; // retain
       
-      [NSApp beginSheet:argumentsWindow modalForWindow:[self window] modalDelegate:self didEndSelector:NULL contextInfo:NULL];
+      // 10.9 code
+//      [self.window beginSheet: argumentsWindow completionHandler:^(NSModalResponse response) {
+//        NSLog(@"Good bye sheet. Response %ld", (long)response);
+//        if (response == NSModalResponseOK) {
+//          // ok
+//        } else {
+//          // cancel
+//          self.tempInputWindow = nil;
+//          [[browser matrixInColumn:[browser lastColumn]-1] deselectAllCells];
+//        }
+//      }];
+      [NSApp beginSheet: argumentsWindow modalForWindow:[self window] modalDelegate:self didEndSelector:NULL contextInfo:NULL];
+//      [NSApp runModalForWindow: argumentsWindow];
     }
   }
   [browser tile]; 
@@ -981,6 +995,7 @@ static NSMutableArray *customButtons = nil;
 {
   [NSApp endSheet:[sender window]];
   [[sender window] close];
+  self.tempInputWindow = nil;
   [[browser matrixInColumn:[browser lastColumn]-1] deselectAllCells];
 }
 
@@ -988,6 +1003,7 @@ static NSMutableArray *customButtons = nil;
 {
   [NSApp endSheet:[sender window]];
   [[sender window] close];
+  self.tempInputWindow = nil;
 }
 
 - (void) classesAction:(id)sender
@@ -1499,7 +1515,7 @@ static NSMutableArray *customButtons = nil;
     return;
   }
   
-  nameSheet = [[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,baseWidth,baseHeight) styleMask:NSTitledWindowMask|NSClosableWindowMask backing:NSBackingStoreBuffered defer:NO];
+  nameSheet = [[NSWindow alloc] initWithContentRect:NSMakeRect(0,0,baseWidth,baseHeight) styleMask: NSTitledWindowMask backing:NSBackingStoreBuffered defer:NO];
   [nameSheet setReleasedWhenClosed: NO];
   [nameSheet setMinSize:NSMakeSize(130,80)];
    
@@ -1526,8 +1542,9 @@ static NSMutableArray *customButtons = nil;
   [cancelButton setTarget:self];
   [cancelButton setKeyEquivalent:@"\e"];
   [[nameSheet contentView] addSubview:cancelButton];
-   
-  [NSApp beginSheet:nameSheet modalForWindow:[self window] modalDelegate:self didEndSelector:NULL contextInfo:NULL];
+  
+  self.tempInputWindow = nameSheet;
+  [NSApp beginSheet: nameSheet modalForWindow:[self window] modalDelegate:self didEndSelector:NULL contextInfo:NULL];
   [field selectText:nil];
 }
 
@@ -1537,6 +1554,7 @@ static NSMutableArray *customButtons = nil;
   {
     [NSApp endSheet:[sender window]];
     [[sender window] close];
+    self.tempInputWindow = nil;
   }
   else if ([[sender stringValue] isEqualToString:@"sys"])
   {
@@ -1549,6 +1567,7 @@ static NSMutableArray *customButtons = nil;
     [self.interpreter setObject:[self selectedObject] forIdentifier:[sender stringValue]];
     [NSApp endSheet:[sender window]];
     [[sender window] close];
+    self.tempInputWindow = nil;
   }
   else
   {
@@ -1892,6 +1911,7 @@ static NSMutableArray *customButtons = nil;
     {
       [NSApp endSheet:[sender window]];
       [[sender window] close];
+      self.tempInputWindow = nil;
       [browser tile];
     }  
   }
