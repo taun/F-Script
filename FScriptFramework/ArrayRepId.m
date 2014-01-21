@@ -196,39 +196,41 @@
 
 - (id)operator_backslash:(FSBlock*)bl // may raise
 {
-    NSUInteger i;  
-    id args[3];
+  NSUInteger i;
+  //id args[3];
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args setCount: 3];
+  
+  [args replacePointerAtIndex: 0 withPointer: t[0]];
+  
+  if ([bl isCompact])
+  {
+    SEL selector = [bl selector];
+    NSString *selectorStr = [bl selectorStr];
+    FSMsgContext *msgContext = [bl msgContext];
     
-    args[0] = t[0];
+    //args[1] = (id)(selector ? selector : [FSCompiler selectorFromString:selectorStr]);
+    [args replacePointerAtIndex: 1 withPointer: selectorStr];
     
-    if ([bl isCompact])
+    for (i = 1; i < count; i++)
     {
-      SEL selector = [bl selector];
-      NSString *selectorStr = [bl selectorStr];
-      FSMsgContext *msgContext = [bl msgContext];
-
-      //args[1] = (id)(selector ? selector : [FSCompiler selectorFromString:selectorStr]);
-      args[1] = selectorStr;
-
-      for (i = 1; i < count; i++)
-      {
-        args[2] = t[i];
-        args[0] = sendMsg(args[0], selector, 3, args, nil, msgContext, nil);
-      }
+      [args replacePointerAtIndex: 2 withPointer: t[i]];
+      [args replacePointerAtIndex: 0 withPointer: sendMsg([args pointerAtIndex: 0], selector, 3, args, nil, msgContext, nil)];
     }
-    else
+  }
+  else
+  {
+    BlockRep *blRep = [bl blockRep];
+    
+    for (i = 1; i < count; i++)
     {
-      BlockRep *blRep = [bl blockRep];
-
-      for (i = 1; i < count; i++)
-      {
-        args[2] = t[i];
-        args[0] = [blRep body_notCompact_valueArgs:args count:3 block:bl];
-      }
+      [args replacePointerAtIndex: 2 withPointer: t[i]];
+      [args replacePointerAtIndex: 0 withPointer: [blRep body_notCompact_valueArgs:args count:3 block:bl]];
     }
-    return args[0];   
+  }
+  return [args pointerAtIndex: 0];
 }
-   
+
 - (FSArray *)replicateWithArray:(FSArray *)operand
 {
   FSArray *r;

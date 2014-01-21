@@ -192,7 +192,7 @@ void __attribute__ ((constructor)) initializeBlock(void)
   assert(0);
 }
 
--(id) valueArgs:(id*)args count:(NSUInteger)count
+-(id) valueArgs:(id)args count:(NSUInteger)count
 {  
   assert(0);
 }
@@ -380,12 +380,12 @@ void __attribute__ ((constructor)) initializeBlock(void)
   assert(0);
 }
 
--(id)body_compact_valueArgs:(id*)args count:(NSUInteger)count
+-(id)body_compact_valueArgs:(id)args count:(NSUInteger)count
 {
   assert(0);
 } 
 
--(id)body_notCompact_valueArgs:(id*)args count:(NSUInteger)count
+-(id)body_notCompact_valueArgs:(id)args count:(NSUInteger)count
 {
   assert(0);
 }  

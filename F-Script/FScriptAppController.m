@@ -26,7 +26,7 @@ void RestartWithCorrectGarbageCollectionSettingIfNecessary()
 
   // NSLog(@"Entering in RestartWithCorrectGarbageCollectionSettingIfNecessary()");
   
-  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
+//  NSAutoreleasePool* pool = [[NSAutoreleasePool alloc] init];
   
   NSDictionary* garbageCollectionUserDefaults = @{@"FScriptRunWithObjCAutomaticGarbageCollection": @YES};
   [[NSUserDefaults standardUserDefaults] registerDefaults:garbageCollectionUserDefaults];
@@ -92,7 +92,7 @@ void RestartWithCorrectGarbageCollectionSettingIfNecessary()
     }
   }
 
-  [pool release];
+//  [pool release];
 }
 
 
@@ -167,7 +167,7 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
 
 - (void)loadSystemFrameworks  // Contributed by Cedric Luthi
 {
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+//  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   
   NSMutableArray *systemFrameworksPaths = [NSMutableArray arrayWithObject:@"/System/Library/Frameworks"];
   
@@ -184,7 +184,7 @@ NSString  *findPathToFileInLibraryWithinSystemDomain(NSString *fileName)
     }
   }
   
-  [pool drain];
+//  [pool drain];
 }
 
 - (void)applicationDidFinishLaunching:(NSNotification *)aNotification

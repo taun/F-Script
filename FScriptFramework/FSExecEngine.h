@@ -64,8 +64,8 @@ ExecException* executeForBlock(FSCNBase *codeNode, FSSymbolTable *symbolTable, F
 
 id execute_rec(FSCNBase *codeNode, FSSymbolTable *localSymbolTable, NSInteger *errorFirstCharIndexPtr, NSInteger *errorLastCharIndexPtr);  
 
-id sendMsg(id receiver, SEL selector, NSUInteger argumentCount, id *args,FSPattern* pattern,FSMsgContext *msgContext, Class ancestorToStartWith);
+id sendMsg(id receiver, SEL selector, NSUInteger argumentCount, id args,FSPattern* pattern,FSMsgContext *msgContext, Class ancestorToStartWith);
 
-id sendMsgNoPattern(id receiver, SEL selector, NSUInteger argumentCount, id *args,FSMsgContext *msgContext, Class ancestorToStartWith);
+id sendMsgNoPattern(id receiver, SEL selector, NSUInteger argumentCount, id args,FSMsgContext *msgContext, Class ancestorToStartWith);
 
-id sendMsgPattern(id receiver, SEL selector, NSUInteger argumentCount, id *args,FSPattern* pattern,FSMsgContext *msgContext, Class ancestorToStartWith);
+id sendMsgPattern(id receiver, SEL selector, NSUInteger argumentCount, id args,FSPattern* pattern,FSMsgContext *msgContext, Class ancestorToStartWith);

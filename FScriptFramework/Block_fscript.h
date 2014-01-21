@@ -40,7 +40,7 @@
 - (void)showError:(NSString*)errorMessage; 
 - (void)showError:(NSString*)errorMessage start:(NSInteger)firstCharacterIndex end:(NSInteger)lastCharacterIndex;
 - (FSSymbolTable *) symbolTable;
-- (id) valueArgs:(id*)args count:(NSUInteger)count;
+- (id) valueArgs:(id)args count:(NSUInteger)count;
 
 ////////////////////////////// USER METHODS ////////////////////////
 

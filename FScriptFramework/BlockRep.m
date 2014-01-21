@@ -512,7 +512,7 @@
 - (id) useRetain    {useCount++; return self;}
 - (NSInteger) useCount {return useCount;}
 
--(id)body_compact_valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block // May raise
+-(id)body_compact_valueArgs:(NSPointerArray*)args count:(NSUInteger)count block:(FSBlock *)block // May raise
 {
   id r;
   
@@ -527,8 +527,8 @@
       sel = [FSCompiler selectorFromString:selStr]; 
       if (sel == (SEL)0) FSExecError(@"The #<null selector> block cannot be evaluated");
     }    
-    args[1] = selStr;
-    r = sendMsgNoPattern(args[0], sel, count, args, msgContext, nil);   // May raise    
+    [args replacePointerAtIndex: 1 withPointer: selStr];
+    r = sendMsgNoPattern([args pointerAtIndex:0], sel, count, args, msgContext, nil);   // May raise
   }
   @catch (FSReturnSignal *returnSignal)
   {
@@ -562,7 +562,7 @@
   return r;
 }
 
--(id)body_notCompact_valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block // May raise
+-(id)body_notCompact_valueArgs:(NSPointerArray*)args count:(NSUInteger)count block:(FSBlock *)block // May raise
 {
   NSUInteger i,nb;
   ExecException* execResult;
@@ -581,11 +581,11 @@
 
   if (signature.argumentCount > 0)
   {
-    [heap setObject:args[0] forIndex:index];  
+    [heap setObject:[args pointerAtIndex:0] forIndex:index];
     for(i = 2, nb = signature.argumentCount+1 ; i < nb; i++)
     {
       index.index++;
-      [heap setObject:args[i] forIndex:index];
+      [heap setObject:[args pointerAtIndex:i] forIndex:index];
     }  
   } 
   
@@ -601,7 +601,7 @@
   {assert(0); return nil;} // to suppress a compiler warning
 }  
 
--(id) valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block
+-(id) valueArgs:(id)args count:(NSUInteger)count block:(FSBlock *)block
 {          
   if (count-1 < signature.argumentCount)
   {
@@ -624,18 +624,20 @@
   }
   else
   {
-    id args[nb+1];
+    //id args[nb+1];
+    NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+    [args setCount: nb+1];
   
     if (![arguments isKindOfClass:[FSArray class]] || [arguments isProxy])
     {
-      args[0] = arguments[0];
-      for (i = 1; i < nb; i++)  args[i+1] = arguments[i];
+      [args replacePointerAtIndex: 0 withPointer: arguments[0]];
+      for (i = 1; i < nb; i++)  [args replacePointerAtIndex: i+1 withPointer: arguments[i]];
     }
     else 
     {
       id *argumentsData = [(FSArray *)arguments dataPtr];
-      args[0] = argumentsData[0];
-      for (i = 1; i < nb; i++) args[i+1] = argumentsData[i];
+      [args replacePointerAtIndex: 0 withPointer: argumentsData[0]];
+      for (i = 1; i < nb; i++) [args replacePointerAtIndex: i+1 withPointer: argumentsData[i]];
     }
     return [self valueArgs:args count:nb+1 block:block];
   }   

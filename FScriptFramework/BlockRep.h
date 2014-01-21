@@ -42,8 +42,8 @@
 - (NSInteger)argumentCount;
 - (NSArray *)argumentsNames;
 - (FSCNBase *)ast;
-- (id)body_compact_valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block;
-- (id)body_notCompact_valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block;
+- (id)body_compact_valueArgs:(NSPointerArray*)args count:(NSUInteger)count block:(FSBlock *)block;
+- (id)body_notCompact_valueArgs:(NSPointerArray*)args count:(NSUInteger)count block:(FSBlock *)block;
 - (FSBlockCompilationResult *)compilForBlock:(FSBlock *)block;   // May cause self to be deallocated.
 - (id)compilForBlock:(FSBlock *)block onError:(FSBlock *)errorBlock; // May raise. May cause self to be deallocated.
 - copyWithZone:(NSZone *)zone;
@@ -80,7 +80,7 @@
 - (id) useRetain;
 - (NSInteger) useCount;
 
-- (id) valueArgs:(id*)args count:(NSUInteger)count block:(FSBlock *)block;
+- (id) valueArgs:(id)args count:(NSUInteger)count block:(FSBlock *)block;
 - (id) valueWithArguments:(NSArray *)arguments block:(FSBlock *)block;
 
 @end

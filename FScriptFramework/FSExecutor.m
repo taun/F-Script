@@ -85,58 +85,58 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
 {
   FSCompilationResult *compilationResult;
   ExecException* execResult;
-  NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
   FSInterpreterResult *r;
-  
-  if (should_journal && journal)
-  {
-    [journal writeData:[command dataUsingEncoding:NSUTF8StringEncoding]];
-    [journal writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
-    [journal synchronizeFile];
-  }
-
-  compilationResult = [compiler compileCode:[command UTF8String] withParentSymbolTable:localSymbolTable];
-
-  switch(compilationResult->type)
-  {
-  case ERROR :
-    if (compilationResult->errorLastCharacterIndex == -1)
-      r = [FSInterpreterResult interpreterResultWithStatus:FS_SYNTAX_ERROR result:nil errorRange:NSMakeRange(0,0) errorMessage:compilationResult->errorMessage callStack:nil];
-    else
-      r = [FSInterpreterResult interpreterResultWithStatus:FS_SYNTAX_ERROR result:nil errorRange:NSMakeRange(compilationResult->errorFirstCharacterIndex, 1+compilationResult->errorLastCharacterIndex - compilationResult->errorFirstCharacterIndex) errorMessage:compilationResult->errorMessage callStack:nil];
-  
-    break;
- 
-  case OK :
-  {    
-    if (verboseLevel >= 5) NSLog(@"before execute()");
+  //@autoreleasepool {
     
-    @try
+    if (should_journal && journal)
     {
-      execResult = execute(compilationResult->code, localSymbolTable); // may raise
-      
-      if (execResult.errorStr)
-      {
-        id callStack = [execResult.exception isKindOfClass:[NSException class]] ? [execResult.exception userInfo][@"FScriptBlockStack"] : nil;
-        r = [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange(execResult.errorFirstCharIndex, 1+execResult.errorLastCharIndex - execResult.errorFirstCharIndex) errorMessage:execResult.errorStr callStack:callStack];              
-      }
-      else
-        r = [FSInterpreterResult interpreterResultWithStatus:FS_OK result:execResult.result errorRange:NSMakeRange(0,0) errorMessage:nil callStack:nil];    
+      [journal writeData:[command dataUsingEncoding:NSUTF8StringEncoding]];
+      [journal writeData:[@"\n" dataUsingEncoding:NSUTF8StringEncoding]];
+      [journal synchronizeFile];
     }
-    @catch (FSReturnSignal *returnSignal)
+    
+    compilationResult = [compiler compileCode:[command UTF8String] withParentSymbolTable:localSymbolTable];
+    
+    switch(compilationResult->type)
     {
-      r = [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange(0,0) errorMessage:@"invalid return" callStack:nil];
-    }  
-    break;
-  }
-  default : 
-    r = nil;  // Should not happend. It's here to avoid a compiler warning.
-    assert(0);
-  } 
-  
-  [r retain];  // to move r out of pool
-  if (verboseLevel >= 5) NSLog(@"before [pool release]");
-  [pool release];    
+      case ERROR :
+        if (compilationResult->errorLastCharacterIndex == -1)
+          r = [FSInterpreterResult interpreterResultWithStatus:FS_SYNTAX_ERROR result:nil errorRange:NSMakeRange(0,0) errorMessage:compilationResult->errorMessage callStack:nil];
+        else
+          r = [FSInterpreterResult interpreterResultWithStatus:FS_SYNTAX_ERROR result:nil errorRange:NSMakeRange(compilationResult->errorFirstCharacterIndex, 1+compilationResult->errorLastCharacterIndex - compilationResult->errorFirstCharacterIndex) errorMessage:compilationResult->errorMessage callStack:nil];
+        
+        break;
+        
+      case OK :
+      {
+        if (verboseLevel >= 5) NSLog(@"before execute()");
+        
+        @try
+        {
+          execResult = execute(compilationResult->code, localSymbolTable); // may raise
+          
+          if (execResult.errorStr)
+          {
+            id callStack = [execResult.exception isKindOfClass:[NSException class]] ? [execResult.exception userInfo][@"FScriptBlockStack"] : nil;
+            r = [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange(execResult.errorFirstCharIndex, 1+execResult.errorLastCharIndex - execResult.errorFirstCharIndex) errorMessage:execResult.errorStr callStack:callStack];
+          }
+          else
+            r = [FSInterpreterResult interpreterResultWithStatus:FS_OK result:execResult.result errorRange:NSMakeRange(0,0) errorMessage:nil callStack:nil];
+        }
+        @catch (FSReturnSignal *returnSignal)
+        {
+          r = [FSInterpreterResult interpreterResultWithStatus:FS_EXECUTION_ERROR result:nil errorRange:NSMakeRange(0,0) errorMessage:@"invalid return" callStack:nil];
+        }
+        break;
+      }
+      default :
+        r = nil;  // Should not happend. It's here to avoid a compiler warning.
+        assert(0);
+    } 
+    
+    [r retain];  // to move r out of pool
+    if (verboseLevel >= 5) NSLog(@"before [pool release]");
+    //}
   if (verboseLevel >= 5) NSLog(@"after [pool release]\n-------------------------------");
   return [r autorelease];
 }
@@ -145,7 +145,7 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
 {
   if ((self = [super init]))
   {
-    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
+//    NSAutoreleasePool *pool = [[NSAutoreleasePool alloc] init];
     
     interpreter = theInterpreter; // WARNING : no retain in order to avoid a cycle
     should_journal = NO;
@@ -155,7 +155,7 @@ void __attribute__ ((constructor)) initializeFSExecutor(void)
     [localSymbolTable insertSymbol:@"sys" object:[FSSystem system:self]];
      
     compiler = [[FSCompiler alloc] init];
-    [pool release];
+//    [pool release];
     
     return self;
   }

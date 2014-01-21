@@ -64,69 +64,69 @@ static int comp(const void *a,const void *b)
 
 - (id)operator_backslash:(FSBlock*)bl
 {
-    NSUInteger i;
-    id res;
-    id args[3];
+  NSUInteger i;
+  id res;
+  //id args[3];
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args setCount: 3];
+  
+  if ([bl isCompact])
+  {
+    SEL selector = [bl selector];
+    NSString *selectorStr  = [bl selectorStr];
+    FSMsgContext *msgContext = [bl msgContext];
+    double acu = t[0];
     
-    if ([bl isCompact]) 
-    {
-      SEL selector = [bl selector];
-      NSString *selectorStr  = [bl selectorStr];
-      FSMsgContext *msgContext = [bl msgContext];
-      double acu = t[0];
-
-      //args[1] = (selector ? selectorStr : [FSCompiler selectorFromString:selectorStr]);
-      args[1] = selectorStr;
-
-      if (selector == @selector(operator_plus:)) { for (i = 1 ; i < count; i++) acu += t[i]         ; return [FSNumber numberWithDouble:acu]; }
-      else if (selector == @selector(max:))      { for (i = 1 ; i < count; i++) acu = MAX(acu, t[i]); return [FSNumber numberWithDouble:acu]; }
-      else if (selector == @selector(min:))      { for (i = 1 ; i < count; i++) acu = MIN(acu, t[i]); return [FSNumber numberWithDouble:acu]; }
-      else
-      {
-        @try
-        {
-          args[0] = [[FSNumber alloc] initWithDouble:t[0]];
-          for (i = 1; i < count; i++) 
-          {
-            args[2] = [[FSNumber alloc] initWithDouble:t[i]];
-            res = [sendMsg(args[0], selector, 3, args, nil, msgContext, nil) retain];
-            [args[0] release];
-            args[0] = res;
-            [args[2] release];  
-          }
-        }
-        @catch (id exception)
-        {
-          [args[0] release];
-          [args[2] release];
-          @throw;
-        }
-      } // end if
-    }
+    //args[1] = (selector ? selectorStr : [FSCompiler selectorFromString:selectorStr]);
+    [args replacePointerAtIndex: 1 withPointer: selectorStr];
+    
+    if (selector == @selector(operator_plus:)) { for (i = 1 ; i < count; i++) acu += t[i]         ; return [FSNumber numberWithDouble:acu]; }
+    else if (selector == @selector(max:))      { for (i = 1 ; i < count; i++) acu = MAX(acu, t[i]); return [FSNumber numberWithDouble:acu]; }
+    else if (selector == @selector(min:))      { for (i = 1 ; i < count; i++) acu = MIN(acu, t[i]); return [FSNumber numberWithDouble:acu]; }
     else
     {
-      BlockRep *blRep = [bl blockRep];
-
       @try
       {
-        args[0] = [[FSNumber alloc] initWithDouble:t[0]];
+        [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:t[0]]];
         for (i = 1; i < count; i++)
         {
-          args[2] = [[FSNumber alloc] initWithDouble:t[i]];
-          res = [[blRep body_notCompact_valueArgs:args count:3 block:bl] retain]; 
-          [args[0] release];
-          args[0] = res;
-          [args[2] release];  
+          [args replacePointerAtIndex: 2 withPointer: [[FSNumber alloc] initWithDouble:t[i]]];
+          res = [sendMsg([args pointerAtIndex:0], selector, 3, args, nil, msgContext, nil) retain];
+          [args replacePointerAtIndex: 0 withPointer: res];
+          [args replacePointerAtIndex: 2 withPointer: NULL];
         }
-      }  
+      }
       @catch (id exception)
       {
-        [args[0] release];
-        [args[2] release];
+        [args replacePointerAtIndex: 0 withPointer: NULL];
+        [args replacePointerAtIndex: 2 withPointer: NULL];
         @throw;
-      }  
+      }
+    } // end if
+  }
+  else
+  {
+    BlockRep *blRep = [bl blockRep];
+    
+    @try
+    {
+      [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:t[0]]];
+      for (i = 1; i < count; i++)
+      {
+        [args replacePointerAtIndex: 2 withPointer: [[FSNumber alloc] initWithDouble:t[i]]];
+        res = [[blRep body_notCompact_valueArgs:args count:3 block:bl] retain];
+        [args replacePointerAtIndex: 0 withPointer: res];
+        [args replacePointerAtIndex: 2 withPointer: NULL];
+      }
     }
-    return [args[0] autorelease]; 
+    @catch (id exception)
+    {
+      [args replacePointerAtIndex: 0 withPointer: NULL];
+      [args replacePointerAtIndex: 2 withPointer: NULL];
+      @throw;
+    }
+  }
+  return [args pointerAtIndex:0];
 }
 
 - (NSUInteger)indexOfObject:(id)anObject inRange:(NSRange)range identical:(BOOL)identical

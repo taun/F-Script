@@ -37,7 +37,9 @@
 - (id)operator_backslash:(FSBlock*)bl  // May raise
 {
   NSUInteger i;
-  id args[3];
+  //id args[3];
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args setCount: 3];
   
   if ([bl isCompact]) 
   {
@@ -47,7 +49,7 @@
     long acu = t[0];
 
     //args[1] = (id)(selector ? selector : [FSCompiler selectorFromString:selectorStr]);
-    args[1] = selectorStr;
+    [args replacePointerAtIndex: 1 withPointer: selectorStr];
 
     if (selector == @selector(operator_ampersand:)) 
     {
@@ -66,11 +68,11 @@
     }
     else
     {
-      args[0] = (t[0] ? (id)fsTrue : (id)fsFalse);
+      [args replacePointerAtIndex: 0 withPointer: (t[0] ? (id)fsTrue : (id)fsFalse)];
       for (i = 1; i < count; i++)
       {
-        args[2] = (t[i] ? (id)fsTrue : (id)fsFalse);
-        args[0] = sendMsg(args[0], selector, 3, args, nil, msgContext, nil); // May raise
+        [args replacePointerAtIndex: 2 withPointer: (t[i] ? (id)fsTrue : (id)fsFalse)];
+        [args replacePointerAtIndex: 0 withPointer: sendMsg([args pointerAtIndex:0], selector, 3, args, nil, msgContext, nil)]; // May raise
       }
     } // end if
   }
@@ -78,14 +80,14 @@
   {
     BlockRep *blRep = [bl blockRep];
     
-    args[0] = (t[0] ? (id)fsTrue : (id)fsFalse);
+    [args replacePointerAtIndex: 0 withPointer: (t[0] ? (id)fsTrue : (id)fsFalse)];
     for (i = 1; i < count; i++)
     {
-      args[2] = (t[i] ? (id)fsTrue : (id)fsFalse);
-      args[0] = [blRep body_notCompact_valueArgs:args count:3 block:bl];
+      [args replacePointerAtIndex: 2 withPointer: (t[i] ? (id)fsTrue : (id)fsFalse)];
+      [args replacePointerAtIndex: 0 withPointer: [blRep body_notCompact_valueArgs:args count:3 block:bl]];
     }
   }
-  return args[0];
+  return [args pointerAtIndex:0];
 }
 
 

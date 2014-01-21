@@ -125,10 +125,10 @@ static NSMutableCharacterSet *letterDigitUnderscoreCharacterSet;
   if ( !tooLate )
   {
     NSMutableDictionary *d; 
-    NSAutoreleasePool *pool;
+//    NSAutoreleasePool *pool;
 
     tooLate = YES;
-    pool = [[NSAutoreleasePool alloc] init];
+//    pool = [[NSAutoreleasePool alloc] init];
 
     letterDigitUnderscoreCharacterSet = [[NSMutableCharacterSet letterCharacterSet] retain];
     [letterDigitUnderscoreCharacterSet formUnionWithCharacterSet:[NSCharacterSet decimalDigitCharacterSet]];
@@ -140,7 +140,7 @@ static NSMutableCharacterSet *letterDigitUnderscoreCharacterSet;
     [d release];
     completionStrings = nil;   
 
-    [pool release];
+//    [pool release];
   }
 } 
 

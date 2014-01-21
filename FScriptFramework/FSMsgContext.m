@@ -28,6 +28,12 @@
   return [[[self alloc] init] autorelease];
 }  
 
+- (NSString*) debugDescription {
+  NSString* desc = [NSString stringWithFormat: @"%@: %@", [self description], [signature debugDescription]];
+  
+  return desc;
+}
+
 - (void) dealloc
 {
   //NSLog(@"MsgContext dealloc");  

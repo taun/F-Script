@@ -1926,14 +1926,12 @@ static NSMutableArray *customButtons = nil;
   if ([receiver isKindOfClass:[FSNewlyAllocatedObjectHolder class]]) receiver = [receiver object];
   
   NSMutableArray* args = [[NSMutableArray alloc] initWithObjects: receiver, selectorStr, nil];
-  [args addObject: receiver];
-  [args addObject: selectorStr];
   
   for (i = 0; i < arguments.count; i++) [args addObject: arguments[i]];
     
   @try
   {
-    result = sendMsgNoPattern(receiver, selector, args.count, &args, [FSMsgContext msgContext], nil);
+    result = sendMsgNoPattern(receiver, selector, args.count, args, [FSMsgContext msgContext], nil);
   }
   @catch (id exception)
   {

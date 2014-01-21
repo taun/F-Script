@@ -327,7 +327,7 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 -(FSSymbolTable *) symbolTable
 { return [blockRep symbolTable];}
 
--(id) valueArgs:(id*)args count:(NSUInteger)count
+-(id) valueArgs:(id)args count:(NSUInteger)count
 {  
   [self compilIfNeeded];  
   return [blockRep valueArgs:args count:count block:self];
@@ -466,77 +466,180 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 }
 
 - (id) value
-{ return [self valueArgs:(id*)nil count:1];}
+{ return [self valueArgs:(id)nil count:1];}
 
 - (id) value:(id)arg1
 { 
-  id args[2] = {arg1,nil};
+  //id args[2] = {arg1,nil};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
   return [self valueArgs:args count:2];
 }
 
 - (id) value:(id)arg1 value:(id)arg2
 { 
-  id args[3] = {arg1,nil,arg2};
+  //id args[3] = {arg1,nil,arg2};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
   return [self valueArgs:args count:3];
 }  
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3
 { 
-  id args[4] = {arg1,nil,arg2,arg3};
+  //id args[4] = {arg1,nil,arg2,arg3};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
   return [self valueArgs:args count:4];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4
 { 
-  id args[5] = {arg1,nil,arg2,arg3,arg4};
+  //id args[5] = {arg1,nil,arg2,arg3,arg4};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
   return [self valueArgs:args count:5];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5
 { 
-  id args[6] = {arg1,nil,arg2,arg3,arg4,arg5};
+  //id args[6] = {arg1,nil,arg2,arg3,arg4,arg5};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
   return [self valueArgs:args count:6];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6
 { 
-  id args[7] = {arg1,nil,arg2,arg3,arg4,arg5,arg6};
+  //id args[7] = {arg1,nil,arg2,arg3,arg4,arg5,arg6};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
   return [self valueArgs:args count:7];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7
 { 
-  id args[8] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7};
+  //id args[8] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
   return [self valueArgs:args count:8];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7 value:(id)arg8
 { 
-  id args[9] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8};
+  //id args[9] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
+  [args addPointer: arg8];
   return [self valueArgs:args count:9];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7 value:(id)arg8 value:(id)arg9
 { 
-  id args[10] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9};
+  //id args[10] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
+  [args addPointer: arg8];
+  [args addPointer: arg9];
   return [self valueArgs:args count:10];
 }
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7 value:(id)arg8 value:(id)arg9 value:(id)arg10
 { 
-  id args[11] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10};
+  //id args[11] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
+  [args addPointer: arg8];
+  [args addPointer: arg9];
+  [args addPointer: arg10];
   return [self valueArgs:args count:11];
 } 
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7 value:(id)arg8 value:(id)arg9 value:(id)arg10 value:(id)arg11
 { 
-  id args[12] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11};
+  //id args[12] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
+  [args addPointer: arg8];
+  [args addPointer: arg9];
+  [args addPointer: arg10];
+  [args addPointer: arg11];
   return [self valueArgs:args count:12];
 } 
 
 - (id) value:(id)arg1 value:(id)arg2 value:(id)arg3 value:(id)arg4 value:(id)arg5 value:(id)arg6 value:(id)arg7 value:(id)arg8 value:(id)arg9 value:(id)arg10 value:(id)arg11 value:(id)arg12
 { 
-  id args[13] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12};
+  //id args[13] = {arg1,nil,arg2,arg3,arg4,arg5,arg6,arg7,arg8,arg9,arg10,arg11,arg12};
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args addPointer: arg1];
+  [args addPointer: NULL];
+  [args addPointer: arg2];
+  [args addPointer: arg3];
+  [args addPointer: arg4];
+  [args addPointer: arg5];
+  [args addPointer: arg6];
+  [args addPointer: arg7];
+  [args addPointer: arg8];
+  [args addPointer: arg9];
+  [args addPointer: arg10];
+  [args addPointer: arg11];
+  [args addPointer: arg12];
   return [self valueArgs:args count:13];
 } 
 
@@ -549,7 +652,6 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 
 - (void) whileFalse
 { 
-  NSAutoreleasePool *pool;
   short i;
   BOOL cond = NO; // initialization of cond in order to avoid a warning
   id resEval; 
@@ -560,21 +662,20 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
    
   while (1)
   {
-    pool = [[NSAutoreleasePool alloc] init];
-    i = 0;
- 
-    while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id*)nil count:1]) == fsFalse || ([resEval isKindOfClass:[FSBoolean class]] && ![resEval isTrue]))))
-    {
-      i++;
+    @autoreleasepool {
+      i = 0;
+      
+      while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id)nil count:1]) == fsFalse || ([resEval isKindOfClass:[FSBoolean class]] && ![resEval isTrue]))))
+      {
+        i++;
+      }
     }
-    [pool release];
     if (!cond) break;
   }        
 }  
 
 - (void) whileFalse:(FSBlock*)iterationBlock
 {
-  NSAutoreleasePool *pool;
   short i;
   BOOL cond = NO; //initialization of cond in order to avoid a warning
   id resEval; 
@@ -591,22 +692,21 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
   
   while (1)
   {
-    pool = [[NSAutoreleasePool alloc] init];
-    i = 0;
- 
-    while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id*)nil count:1]) == fsFalse || ([resEval isKindOfClass:[FSBoolean class]] && ![resEval isTrue]))))
-    {
-      i++;
-      [iterationBlock body_notCompact_valueArgs:(id*)nil count:1];
+    @autoreleasepool {
+      i = 0;
+      
+      while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id)nil count:1]) == fsFalse || ([resEval isKindOfClass:[FSBoolean class]] && ![resEval isTrue]))))
+      {
+        i++;
+        [iterationBlock body_notCompact_valueArgs:(id)nil count:1];
+      }
     }
-    [pool release];
     if (!cond) break;
   }
 }  
 
 - (void) whileTrue
 { 
-  NSAutoreleasePool *pool;
   short i;
   BOOL cond = NO; // initialization of cond in order to avoid a warning
   id resEval; 
@@ -617,21 +717,20 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
    
   while (1)
   {
-    pool = [[NSAutoreleasePool alloc] init];
-    i = 0;
- 
-    while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id*)nil count:1]) == fsTrue || ([resEval isKindOfClass:[FSBoolean class]] && [resEval isTrue]))))
-    {
-      i++;
+    @autoreleasepool {
+      i = 0;
+      
+      while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id)nil count:1]) == fsTrue || ([resEval isKindOfClass:[FSBoolean class]] && [resEval isTrue]))))
+      {
+        i++;
+      }
     }
-    [pool release];
     if (!cond) break;
   }        
 }  
 
 - (void) whileTrue:(FSBlock*)iterationBlock
 {
-  NSAutoreleasePool *pool;
   short i;
   BOOL cond = NO; // initialization of cond in order to avoid a warning
   id resEval; 
@@ -648,15 +747,15 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
   
   while (1)
   {
-    pool = [[NSAutoreleasePool alloc] init];
-    i = 0;
- 
-    while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id*)nil count:1]) == fsTrue || ([resEval isKindOfClass:[FSBoolean class]] && [resEval isTrue]))))
-    {
-      i++;
-      [iterationBlock body_notCompact_valueArgs:(id*)nil count:1];
+    @autoreleasepool {
+      i = 0;
+      
+      while (i < 300 && (cond = ((resEval = [self body_notCompact_valueArgs:(id)nil count:1]) == fsTrue || ([resEval isKindOfClass:[FSBoolean class]] && [resEval isTrue]))))
+      {
+        i++;
+        [iterationBlock body_notCompact_valueArgs:(id)nil count:1];
+      }
     }
-    [pool release];
     if (!cond) break;
   }
   /*while ([self body_notCompact_valueArgs:(id*)nil count:1] == fsTrue)
@@ -680,12 +779,12 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 
 - (BlockRep *)blockRep        { return blockRep;}
 
--(id)body_compact_valueArgs:(id*)args count:(NSUInteger)count
+-(id)body_compact_valueArgs:(id)args count:(NSUInteger)count
 {
   return [blockRep body_compact_valueArgs:args count:count block:self];
 } 
    
--(id)body_notCompact_valueArgs:(id*)args count:(NSUInteger)count
+-(id)body_notCompact_valueArgs:(NSPointerArray*)args count:(NSUInteger)count
 {
   return [blockRep body_notCompact_valueArgs:args count:count block:self];
 }  
@@ -699,10 +798,12 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 - (void)evaluateWithDoubleFrom:(double)start to:(double)stop by:(double)step 
 // precondition:  step != 0
 {
-  FSNumber *args[2];   // In fact an array with the special layout needed for methods 
+  //FSNumber *args[2];   // In fact an array with the special layout needed for methods
                        // body_compact_valueArgs:count:block: and body_notCompact_valueArgs:count:block:
+  NSPointerArray* args = [NSPointerArray pointerArrayWithStrongObjects];
+  [args setCount: 2];
+  
   double newValue;                   
-  NSAutoreleasePool *pool = nil; 
   
   if ((start < stop && step < 0) || (start > stop && step > 0)) return;
 
@@ -716,93 +817,88 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
 
   @try
   {
-    args[0] = [[FSNumber alloc] initWithDouble:start];
+    [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:start]];
     
     while (1)
     {
       short i = 0;
 
-      pool = [[NSAutoreleasePool alloc] init];
-    
-      if ([blockRep isCompact])
-      {
-        if (start < stop)
+      @autoreleasepool {
+        if ([blockRep isCompact])
         {
-          while (i < 1000 && args[0]->value <= stop)
+          if (start < stop)
           {
-            [blockRep body_compact_valueArgs:args count:2 block:self];  // may raise
-            i++;
-            newValue = args[0]->value + step;
-            [args[0] release];
-            args[0] = [[FSNumber alloc] initWithDouble:newValue];
+            while (i < 1000 && ((FSNumber*)[args pointerAtIndex:0])->value <= stop)
+            {
+              [blockRep body_compact_valueArgs:args count:2 block:self];  // may raise
+              i++;
+              newValue = ((FSNumber*)[args pointerAtIndex:0])->value + step;
+              [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:newValue]];
+            }
+            if (((FSNumber*)[args pointerAtIndex:0])->value > stop)
+            {
+              [args replacePointerAtIndex: 0 withPointer: NULL];
+              break;
+            }
           }
-          if (args[0]->value > stop)
+          else if (start > stop)
           {
-            [args[0] release];
-            break;
+            while (i < 1000 && ((FSNumber*)[args pointerAtIndex:0])->value >= stop)
+            {
+              [blockRep body_compact_valueArgs:args count:2 block:self];  // may raise
+              i++;
+              newValue = ((FSNumber*)[args pointerAtIndex:0])->value + step;
+              [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:newValue]];
+            }
+            if (((FSNumber*)[args pointerAtIndex:0])->value < stop)
+            {
+              [args replacePointerAtIndex: 0 withPointer: NULL];
+              break;
+            }
           }
         }
-        else if (start > stop)
+        else
         {
-          while (i < 1000 && args[0]->value >= stop)
+          if (start < stop)
           {
-            [blockRep body_compact_valueArgs:args count:2 block:self];  // may raise
-            i++;
-            newValue = args[0]->value + step;
-            [args[0] release];
-            args[0] = [[FSNumber alloc] initWithDouble:newValue];
+            while (i < 1000 && ((FSNumber*)[args pointerAtIndex:0])->value <= stop)
+            {
+              [blockRep body_notCompact_valueArgs:args count:2 block:self];  // may raise
+              i++;
+              newValue = ((FSNumber*)[args pointerAtIndex:0])->value + step;
+              [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:newValue]];
+            }
+            if (((FSNumber*)[args pointerAtIndex:0])->value > stop)
+            {
+              [args replacePointerAtIndex: 0 withPointer: NULL];
+              break;
+            }
           }
-          if (args[0]->value < stop)
+          else if (start > stop)
           {
-            [args[0] release];
-            break;
-          }
-        }    
+            while (i < 1000 && ((FSNumber*)[args pointerAtIndex:0])->value >= stop)
+            {
+              [blockRep body_notCompact_valueArgs:args count:2 block:self];  // may raise
+              i++;
+              newValue = ((FSNumber*)[args pointerAtIndex:0])->value + step;
+              [args replacePointerAtIndex: 0 withPointer: [[FSNumber alloc] initWithDouble:newValue]];
+            }
+            if (((FSNumber*)[args pointerAtIndex:0])->value < stop)
+            {
+              [args replacePointerAtIndex: 0 withPointer: NULL];
+              break;
+            }          
+          }  
+        } 
       }
-      else
-      {
-        if (start < stop)
-        {  
-          while (i < 1000 && args[0]->value <= stop)
-          {
-            [blockRep body_notCompact_valueArgs:args count:2 block:self];  // may raise
-            i++;
-            newValue = args[0]->value + step;
-            [args[0] release];
-            args[0] = [[FSNumber alloc] initWithDouble:newValue];
-          }
-          if (args[0]->value > stop)
-          {
-            [args[0] release];
-            break;
-          }
-        }  
-        else if (start > stop)
-        {  
-          while (i < 1000 && args[0]->value >= stop)
-          {
-            [blockRep body_notCompact_valueArgs:args count:2 block:self];  // may raise
-            i++;
-            newValue = args[0]->value + step;
-            [args[0] release];
-            args[0] = [[FSNumber alloc] initWithDouble:newValue];
-          }
-          if (args[0]->value < stop)
-          {
-            [args[0] release];
-            break;
-          }          
-        }  
-      } 
-      [pool release]; 
+    
     }
   }  
   @catch (id exception)
   {
     [exception retain];
-    [pool release];
-    [args[0] release];
-    [exception autorelease]; 
+    [args replacePointerAtIndex: 0 withPointer: NULL];
+    [exception autorelease];
     @throw;
   }          
 }
