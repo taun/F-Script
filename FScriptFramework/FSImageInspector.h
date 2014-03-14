@@ -10,7 +10,7 @@
   IBOutlet NSImageView *imageView;
 }
 
-+ (FSImageInspector *)imageInspectorWithImage:(id)object;
++ (FSImageInspector *)newImageInspectorWithImage:(id)object;
 
 - (FSImageInspector *)initWithImage:(id)object;
 

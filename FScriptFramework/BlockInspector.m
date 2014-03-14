@@ -182,12 +182,12 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 - initWithBlock:(FSBlock*)bl
 {
-  if ([super init])
+  self = [super init];
+  if (self)
   {
     inspectedObject = bl;
-    return self;
   }
-  return nil;
+  return self;
 }  
 
 - (IBAction) run:sender

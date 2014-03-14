@@ -7,7 +7,7 @@
 @implementation FSRecursiveReplacer 
 - (id)initWithFrom:(NSString *)f to:(NSString *)t next:(FSRecursiveReplacer *)n;
 {
-  [super init];
+    self = [super init];
   from=[f copy];
   to=[t copy];
   next=[n retain];

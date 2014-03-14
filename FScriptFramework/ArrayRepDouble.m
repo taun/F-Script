@@ -1122,7 +1122,7 @@ static int comp(const void *a,const void *b)
   return nil; //W
 }
 
-- init { return [self initWithCapacity:0]; }
+- init { return [self initWithCapacity:1]; }
 
 - initFilledWithDouble:(double)elem count:(NSUInteger)nb // contract: a return value of nil means not enough memory
 {

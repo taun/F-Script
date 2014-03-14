@@ -145,8 +145,12 @@
 
   theConnection = [[NSConnection alloc] init];
   [theConnection setRootObject:self];
-  if ([theConnection registerName:operand] == NO) return nil;
-  else                                            return theConnection;
+  if ([theConnection registerName:operand] == NO) {
+    [theConnection release];
+    theConnection = nil;
+  }
+
+  return theConnection;
 }
 
 

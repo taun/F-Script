@@ -8,7 +8,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
  
 @implementation FSImageInspector
 
-+(FSImageInspector *)imageInspectorWithImage:(id)object
++(FSImageInspector *)newImageInspectorWithImage:(id)object
 {
   return [[[self alloc] initWithImage:object] autorelease];
 }

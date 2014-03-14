@@ -8,7 +8,7 @@ static NSPoint topLeftPoint = {0,0}; // Used for cascading windows.
 
 @implementation FSAttributedStringInspector
 
-+(FSAttributedStringInspector *)attributedStringInspectorWithAttributedString:(NSAttributedString *)object
++(FSAttributedStringInspector *)newAttributedStringInspectorWithAttributedString:(NSAttributedString *)object
 {
   return [[[self alloc] initWithAttributedString:object] autorelease];
 }

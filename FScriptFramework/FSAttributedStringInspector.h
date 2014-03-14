@@ -11,7 +11,7 @@
   IBOutlet NSTextView *attributedStringView;    
 }
 
-+ (FSAttributedStringInspector *)attributedStringInspectorWithAttributedString:(NSAttributedString *)object;
++ (FSAttributedStringInspector *)newAttributedStringInspectorWithAttributedString:(NSAttributedString *)object;
 - (FSAttributedStringInspector *)initWithAttributedString:(NSAttributedString *)object;
 - (IBAction)updateAction:(id)sender;
 

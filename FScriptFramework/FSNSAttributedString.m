@@ -8,7 +8,7 @@
 
 -(void)inspect
 {
-  [FSAttributedStringInspector attributedStringInspectorWithAttributedString:self];
+  [FSAttributedStringInspector newAttributedStringInspectorWithAttributedString:self];
 }
 
 @end

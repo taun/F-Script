@@ -455,13 +455,13 @@
   // Note that this method must be called on a block which is already compiled 
   if (!signature.hasLocals)
   {
-    if (symbol_table == parent) return [[[FSBlock alloc] initWithBlockRep:self] autorelease];
+    if (symbol_table == parent) return [[[[FSBlock alloc] initWithBlockRep:self] retain] autorelease];
     else if (useCount == 0) 
     {
       [parent retain]; 
       [symbol_table release]; 
       symbol_table = parent ; 
-      return [[[FSBlock alloc] initWithBlockRep:self] autorelease];
+      return [[[[FSBlock alloc] initWithBlockRep:self] retain] autorelease];
     }
   }
   
@@ -479,7 +479,7 @@
 
     new = [[BlockRep alloc] initWithCode:ac symbolTable:s  signature:signature source:source isCompiled:is_compiled isCompact:isCompact sel:sel selStr:[[selStr copy] autorelease]]; 
     if (signature.hasLocals) [s release];
-    r = [[[FSBlock alloc] initWithBlockRep:new] autorelease];
+    r = [[[[FSBlock alloc] initWithBlockRep:new] retain ] autorelease];
     [new release];
     return r;
   }

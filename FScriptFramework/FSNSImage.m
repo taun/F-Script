@@ -8,7 +8,7 @@
 
 -(void)inspect
 {
-  [FSImageInspector imageInspectorWithImage:self];
+  [FSImageInspector newImageInspectorWithImage:self];
 }
 
 @end

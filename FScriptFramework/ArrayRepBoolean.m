@@ -223,7 +223,7 @@
   }    
 }
 
-- init { return [self initWithCapacity:0]; }
+- init { return [self initWithCapacity:1]; }
 
 - initFilledWithBoolean:(char)elem count:(NSUInteger)nb // contract: a return value of nil means not enough memory
 {

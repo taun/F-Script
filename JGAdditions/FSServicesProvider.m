@@ -54,11 +54,12 @@ static id globalServicesProvider;
 
 - (id)initWithFScriptInterpreterViewProvider:(id)controller
 {
-  [super init];
-  interpreterViewProvider=[controller retain];
-  if (!globalServicesProvider)
-    globalServicesProvider=[self retain];
-  return self;
+    self = [super init];
+    interpreterViewProvider=[controller retain];
+    if (!globalServicesProvider) {
+        globalServicesProvider=[self retain];
+    }
+    return self;
 }
 
 - (id)interpreterViewProvider
