@@ -1322,7 +1322,7 @@ static NSMutableArray *customButtons = nil;
   if      (browsingMode == FSBrowsingWorkspace) [self fillMatrixForWorkspaceBrowsing:[browser matrixInColumn:0]];
   else if (browsingMode == FSBrowsingClasses)   [self fillMatrixForClassesBrowsing:[browser matrixInColumn:0]];
   
-  i = 0; // In order to avoid a warning "may be used unintialized"
+//  i = 0; // In order to avoid a warning "may be used unintialized"
   switch (browsingMode)
   {
     case FSBrowsingWorkspace: 

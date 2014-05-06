@@ -129,7 +129,7 @@ NSString *FS_Block_keyOfSetValueForKeyMessage(FSBlock *s)
   {
     // The block has local symbols
     BlockRep *new = [blockRep copyWithZone:zone];
-    FSBlock *r =[[FSBlock allocWithZone:zone] initWithBlockRep:new];
+    FSBlock *r =[[FSBlock allocWithZone:zone] initWithBlockRep: new];
     
     [new release];
     return r;

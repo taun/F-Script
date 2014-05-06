@@ -59,6 +59,7 @@ static int comp(const void *a,const void *b)
   ArrayRepDouble *copy = [self copy];
   FSArray *r = [FSArray arrayWithRep:copy];
   [copy release];
+  copy = nil;
   return r;
 }
 
