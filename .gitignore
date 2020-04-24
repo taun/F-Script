@@ -19,3 +19,4 @@ profile
 
 ## Ignore temporary files
 *~.nib
+*.original
